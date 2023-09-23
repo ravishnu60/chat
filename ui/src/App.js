@@ -1,23 +1,22 @@
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
+import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
+
+const Login = React.lazy(()=>import('./Pages/Login.js'));
+const Home = React.lazy(()=>import('./Pages/Home.js'));
+const Chat = React.lazy(()=>import('./Pages/Chat.js'));
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="">
+    <BrowserRouter >
+      <Routes>
+      <Route path='/login' element={<Login/>} />
+      <Route path='/home' element={<Home/>} />
+      <Route path='/chat' element={<Chat/>} />
+      <Route path='/' name="" element={<Navigate replace to='/login' />}></Route>
+      </Routes>
+    </BrowserRouter>
     </div>
   );
 }
