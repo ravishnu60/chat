@@ -3,9 +3,21 @@ from fastapi.openapi.utils import get_openapi
 from db import engine
 from Models.model import base
 from Routes import chat
+from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
 base.metadata.create_all(engine)
+
+origins=['*']
+
+app.add_middleware(
+    CORSMiddleware,
+     allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    
+)
 
 @app.get('/')
 def root():
