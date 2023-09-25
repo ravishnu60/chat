@@ -6,7 +6,7 @@ from Routes import chat
 from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
-base.metadata.create_all(engine)
+# base.metadata.drop_all(engine)
 
 origins=['*']
 

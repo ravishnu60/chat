@@ -16,4 +16,5 @@ class Message(base):
     to_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     message= Column(String, nullable= False)
     is_read= Column(Boolean, nullable= False,server_default='false')
+    sent=Column(Boolean,nullable= False, server_default='true')
     createdAt= Column(DateTime, nullable= False, server_default=func.now())

@@ -37,11 +37,14 @@ def login(res:Response, data:OAuth2PasswordRequestForm= Depends(), db:Session=De
     acc_token= token.get_token({"id":get_user.user_id,"name":get_user.name})
     return {"status_code":200,"status":"success","detail":"Logged in successfully","access_token":acc_token,"token_type":"bearer"}
 
+@app.get('/userinfo')
+def userData(res: Response, get_curr_user= Depends(token.get_current_user)):
+    return {"status_code":200,"status":"success","detail":"User found","data":get_curr_user}
 
 @app.get('/find/{phone_no}')
 def findUser(phone_no:int,res: Response, db: Session= Depends(get_DB),get_curr_user= Depends(token.get_current_user)):
     user= db.query(User).filter(User.phone_no == phone_no).first()
-    if not user:
+    if not user or user.user_id == get_curr_user['id']:
         res.status_code= status.HTTP_404_NOT_FOUND
         return {"status_code":404,"status":"failed","detail":"User not found"}
     del user.password
@@ -63,21 +66,22 @@ def getChatList(res: Response, db: Session= Depends(get_DB), get_curr_user= Depe
     get_name= db.query(User).options(load_only('name')).filter(User.user_id.in_(ids)).all()
     return {"status_code":200,"status":"success","detail":"chat found","data":get_name}
 
-@app.get('/prechat/{id}')
+@app.get('/pastchat/{id}')
 def getchat(id:int,res: Response, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
     # update viewed status
     queryobj= db.query(Message).filter(Message.to_id==get_curr_user['id'], Message.from_id==id, Message.is_read==False)
     if queryobj.first():
         queryobj.update({"is_read":True}, synchronize_session= False)
         db.commit()
+    
     #get messages
-    my_msg= db.query(Message).options(load_only('message','is_read','from_id','createdAt')).filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),Message.to_id== get_curr_user['id'])).order_by(Message.createdAt).all()
+    my_msg= db.query(Message).options(load_only('message','is_read','from_id','createdAt')).filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),and_(Message.to_id== get_curr_user['id'],Message.from_id == id))).order_by(Message.createdAt).all()
     for msg in my_msg:
         msg.from_id = msg.from_id == get_curr_user['id']
         
     return {"status_code":200,"status":"success","detail":"chat found","data":my_msg}
     
-@app.post('/chat')
+@app.post('/message')
 def chat(data:MsgSchma, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
     data.from_id=get_curr_user['id']
     msg= Message(**data.dict())
