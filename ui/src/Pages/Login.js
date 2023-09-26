@@ -10,6 +10,7 @@ function Login(props) {
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
   const { register: reg, handleSubmit: regSubmit, formState: { errors: regError }, reset: regReset } = useForm();
   const navigate = useNavigate();
+  const [view,setView] = useState(false);
 
   const submit = (data) => {
     const formdata = new FormData();
@@ -50,6 +51,7 @@ function Login(props) {
       setStep(0);
       reset();
     }
+    setView(false);
   }
   useEffect(() => {
     localStorage.clear();
@@ -78,8 +80,11 @@ function Login(props) {
 
                 <div className="form-outline mb-4">
                   <label className="form-label" >Password</label>
-                  <input type="password" className="form-control "
+                  <div className='input-group'>
+                  <input type={view ?"text": "password"} className="form-control "
                     {...register('password', { required: true })} onFocus={() => { setError(false) }} />
+                    <div className='input-group-text' style={{cursor:'pointer'}} onClick={()=>{setView(!view)}}>{view ? <i className='fa fa-eye'></i> : <i className='fa fa-eye-slash'></i>}</div>
+                  </div>
                   {errors?.password && <div className="text-danger">Password is required</div>}
                 </div>
               </>
@@ -103,8 +108,11 @@ function Login(props) {
 
                 <div className="form-outline mb-4">
                   <label className="form-label" >Password</label>
-                  <input type="password" className="form-control "
+                  <div className='input-group'>
+                  <input type={view ?"text": "password"} className="form-control "
                     {...reg('password', { required: true })} onFocus={() => { setError(false) }} />
+                    <div className='input-group-text' style={{cursor:'pointer'}} onClick={()=>{setView(!view)}}>{view ? <i className='fa fa-eye'></i> : <i className='fa fa-eye-slash'></i>}</div>
+                  </div>
                   {regError?.password && <div className="text-danger">Password is required</div>}
                 </div>
               </>

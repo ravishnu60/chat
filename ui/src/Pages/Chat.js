@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { base_url, permission, requestPermission, userstatus } from '../Utils/Utility';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
