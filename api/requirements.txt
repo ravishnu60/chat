@@ -66,3 +66,4 @@ virtualenv
 watchfiles
 websockets
 zope.interface
+pydantic-settings
