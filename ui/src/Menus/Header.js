@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { userstatus } from '../Utils/Utility';
 import logo from '../Assets/logo.png'
+import { Link } from 'react-router-dom';
 
 function Header(props) {
   const location = useLocation();
@@ -42,7 +43,7 @@ function Header(props) {
           </>
         }
       </div>
-      {user?.name && <div className='text-center h5 mt-2'>Welcome <span className='text-success'><u>{user?.name}</u> </span></div>}
+      {user?.name && <div className='text-center h5 mt-2'>Welcome <Link to='/home' className='text-success'><u>{user?.name}</u> </Link></div>}
     </div>
   )
 }
