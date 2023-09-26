@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router'
 import { userstatus } from '../Utils/Utility';
+import logo from '../Assets/logo.png'
 
 function Header(props) {
   const location = useLocation();
@@ -16,20 +17,32 @@ function Header(props) {
     const data = await userstatus(navigate, header);
     setUser(data?.data)
   }
-  
+
   useEffect(() => {
     setTimeout(() => {
-      if(!(location.pathname =='/login'))
+      if (!(location.pathname == '/login'))
         getUser();
     }, 400);
   }, [props])
   return (
-    <div className='fixed-top text-center p-2 bg-primary text-light d-flex justify-content-between'>
-      <div className=' h4 fw-bold'>Connect</div>
-      <div className='d-flex align-items-center'>
-        {user?.name && <h5 className='mr-3'>Welcome! {user?.name}</h5>}
-        <button className='btn btn-danger' hidden={location.pathname === '/login' ? true : false} onClick={signout}>Sign out</button>
+    <div className='fixed-top'>
+      <div className='text-center p-2 bg-primary text-light d-flex justify-content-between'>
+        {location.pathname === '/login' ?
+          <>
+            <div> </div>
+            <div className=' h4 fw-bold'>Connect <img src={logo} width={25} /></div>
+            <div> </div>
+          </> :
+          <>
+            <div></div>
+            <div className='h5 fw-bold'>Connect <img src={logo} width={25} /> </div>
+            <div className='d-flex align-items-center'>
+              <button className='btn btn-danger' hidden={location.pathname === '/login' ? true : false} onClick={signout}>Sign out</button>
+            </div>
+          </>
+        }
       </div>
+      {user?.name && <div className='text-center h5 mt-2'>Welcome <span className='text-success'><u>{user?.name}</u> </span></div>}
     </div>
   )
 }

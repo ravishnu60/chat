@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useLoaderData, useLocation, useNavigate } from 'react-router-dom';
-import { base_url, userstatus } from '../Utils/Utility';
+import { base_url, permission, requestPermission, userstatus } from '../Utils/Utility';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
+import logo from '../Assets/logo.png'
 
 function Chat() {
   const location = useLocation();
@@ -11,10 +12,25 @@ function Chat() {
   const userData = location.state;
   const [chat, setChat] = useState([]);
   const [scroll, setScroll] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(false);
   const { register, reset, handleSubmit } = useForm();
 
-  const header = { "Authorization": "bearer " + localStorage.getItem('token') }
+  const header = { "Authorization": "bearer " + localStorage.getItem('token') };
+
+  function showNotification(msg) {
+    let title = "Message form "+ userData?.name;
+    let icon = logo;
+    let body = msg;
+
+    let notification = new Notification(title, { body, icon });
+
+    notification.onclick = () => {
+      notification.close();
+      window.parent.focus();
+    }
+
+  }
 
   const continuousAPI = () => {
     axios({
@@ -22,12 +38,21 @@ function Chat() {
       url: `${base_url}/pastchat/${userData?.id}`,
       headers: header
     }).then((res) => {
+      if(chat?.length!==0 && chat?.length != res?.data?.data?.length){
+        if (permission === "granted") {
+          showNotification(res?.data?.data[res?.data?.data?.length-1]?.message);
+        } else if (permission === "default") {
+          requestPermission();
+        }
+      }
       setChat(res.data?.data);
       setScroll(true);
-      setCount(!count)
+      setCount(!count);
+      setLoading(false);
     }).catch((err) => {
       userstatus(navigate, header);
       setChat([]);
+      setLoading(false);
     })
   }
 
@@ -88,12 +113,12 @@ function Chat() {
             //   <div className='border border-primary d-inline-flex p-2 rounded'>{data?.message}</div>
             // </div>
           )}
-          {chat?.length == 0 && <div className=" text-secondary text-center">Start communication</div>}
+          {loading ? <div className=" text-secondary text-center">Loading...</div> : chat?.length == 0 && <div className=" text-secondary text-center">Start communication</div>}
         </div>
       </div>
       <div className='mt-2'>
         <form className='input-group' onSubmit={handleSubmit(sendMsg)}>
-          <input className='form-control border-secondary'
+          <input className='form-control border-secondary' autoComplete='off'
             placeholder='Message here'
             {...register('msg', { required: true })} />
           <button className=' input-group-text p-2 border border-success rounded' type='submit'><i className='fa fa-arrow-right'></i></button>

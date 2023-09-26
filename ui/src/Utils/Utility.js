@@ -1,7 +1,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export const base_url = "http://localhost:8000/chat"
+export const base_url = "http://192.168.1.148:8000/chat"
 
 export const alert = (text, status) => {
     Swal.fire({
@@ -24,3 +24,13 @@ export const userstatus = async (navigate, header) => {
         navigate('/login');
     });
 }
+
+export const permission = Notification.permission;
+
+export  function requestPermission() {
+    Notification.requestPermission(function (permission) {
+      if (permission === "granted") {
+        // showNotification();
+      }
+    });
+  }

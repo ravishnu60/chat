@@ -23,7 +23,7 @@ function Home() {
   }
 
   const newChat =()=>{
-    axios({
+    if(search && search?.toString()?.length >9){axios({
       method: 'get',
       url: `${base_url}/find/${search}`,
       headers: header
@@ -33,7 +33,7 @@ function Home() {
     }).catch((err) => {
       userstatus(navigate, header);
       alert('User not found',false)
-    })
+    })}
   }
 
   useEffect(() => {
@@ -42,18 +42,20 @@ function Home() {
   }, []);
   return (
     <>
-      <div class="input-group mb-2">
+      <div class="input-group">
         <input type="number" value={search} onChange={(e)=>setSearch(e.target.value)} class="form-control" placeholder="Enter mobile no." />
         <div class="input-group-append">
-          <button class="input-group-text" onClick={newChat} ><i className='fa fa-arrow-right text-primary'></i></button>
+          <button class="input-group-text" onClick={newChat} ><i className='fa fa-search text-primary'></i></button>
         </div>
       </div>
-      <div className='list-group'>
+      {search && search?.toString()?.length<10 && <div className='text-danger'>Enter valid number</div>}
+      <div className='list-group mt-2 border border-success rounded' >
         {
-          list?.map((item) => (
+          list?.map((item,index) => (
             <button type="button" 
               onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }} 
-              className="list-group-item list-group-item-info text-left text-dark font-weight-bold text-capitalize ">
+              className="list-group-item text-left text-dark font-weight-bold text-capitalize " 
+              style={index%2==0 ? {background:'linear-gradient(45deg,rgb(101 220 255),#e6fffd'}: {background:'white'}}>
               {item?.name}
             </button>
           ))
