@@ -9,8 +9,8 @@ secret_key= "gcdygfrt89y87r8y dih uicdfkugcd7fesgcuiofe"
 algorithm= 'HS256'
     
 def get_token(data):
-    expire= datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
-    data["exp"]=expire
+    # expire= datetime.datetime.utcnow() + datetime.timedelta(minutes=30)
+    # data["exp"]=expire
     return jwt.encode(data,secret_key,algorithm=algorithm)
 
 def get_current_user(token=Depends(Oauth_token)):

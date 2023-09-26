@@ -9,7 +9,6 @@ function App() {
     <div className="">
       <BrowserRouter >
         <Routes>
-          <Route path='/' element={<Navigate replace to='/login' />} />
           <Route path='*' name="" element={<Layout />} />
         </Routes>
       </BrowserRouter>

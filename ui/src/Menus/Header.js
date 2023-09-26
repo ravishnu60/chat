@@ -12,7 +12,7 @@ function Header(props) {
 
   const signout = () => {
     setUser();
-    navigate('/login');
+    navigate('/');
   }
   const getUser = async () => {
     const data = await userstatus(navigate, header);
@@ -21,14 +21,14 @@ function Header(props) {
 
   useEffect(() => {
     setTimeout(() => {
-      if (!(location.pathname == '/login'))
+      if (!(location.pathname == '/'))
         getUser();
     }, 400);
   }, [props])
   return (
     <div className='fixed-top'>
       <div className='text-center p-2 bg-primary text-light d-flex justify-content-between'>
-        {location.pathname === '/login' ?
+        {location.pathname === '/' ?
           <>
             <div> </div>
             <div className=' h4 fw-bold'>Connect <img src={logo} width={25} /></div>
@@ -38,7 +38,7 @@ function Header(props) {
             <div></div>
             <div className='h5 fw-bold'>Connect <img src={logo} width={25} /> </div>
             <div className='d-flex align-items-center'>
-              <button className='btn btn-danger' hidden={location.pathname === '/login' ? true : false} onClick={signout}>Sign out</button>
+              <button className='btn btn-danger' hidden={location.pathname === '/' ? true : false} onClick={signout}>Sign out</button>
             </div>
           </>
         }

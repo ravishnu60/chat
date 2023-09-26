@@ -1,6 +1,6 @@
 import React, { Suspense, useState } from 'react'
 import Header from './Header'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 
 const Login = React.lazy(() => import('../Pages/Login.js'));
 const Home = React.lazy(() => import('../Pages/Home.js'));
@@ -14,9 +14,10 @@ function Main() {
             <div className=' container-fluid mt-5 py-5'>
                 <Suspense>
                     <Routes>
-                        <Route path='/login' element={<Login setRefresh={setRefresh} />} />
+                        <Route path='/' element={<Login setRefresh={setRefresh} />} />
                         <Route path='/home' element={<Home />} />
                         <Route path='/chat' element={<Chat />} />
+                        <Route path='/*' element={<Navigate replace to='/' />} />
                     </Routes>
                 </Suspense>
             </div>

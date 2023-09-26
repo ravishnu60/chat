@@ -22,7 +22,7 @@ export const userstatus = async (navigate, header) => {
     }).then((res) => {
         return res.data;
     }).catch(() => {
-        navigate('/login');
+        navigate('/');
     });
 }
 
