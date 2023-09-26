@@ -13,13 +13,13 @@ function Chat() {
   const [chat, setChat] = useState([]);
   const [scroll, setScroll] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [count, setCount] = useState(false);
+  const [count, setCount] = useState(false); //for continuous call
   const { register, reset, handleSubmit } = useForm();
 
   const header = { "Authorization": "bearer " + localStorage.getItem('token') };
 
   function showNotification(msg) {
-    let title = "Message form "+ userData?.name;
+    let title = "Message form " + userData?.name;
     let icon = logo;
     let body = msg;
 
@@ -38,20 +38,25 @@ function Chat() {
       url: `${base_url}/pastchat/${userData?.id}`,
       headers: header
     }).then((res) => {
-      if(chat?.length!==0 && chat?.length != res?.data?.data?.length){
+      let temp = res?.data?.data;
+      if (chat?.length !== 0 && chat?.length != temp?.length) {
         if (permission === "granted") {
-          showNotification(res?.data?.data[res?.data?.data?.length-1]?.message);
+          if (!temp[temp?.length - 1]?.from_id) {
+            showNotification(temp[temp?.length - 1]?.message);
+          }
         } else if (permission === "default") {
           requestPermission();
         }
+        setScroll(!scroll);
       }
-      setChat(res.data?.data);
-      setScroll(true);
+      chat?.length==0 && setScroll(true);
+      setChat(temp);
       setCount(!count);
       setLoading(false);
     }).catch((err) => {
       userstatus(navigate, header);
       setChat([]);
+      setCount(!count);
       setLoading(false);
     })
   }
@@ -70,13 +75,11 @@ function Chat() {
         data: temp
       }).then((res) => {
         reset();
-        setScroll(!scroll);
       }).catch((err) => {
 
       });
     }
   }
-
 
   useEffect(() => {
     userstatus(navigate, header);
@@ -85,7 +88,7 @@ function Chat() {
   useEffect(() => {
     setTimeout(() => {
       continuousAPI();
-    }, 800);
+    }, 1000);
   }, [count])
 
   useEffect(() => {
@@ -104,10 +107,14 @@ function Chat() {
             <div className='row p-3' key={index}>
               {data?.from_id ?
                 <>
-                  <div className='col-7'></div>
-                  <div className='col-5 text-right'><div className='border border-primary rounded p-2'>{data?.message}</div><i className='fas fa-sm fa-thumbs-up'></i></div>
+                  <div className='col-7'></div> {/* send */}
+                  <div className='col-5 text-right'><div className='border border-primary rounded p-2'>{data?.message}</div>{data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
                 </>
-                : <div className='col-5 border border-success rounded'><div className='p-1'>{data?.message}</div></div>}
+                :
+                <div className='col-5 border border-success rounded'>{/* receive */}
+                  <div className='p-1'>{data?.message}</div>
+                </div>
+              }
             </div>
             // <div className={data?.from_id ? 'd-flex flex-row-reverse mt-2':'mt-2'}>
             //   <div className='border border-primary d-inline-flex p-2 rounded'>{data?.message}</div>

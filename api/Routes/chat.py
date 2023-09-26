@@ -19,7 +19,7 @@ def newUser(data:userSchma, res:Response, db:Session=Depends(get_DB)):
         res.status_code= status.HTTP_409_CONFLICT
         return {"status_code":409,"status":"failed","detail":"Mobile number already in use"}
     data.password= hash.encrypt(data.password)
-    newUserObj=User(**data.dict()) 
+    newUserObj=User(**data.model_dump()) 
     db.add(newUserObj)
     db.commit()
     db.refresh(newUserObj)
@@ -63,7 +63,7 @@ def getChatList(res: Response, db: Session= Depends(get_DB), get_curr_user= Depe
     ids=[]
     for chat in get_chat:
         ids.append(chat[0])
-    get_name= db.query(User).options(load_only('name')).filter(User.user_id.in_(ids)).all()
+    get_name= db.query(User).options(load_only(User.name)).filter(User.user_id.in_(ids)).all()
     return {"status_code":200,"status":"success","detail":"chat found","data":get_name}
 
 @app.get('/pastchat/{id}')
@@ -75,7 +75,7 @@ def getchat(id:int,res: Response, db: Session= Depends(get_DB), get_curr_user= D
         db.commit()
     
     #get messages
-    my_msg= db.query(Message).options(load_only('message','is_read','from_id','createdAt')).filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),and_(Message.to_id== get_curr_user['id'],Message.from_id == id))).order_by(Message.createdAt).all()
+    my_msg= db.query(Message).options(load_only(Message.message,Message.is_read,Message.from_id,Message.createdAt)).filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),and_(Message.to_id== get_curr_user['id'],Message.from_id == id))).order_by(Message.createdAt).all()
     for msg in my_msg:
         msg.from_id = msg.from_id == get_curr_user['id']
         
@@ -84,7 +84,7 @@ def getchat(id:int,res: Response, db: Session= Depends(get_DB), get_curr_user= D
 @app.post('/message')
 def chat(data:MsgSchma, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
     data.from_id=get_curr_user['id']
-    msg= Message(**data.dict())
+    msg= Message(**data.model_dump())
     db.add(msg)
     db.commit()
     return {"status_code":200,"status":"success","detail":"sent successfully"}
