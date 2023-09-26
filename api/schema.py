@@ -7,7 +7,7 @@ class userSchma(BaseModel):
     password : str
     
 class MsgSchma(BaseModel):
-    from_id:Optional[int]
+    from_id:Optional[int]=0
     to_id:int
     message:str
     is_read:Optional[bool]=False
