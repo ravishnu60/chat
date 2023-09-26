@@ -1,7 +1,8 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 
-export const base_url = "http://192.168.1.148:8000/chat"
+// export const base_url = "http://192.168.1.148:8000/chat";
+export const base_url = "https://chat-api-zu97.onrender.com/chat";
 
 export const alert = (text, status) => {
     Swal.fire({
