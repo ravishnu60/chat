@@ -41,7 +41,7 @@ function Chat() {
       let temp = res?.data?.data;
       if (chat?.length !== 0 && chat?.length != temp?.length) {
         if (permission === "granted") {
-          if (!temp[temp?.length - 1]?.from_id) {
+          if (temp[temp?.length - 1]?.from_id==false) {
             showNotification(temp[temp?.length - 1]?.message);
           }
         } else if (permission === "default") {
