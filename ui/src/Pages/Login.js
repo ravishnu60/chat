@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { alert, base_url } from '../Utils/Utility';
+import { alert, base_url, loadingFunc } from '../Utils/Utility';
 import { useNavigate } from 'react-router-dom';
 
 function Login(props) {
@@ -11,8 +11,10 @@ function Login(props) {
   const { register: reg, handleSubmit: regSubmit, formState: { errors: regError }, reset: regReset } = useForm();
   const navigate = useNavigate();
   const [view,setView] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const submit = (data) => {
+    setLoading(true);
     const formdata = new FormData();
     formdata.append('username', data.username);
     formdata.append('password', data.password);
@@ -22,14 +24,17 @@ function Login(props) {
       setTimeout(() => {
         navigate('/home');
         props.setRefresh(0);
+    setLoading(false);
       }, 300);
 
     }).catch(() => {
       setError(true);
+    setLoading(false);
     })
   }
 
   const registerNew = (data) => {
+    setLoading(true);
     axios({
       method: 'POST',
       url: `${base_url}/new`,
@@ -38,8 +43,9 @@ function Login(props) {
       alert('Registered successfully', true);
       setStep(0);
       reset();
+    setLoading(false);
     }).catch((err) => {
-
+      setLoading(false);
     });
   }
 
@@ -55,10 +61,12 @@ function Login(props) {
   }
   useEffect(() => {
     localStorage.clear();
+    Notification.requestPermission();
   }, [])
 
   return (
     <div className='mt-5'>
+          {loadingFunc(loading)}
       <div className="row d-flex align-items-center justify-content-center">
         {/* <div className="col-lg-4 col-0">
               <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.svg"

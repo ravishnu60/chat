@@ -6,6 +6,7 @@ from Authorize import hash, token
 from Models.model import User, Message
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import or_,and_
+import datetime
 
 app= APIRouter(
     prefix='/chat',
@@ -52,34 +53,84 @@ def findUser(phone_no:int,res: Response, db: Session= Depends(get_DB),get_curr_u
 
 @app.get('/chatlist')
 def getChatList(res: Response, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
-    sent_chat= db.query(Message.to_id).order_by(Message.msg_id.desc()).filter(Message.from_id == get_curr_user['id']).all()
-    receive_chat= db.query(Message.from_id).order_by(Message.msg_id.desc()).filter(Message.to_id == get_curr_user['id']).all()
-    get_chat= sent_chat+receive_chat
-    
+    get_chat= db.query(Message.from_id,Message.to_id,Message.is_read)\
+        .order_by(Message.msg_id.desc())\
+            .filter(or_(Message.from_id == get_curr_user['id'],Message.to_id == get_curr_user['id'])).all()
+
     if not get_chat:
         res.status_code= status.HTTP_404_NOT_FOUND
         return {"status_code":404,"status":"failed","detail":"No chats"}
+
+    latest_text= db.query(Message)
     
     ids=[]
+    newtext={}
+    #get ids and new messgae count
     for chat in get_chat:
-        ids.append(chat[0])
-    get_name= db.query(User).options(load_only(User.name)).filter(User.user_id.in_(ids)).all()
+        id=0
+        if chat[0] == get_curr_user['id']:
+            id=chat[1]
+        elif chat[1]== get_curr_user['id']:
+            id=chat[0]
+            if chat[2]==False and str(id) in newtext:
+                newtext[str(id)]+=1
+            elif chat[2]==False:
+                newtext[str(id)]=1
+            
+        if id not in ids:
+            ids.append(id)
+            
+        if str(id) not in newtext:
+            newtext[str(id)]=0
+    
+    
+    get_name=[]
+    for id in ids:
+        temp= db.query(User).options(load_only(User.name)).filter(User.user_id==id).first()
+        temp.newmsg=newtext[str(id)]
+        get_name.append(temp)
+    
+    # get_name= db.query(User).options(load_only(User.name)).filter(User.user_id.in_(ids)).all()
     return {"status_code":200,"status":"success","detail":"chat found","data":get_name}
 
-@app.get('/pastchat/{id}')
-def getchat(id:int,res: Response, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
+@app.get('/pastchat')
+def getchat(id:int,res: Response,limit:int=10, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
     # update viewed status
     queryobj= db.query(Message).filter(Message.to_id==get_curr_user['id'], Message.from_id==id, Message.is_read==False)
     if queryobj.first():
         queryobj.update({"is_read":True}, synchronize_session= False)
         db.commit()
     
-    #get messages
-    my_msg= db.query(Message).options(load_only(Message.message,Message.is_read,Message.from_id,Message.createdAt)).filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),and_(Message.to_id== get_curr_user['id'],Message.from_id == id))).order_by(Message.createdAt).all()
+    #get messages latest 10
+    my_msg= db.query(Message)\
+        .options(load_only(Message.message,Message.is_read,Message.from_id,Message.createdAt))\
+        .filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),
+                    and_(Message.to_id== get_curr_user['id'],Message.from_id == id)))\
+        .order_by(Message.createdAt.desc()).limit(10).all()
+    aligned_msg=[]
+    temp_date=None
+    #Add Date in list
     for msg in my_msg:
+        if temp_date==None:
+            temp_date= msg.createdAt.strftime('%d/%m/%Y')
+            
+        if temp_date != msg.createdAt.strftime('%d/%m/%Y'):
+            aligned_msg.append({"date":temp_date})
+            temp_date= msg.createdAt.strftime('%d/%m/%Y')
+            
         msg.from_id = msg.from_id == get_curr_user['id']
+        msg.createdAt= msg.createdAt.strftime('%I:%M %p')
+        aligned_msg.append(msg)
+    
+    #insert latest date into list
+    aligned_msg.append({"date":temp_date})
         
-    return {"status_code":200,"status":"success","detail":"chat found","data":my_msg}
+    my_msg= aligned_msg.copy()
+    aligned_msg.clear()
+    for num in range(len(my_msg)):
+        aligned_msg.append(my_msg[len(my_msg)-(num+1)])
+    
+    return {"status_code":200,"status":"success","detail":"chat found","data":aligned_msg}
     
 @app.post('/message')
 def chat(data:MsgSchma, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
