@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, Response, status
+import pytz
 from db import get_DB
 from sqlalchemy.orm import Session, load_only
 from schema import userSchma, MsgSchma
@@ -111,6 +112,7 @@ def getchat(id:int,res: Response,limit:int=10, db: Session= Depends(get_DB), get
     temp_date=None
     #Add Date in list
     for msg in my_msg:
+        msg.createdAt= msg.createdAt.astimezone(pytz.timezone('Asia/Kolkata'))
         if temp_date==None:
             temp_date= msg.createdAt.strftime('%d/%m/%Y')
             
