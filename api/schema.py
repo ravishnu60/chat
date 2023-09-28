@@ -11,4 +11,9 @@ class MsgSchma(BaseModel):
     to_id:int
     message:str
     is_read:Optional[bool]=False
+
+class TypingSchema(BaseModel):
+    from_id:Optional[int]=0
+    to_id:int
+    typing:bool
     

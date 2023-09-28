@@ -52,7 +52,7 @@ export function showNotification(title, body) {
 
 export const loadingFunc = (status) => {
     if (status) {
-        return (<div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
+        return (<div style={{ zIndex:9999, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
             <img src={loading_gif} width={100} />
         </div>)
     }

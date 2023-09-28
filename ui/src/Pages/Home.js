@@ -10,11 +10,11 @@ function Home() {
   const [update, setUpdate] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const header = { "Authorization": "bearer " + localStorage.getItem('token') }
 
   const getchatlist = () => {
-    list?.length==0 && setLoading(true);
+    list?.length == 0 && setLoading(true);
     axios({
       method: 'get',
       url: `${base_url}/chatlist`,
@@ -28,9 +28,9 @@ function Home() {
             popup = true;
         });
       }
-      popup && showNotification(`Hi ${user?.name}`,'New Message arrived');
+      popup && showNotification(`Hi ${user?.name}`, 'New Message arrived');
       setUpdate(!update);
-    list?.length==0 && setLoading(false);
+      list?.length == 0 && setLoading(false);
       setList(temp);
     }).catch((err) => {
       userstatus(navigate, header);
@@ -72,8 +72,8 @@ function Home() {
   }, [update]);
   return (
     <>
+      {loadingFunc(loading)}
       <div class="input-group">
-        {loadingFunc(loading)}
         <input type="number" value={search} onChange={(e) => setSearch(e.target.value)} class="form-control" placeholder="Enter mobile no." />
         <div class="input-group-append">
           <button class="input-group-text" onClick={newChat} ><i className='fa fa-search text-primary'></i></button>
@@ -94,7 +94,7 @@ function Home() {
             </div>
           ))
         }
-        {list?.length == 0 && <div className='text-center text-secondary h4'>No chats</div>}
+        {(list?.length == 0 && !loading) && <div className='text-center text-secondary h4'>No chats</div>}
       </div>
     </>
   )

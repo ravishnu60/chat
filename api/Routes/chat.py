@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, Response, status
 import pytz
 from db import get_DB
 from sqlalchemy.orm import Session, load_only
-from schema import userSchma, MsgSchma
+from schema import userSchma, MsgSchma, TypingSchema
 from Authorize import hash, token
-from Models.model import User, Message
+from Models.model import User, Message, Typing
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import or_,and_
 import datetime
@@ -107,7 +107,7 @@ def getchat(id:int,res: Response,limit:int=10, db: Session= Depends(get_DB), get
         .options(load_only(Message.message,Message.is_read,Message.from_id,Message.createdAt))\
         .filter(or_(and_(Message.from_id== get_curr_user['id'], Message.to_id==id),
                     and_(Message.to_id== get_curr_user['id'],Message.from_id == id)))\
-        .order_by(Message.createdAt.desc()).limit(10).all()
+        .order_by(Message.createdAt.desc()).limit(limit).all()
     aligned_msg=[]
     temp_date=None
     #Add Date in list
@@ -132,7 +132,14 @@ def getchat(id:int,res: Response,limit:int=10, db: Session= Depends(get_DB), get
     for num in range(len(my_msg)):
         aligned_msg.append(my_msg[len(my_msg)-(num+1)])
     
-    return {"status_code":200,"status":"success","detail":"chat found","data":aligned_msg}
+    #send typing status
+    type_status= db.query(Typing.typing).filter(Typing.to_id==get_curr_user['id'], Typing.from_id==id).first()
+    if not type_status:
+        type_status= {"typing":False}
+    else:
+        type_status= {"typing":type_status[0]}     
+    
+    return {"status_code":200,"status":"success","detail":"chat found","data":{"message":aligned_msg,**type_status}}
     
 @app.post('/message')
 def chat(data:MsgSchma, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
@@ -150,4 +157,19 @@ def markAsRead(sender_id:int, res: Response, db: Session= Depends(get_DB), get_c
         return {"status_code":404,"status":"failed","detail":"No Messages"}
     queryobj.update({"is_read":True}, synchronize_session= False)
     db.commit()
+    return {"status_code":200,"status":"success","detail":"status changed"}
+
+@app.put("/typing")
+def typingStatus(data:TypingSchema,db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
+    data.from_id= get_curr_user['id']
+    query= db.query(Typing).filter(Typing.from_id==get_curr_user['id'], Typing.to_id==data.to_id)
+    print(data.typing != query.first().typing)
+    if data.typing != query.first().typing:
+        if query.first():
+            query.update({"typing":data.typing}, synchronize_session=False)
+            db.commit()
+        else:
+            newData= Typing(**data.model_dump())
+            db.add(newData)
+            db.commit()
     return {"status_code":200,"status":"success","detail":"status changed"}
