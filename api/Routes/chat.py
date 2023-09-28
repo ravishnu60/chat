@@ -163,13 +163,13 @@ def markAsRead(sender_id:int, res: Response, db: Session= Depends(get_DB), get_c
 def typingStatus(data:TypingSchema,db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
     data.from_id= get_curr_user['id']
     query= db.query(Typing).filter(Typing.from_id==get_curr_user['id'], Typing.to_id==data.to_id)
-    print(data.typing != query.first().typing)
-    if data.typing != query.first().typing:
-        if query.first():
+    
+    if query.first():
+        if data.typing != query.first().typing:
             query.update({"typing":data.typing}, synchronize_session=False)
             db.commit()
-        else:
-            newData= Typing(**data.model_dump())
-            db.add(newData)
-            db.commit()
+    else:
+        newData= Typing(**data.model_dump())
+        db.add(newData)
+        db.commit()
     return {"status_code":200,"status":"success","detail":"status changed"}
