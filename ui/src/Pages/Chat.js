@@ -45,7 +45,6 @@ function Chat() {
       }
       //align div for prev chat view
       if (chat?.message?.length !== undefined && chat?.message?.length !== temp?.message?.length) {
-        console.log(tempEle.scrollHeight);
         limit != 10 && divEle?.scrollTo(0,tempEle.scrollHeight*5+25)
       }
       chat == undefined && setScroll(true);
@@ -155,8 +154,8 @@ function Chat() {
             <div className='row p-3' key={index} id={`first${index}`}>
               {data?.from_id ?
                 <>
-                  <div className='col-7'></div> {/* send */}
-                  <div className='col-5'>
+                  <div className='col-5'></div> {/* send */}
+                  <div className='col-7'>
                     <div className='d-flex flex-row-reverse '>
                       <div className='border border-primary rounded p-2'>{data?.message}</div>
                     </div>
@@ -165,7 +164,7 @@ function Chat() {
                 </>
                 :
                 <>{data?.from_id == false ?
-                  <div className='col-5'>{/* receive */}
+                  <div className='col-7'>{/* receive */}
                     <div className='d-flex'>
                       <div className='border border-primary rounded p-2'>{data?.message}</div>
                     </div>
