@@ -1,0 +1,20 @@
+.list-group-item{
+    background-color: #b1eea238 !important ;
+    /* color: #3efaff !important; */
+}
+
+.input-group-text{
+    background-color: #ffffff00 !important;
+    border-left: none;
+    border-color: #000000 !important;
+    border-radius: 0px 4px 4px 0px;
+}
+
+input, .form-control{
+    background-color: #ffffff00 !important;
+    border-color: #000000 !important;
+}
+
+.input-send{
+    background-color: rgb(51, 255, 0) !important;
+}

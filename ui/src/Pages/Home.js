@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { alert, base_url, loadingFunc, showNotification, userstatus } from '../Utils/Utility';
 import axios from 'axios';
-import Chat from './Chat';
+import '../Style/style.css'
 
 function Home() {
   const [list, setList] = useState([]);
@@ -87,8 +87,9 @@ function Home() {
               onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}
               className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between"
               style={index % 2 == 0 ?
-                { background: 'linear-gradient(45deg,rgb(101 220 255),#e6fffd', cursor: 'pointer' } :
-                { background: 'white', cursor: 'pointer' }}>
+                { background: 'linear-gradient(45deg, #65dcff8f, #e6fffb00)', cursor: 'pointer' } :
+                { background: 'white', cursor: 'pointer' }}
+                >
               <div>{item?.name}</div>
               {item?.newmsg !== 0 && <div className='bg-info text-light px-2 rounded'>{item?.newmsg}</div>}
             </div>
