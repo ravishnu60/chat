@@ -15,19 +15,25 @@ function Chat() {
   const [scroll, setScroll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(false); //for continuous call
-  const { register, reset, handleSubmit, getValues } = useForm();
+  const { register, reset, handleSubmit } = useForm();
   const [limit, setLimit] = useState(10);
+  // const [preload, setPreload] = useState(false);
+
+  //scroll element
+  const divEle = document.getElementById('chatDiv');
 
   const header = { "Authorization": "bearer " + localStorage.getItem('token') };
 
   const continuousAPI = () => {
+    let tempEle= document.getElementById('first0')
     axios({
       method: 'get',
       url: `${base_url}/pastchat?id=${userData?.id}&limit=${limit}`,
       headers: header
     }).then((res) => {
       let temp = res?.data?.data;
-      if (chat?.message?.length !== 0 && chat?.message?.[chat?.message?.length - 1]?.message != temp?.message?.[temp?.message?.length - 1]?.message) {
+      //chek new msg for alert and scroll
+      if (chat?.message?.length !== undefined && chat?.message?.[chat?.message?.length - 1]?.message != temp?.message?.[temp?.message?.length - 1]?.message) {
         if (permission === "granted") {
           if (temp?.message?.[temp?.message?.length - 1]?.from_id == false) {
             showNotification(`Message from ${userData?.name}`, temp?.message[temp?.message?.length - 1]?.message);
@@ -37,10 +43,17 @@ function Chat() {
         }
         setScroll(!scroll);
       }
-      chat== undefined && setScroll(true);
+      //align div for prev chat view
+      if (chat?.message?.length !== undefined && chat?.message?.length !== temp?.message?.length) {
+        console.log(tempEle.scrollHeight);
+        limit != 10 && divEle?.scrollTo(0,tempEle.scrollHeight*5+25)
+      }
+      chat == undefined && setScroll(true);
       setChat(temp);
       setCount(!count);
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 200);
     }).catch((err) => {
       userstatus(navigate, header);
       setChat();
@@ -72,30 +85,30 @@ function Chat() {
     }
   }
 
-  const markasread=()=>{
+  const markasread = () => {
     axios({
-      method:'put',
+      method: 'put',
       url: `${base_url}/markasread/${userData?.id}`,
-      header:header
-    }).then(res=>{
+      headers: header,
+    }).then(res => {
 
-    }).catch(err=>{
+    }).catch(err => {
 
     });
   }
 
-  const typing=(status,val)=>{
-    if (!val){
-      status= false;
+  const typing = (status, val) => {
+    if (!val) {
+      status = false;
     }
     axios({
-      method:'put',
+      method: 'put',
       url: `${base_url}/typing`,
-      data:{to_id:userData?.id,typing:status},
-      headers:header
-    }).then(res=>{
+      data: { to_id: userData?.id, typing: status },
+      headers: header
+    }).then(res => {
       // console.log(res.data);
-    }).catch(err=>{});
+    }).catch(err => { });
   }
 
   //initialize the call
@@ -112,16 +125,21 @@ function Chat() {
     }, 1000);
   }, [count])
 
+
   //UseEffect to scroll end
   useEffect(() => {
-    chat?.message?.length !== 0 && document.getElementById('chatDiv')?.scrollTo(0, document.getElementById('chatDiv')?.scrollHeight);
-  }, [scroll, chat?.typing==true])
+    chat?.message?.length !== 0 && divEle?.scrollTo(0, divEle?.scrollHeight);
+  }, [scroll, chat?.typing == true])
 
   // console.log(document.getElementById(`date${chat.length}`)?.scrollHeight)
 
-  document.getElementById('chatDiv')?.addEventListener('scroll',()=>{
-    console.log(document.getElementById('chatDiv')?.scrollHeight,document.getElementById('chatDiv')?.scrollTop);
-    document.getElementById('chatDiv')?.scrollTop==0 && setLimit(15)
+  divEle?.addEventListener('scroll', () => {
+    console.log(divEle.scrollTop + divEle.offsetHeight, divEle.scrollHeight);
+    if (divEle?.scrollTop == 0) {
+      setLimit(limit + 5);
+      setLoading(true);
+    }
+    divEle.scrollTop + divEle.offsetHeight == divEle?.scrollHeight && setLimit(10)
   })
 
   return (
@@ -134,7 +152,7 @@ function Chat() {
         </div>
         <div id="chatDiv" className='p-2' style={{ maxHeight: '60vh', overflowX: 'hidden', overflowY: 'auto' }}>
           {chat?.message?.map((data, index) =>
-            <div className='row p-3' key={index}>
+            <div className='row p-3' key={index} id={`first${index}`}>
               {data?.from_id ?
                 <>
                   <div className='col-7'></div> {/* send */}
@@ -153,19 +171,19 @@ function Chat() {
                     </div>
                     <div className='small' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
 
-                  </div> : <div id={`date${index+1}`} className='col-10 offset-1 text-center font-weight-bold '>{data?.date}</div>}</>
+                  </div> : <div className='col-10 offset-1 text-center font-weight-bold '>{data?.date}</div>}</>
               }
             </div>
           )}
-          {loading ? <div className=" text-secondary text-center">Loading...</div> : chat==undefined && <div className=" text-secondary text-center">Start communication</div>}
-      {chat?.typing && <img src={typing_gif} width={30}/>}
+          {loading ? <div className=" text-secondary text-center">Loading...</div> : chat == undefined && <div className=" text-secondary text-center">Start communication</div>}
+          {chat?.typing && <img src={typing_gif} width={30} />}
         </div>
       </div>
       <div className='mt-2'>
         <form className='input-group' onSubmit={handleSubmit(sendMsg)}>
           <input className='form-control border-secondary' autoComplete='off'
             placeholder='Message here'
-            {...register('msg', { required: true,onChange:(e)=>{typing(true,e.target.value)},onBlur:()=>{typing(false)} })} />
+            {...register('msg', { required: true, onChange: (e) => { typing(true, e.target.value) }, onBlur: () => { typing(false) } })} />
           <button className=' input-group-text p-2 border border-success rounded' type='submit'><i className='fa fa-arrow-right'></i></button>
         </form>
       </div>

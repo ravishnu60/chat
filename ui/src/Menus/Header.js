@@ -27,7 +27,7 @@ function Header(props) {
   }, [props])
   return (
     <div className='fixed-top'>
-      <div className='text-center p-2 bg-primary text-light d-flex justify-content-between'>
+      <div className='text-center p-2 bg-primary text-light d-flex justify-content-between align-items-center'>
         {location.pathname === '/' ?
           <>
             <div> </div>
