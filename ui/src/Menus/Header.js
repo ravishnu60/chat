@@ -43,7 +43,7 @@ function Header(props) {
           </>
         }
       </div>
-      {user?.name && <div className='text-center h5 p-1'>Welcome <Link to='/home' className='text-success'><u>{user?.name}</u> </Link></div>}
+      {user?.name && <div className='text-center h4'>Welcome <Link to='/home' className='text-success'><u>{user?.name}</u> </Link></div>}
     </div>
   )
 }

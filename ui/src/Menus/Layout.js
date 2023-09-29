@@ -11,7 +11,7 @@ function Main() {
     return (
         <div>
             <Header loader={refresh} />
-            <div className=' container-fluid mt-5 py-5'>
+            <div className=' container-fluid mt-5 pt-5'>
                 <Suspense>
                     <Routes>
                         <Route path='/' element={<Login setRefresh={setRefresh} />} />

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { alert, base_url, loadingFunc, showNotification, userstatus } from '../Utils/Utility';
 import axios from 'axios';
-import '../Style/style.css'
+import '../Style/style.css';
 
 function Home() {
   const [list, setList] = useState([]);
@@ -85,9 +85,9 @@ function Home() {
           list?.map((item, index) => (
             <div
               onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}
-              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between"
+              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between border-bottom-0"
               style={index % 2 == 0 ?
-                { background: 'linear-gradient(45deg, #65dcff8f, #e6fffb00)', cursor: 'pointer' } :
+                { background: 'linear-gradient(45deg, #efff658f, #e6fffb00)', cursor: 'pointer' } :
                 { background: 'white', cursor: 'pointer' }}
                 >
               <div>{item?.name}</div>
