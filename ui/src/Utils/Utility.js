@@ -37,18 +37,28 @@ export function requestPermission() {
         }
     });
 }
+navigator?.serviceWorker?.register('sw.js');
 
 export function showNotification(title, body) {
     let icon = logo;
 
-    let notification = new Notification(title, { body, icon });
+    // let notification = new Notification(title, { body, icon });
 
-    notification.onclick = () => {
-        notification.close();
-        window.parent.focus();
-    }
+    // notification.onclick = () => {
+    //     notification.close();
+    //     window.parent.focus();
+    // }
+
+    Notification.requestPermission(function(result) {
+        if (result === 'granted') {
+          navigator.serviceWorker.ready.then(function(registration) {
+            registration.showNotification(title, { body, icon });
+          });
+        }
+      });
 
 }
+
 
 export const loadingFunc = (status) => {
     if (status) {
