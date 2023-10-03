@@ -7,7 +7,7 @@ const Login = React.lazy(() => import('./Pages/Login.js'));
 
 function App() {
   return (
-    <div className="">jnythnty
+    <div className="min vh-100">jnythnty
       <HashRouter >
         <Routes>
           <Route path='/login' name="login" element={<Login />} />
