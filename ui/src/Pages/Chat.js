@@ -191,7 +191,7 @@ function Chat() {
           <input className='form-control border-secondary p-2 mx-2' autoComplete='off'
             placeholder='Message here'
             {...register('msg', { required: true, onChange: (e) => { typing(true, e.target.value) }, onBlur: () => { typing(false) } })} />
-          <button className='btn' style={{rotate:'330deg'}} type='submit' title='Send'>
+          <button className='btn btn-link' style={{rotate:'330deg'}} type='submit' title='Send'>
             {getValues('msg') ? <img src={sendIcon} width={40} /> : <img src={sendIcon1} width={40} />}
           </button>
         </form>
