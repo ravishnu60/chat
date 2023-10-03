@@ -34,7 +34,7 @@ function Header(props) {
           <button className='btn btn-danger' hidden={location.pathname === '/login' ? true : false} onClick={signout}>Sign out</button>
         </div>
       </div>
-      {user?.name && <div className='text-center h4'>Welcome <Link to='/home' className='text-success'><u>{user?.name}</u> </Link></div>}
+      {user?.name && <div className='text-center bg-white h4'>Welcome <Link to='/home' className='text-success'><u>{user?.name}</u> </Link></div>}
     </div>
   )
 }

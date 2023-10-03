@@ -28,40 +28,26 @@ export const userstatus = async (navigate, header) => {
     });
 }
 
-export const permission = Notification.permission;
+export const permission = '' // Notification.permission;
 
 export function requestPermission() {
-    Notification.requestPermission(function (permission) {
-        if (permission === "granted") {
-            // showNotification();
-        }
-    });
+    // Notification.requestPermission(function (permission) {
+    //     if (permission === "granted") {
+    //         // showNotification();
+    //     }
+    // });
 }
 
-navigator?.serviceWorker?.register('sw.js');
+// navigator?.serviceWorker?.register('sw.js');
 
 export function showNotification(title, body) {
     let icon = logo;
 
-    let notification = new Notification(title, { body, icon });
-    notification.onclick = () => {
-        notification.close();
-        window.parent.focus();
-    }
-
-
-
-    // Notification.requestPermission(function (result) {
-    //     if (result === 'granted') {
-    //         navigator.serviceWorker.ready.then(function (registration) {
-    //             let notification = registration.showNotification(title, { body, icon });
-    //             notification.onclick = () => {
-    //                 notification.close();
-    //                 window.parent.focus();
-    //             }
-    //         });
-    //     }
-    // });
+    // let notification = new Notification(title, { body, icon });
+    // notification.onclick = () => {
+    //     notification.close();
+    //     window.parent.focus();
+    // }
 
 }
 

@@ -38,7 +38,7 @@ function Chat() {
       if (chat?.message?.length !== undefined && chat?.message?.[chat?.message?.length - 1]?.message != temp?.message?.[temp?.message?.length - 1]?.message) {
         if (permission === "granted") {
           if (temp?.message?.[temp?.message?.length - 1]?.from_id == false) {
-            showNotification(`Message from ${userData?.name}`, temp?.message[temp?.message?.length - 1]?.message);
+            // showNotification(`Message from ${userData?.name}`, temp?.message[temp?.message?.length - 1]?.message);
           }
         } else if (permission === "default") {
           requestPermission();
