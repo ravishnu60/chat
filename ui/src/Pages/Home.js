@@ -3,15 +3,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { alert, base_url, loadingFunc, showNotification, userstatus } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
+import findperson from '../Assets/find-person.png'
+import { useForm } from 'react-hook-form';
 
 function Home() {
   const [list, setList] = useState([]);
-  const [search, setSearch] = useState();
   const [update, setUpdate] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const header = { "Authorization": "bearer " + localStorage.getItem('token') }
+  const { register, formState: { errors }, reset, handleSubmit, } = useForm();
+
 
   const getchatlist = () => {
     list?.length == 0 && setLoading(true);
@@ -34,19 +37,20 @@ function Home() {
       setList(temp);
     }).catch((err) => {
       userstatus(navigate, header);
-      setList([]);
+      // setList([]);
       setLoading(false);
     })
   }
 
-  const newChat = () => {
+  const newChat = (data) => {
+    const search = data.search;
     if (search && search?.toString()?.length > 9) {
       axios({
         method: 'get',
         url: `${base_url}/find/${search}`,
         headers: header
       }).then((res) => {
-        setSearch();
+        reset();
         navigate('/chat', { state: { id: res?.data?.data?.user_id, name: res?.data?.data?.name } })
       }).catch((err) => {
         userstatus(navigate, header);
@@ -73,23 +77,31 @@ function Home() {
   return (
     <>
       {loadingFunc(loading)}
-      <div class="input-group">
-        <input type="number" value={search} onChange={(e) => setSearch(e.target.value)} class="form-control" placeholder="Enter mobile no." />
-        <div class="input-group-append">
-          <button class="input-group-text" onClick={newChat} ><i className='fa fa-search text-primary'></i></button>
+      <form onSubmit={handleSubmit(newChat)}>
+        <div class="input-group">
+          <input type="number" class="form-control"
+            autoComplete='off'
+            placeholder="Enter mobile no."
+            {...register('search', {required:true, minLength: 10 })}
+            aria-invalid={errors?.password ? "true" : "false"}
+          />
+          <div class="input-group-append">
+            <button class="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} /></button>
+          </div>
         </div>
-      </div>
-      {search && search?.toString()?.length < 10 && <div className='text-danger'>Enter valid number</div>}
+        {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
+      </form>
+
       <div className='list-group mt-2 border border-success rounded' >
         {
           list?.map((item, index) => (
             <div
               onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}
-              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between border-bottom-0"
-              style={index % 2 == 0 ?
-                { background: 'linear-gradient(45deg, #efff658f, #e6fffb00)', cursor: 'pointer' } :
-                { background: 'white', cursor: 'pointer' }}
-                >
+              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between border-bottom-5"
+            // style={index % 2 == 0 ?
+            //   { background: 'linear-gradient(45deg, #65deff8f, #e6fffb00)', cursor: 'pointer' } :
+            //   { background: 'linear-gradient(45deg, #65deff8f, #e6fffb00)', cursor: 'pointer' }}
+            >
               <div>{item?.name}</div>
               {item?.newmsg !== 0 && <div className='bg-info text-light px-2 rounded'>{item?.newmsg}</div>}
             </div>

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import typing_gif from '../Assets/typing.gif';
 import '../Style/style.css';
 import sendIcon from '../Assets/send.gif';
+import sendIcon1 from '../Assets/send.png';
 
 function Chat() {
   const location = useLocation();
@@ -16,7 +17,7 @@ function Chat() {
   const [scroll, setScroll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [count, setCount] = useState(false); //for continuous call
-  const { register, reset, handleSubmit } = useForm();
+  const { register, reset, handleSubmit, getValues } = useForm();
   const [limit, setLimit] = useState(10);
   // const [preload, setPreload] = useState(false);
 
@@ -145,7 +146,7 @@ function Chat() {
   return (
     <div className='container'>
       {loadingFunc(loading)}
-      <div className='border border-info rounded' style={{ backgroundColor: '#77ffc847' }}>
+      <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
         <div className='d-flex justify-content-between align-items-center text-light' style={{ backgroundColor: '#ff5586' }}>
           <div className='ml-3 h4'>{userData?.name}</div>
           <button className='btn btn-info text-right' title='Back' onClick={() => { navigate('/home') }}>
@@ -181,17 +182,17 @@ function Chat() {
               }
             </div>
           )}
-          {loading ? <div className=" text-secondary text-center">Loading...</div> : chat == undefined && <div className=" text-secondary text-center">Start communication</div>}
+          {loading ? <div className=" text-secondary text-center">Loading...</div> : chat == undefined && <div className=" text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={30} />}
         </div>
       </div>
       <div className='mt-2'>
-        <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
+        <form className='d-flex align-items-end' onSubmit={handleSubmit(sendMsg)}>
           <input className='form-control border-secondary p-2 mx-2' autoComplete='off'
             placeholder='Message here'
             {...register('msg', { required: true, onChange: (e) => { typing(true, e.target.value) }, onBlur: () => { typing(false) } })} />
-          <button className='btn' type='submit' title='Send'>
-            <img src={sendIcon} width={40} />
+          <button className='btn' style={{rotate:'330deg'}} type='submit' title='Send'>
+            {getValues('msg') ? <img src={sendIcon} width={40} /> : <img src={sendIcon1} width={40} />}
           </button>
         </form>
       </div>
