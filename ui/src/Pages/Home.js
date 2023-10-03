@@ -65,6 +65,7 @@ function Home() {
   }
 
   useEffect(() => {
+    Notification.requestPermission();
     getchatlist();
     getUser();
   }, []);

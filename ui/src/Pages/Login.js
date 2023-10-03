@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import '../Style/style.css';
 import logo from '../Assets/logo.png'
 
-function Login(props) {
+function Login() {
   const [error, setError] = useState(false);
   const [step, setStep] = useState(0);
   const { register, handleSubmit, formState: { errors }, reset } = useForm();
@@ -25,7 +25,6 @@ function Login(props) {
       localStorage.setItem('token', res.data.access_token);
       setTimeout(() => {
         navigate('/home');
-        // props.setRefresh(0);
         setLoading(false);
       }, 300);
 
@@ -61,11 +60,7 @@ function Login(props) {
     }
     setView(false);
   }
-  useEffect(() => {
-    localStorage.clear();
-    Notification.requestPermission();
-  }, [])
-
+  
   return (
     <div>
       <div className='fixed-top'>
