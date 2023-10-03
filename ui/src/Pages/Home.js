@@ -31,7 +31,7 @@ function Home() {
             popup = true;
         });
       }
-      // popup && showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
+      popup && showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
       setUpdate(!update);
       list?.length == 0 && setLoading(false);
       setList(temp);
