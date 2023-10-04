@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import logo from '../Assets/logo.png'
 import loading_gif from '../Assets/loading1.gif'
 
-// export const base_url = "http://192.168.1.148:8000/chat";
+// export const base_url = "http://127.0.0.1:8000/chat";
 export const base_url = "https://chat-api-zu97.onrender.com/chat";
 
 export const alert = (text, status) => {

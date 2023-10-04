@@ -129,10 +129,10 @@ function Home() {
               key={index}
               className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 border-bottom-0"
             >
-              <div className='col-11' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
+              <div className='col-lg-11 col-10' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
                 <img src={profile} width={40} className='mr-3' /> {item?.name}
               </div>
-              <div className='col-1 text-right'>
+              <div className='col-lg-1 col-2 text-right'>
                 {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 rounded'>{item?.newmsg}</span>}
                 <button className='btn btn-link messagedel' title='delete chat' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
               </div>
