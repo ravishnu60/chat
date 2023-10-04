@@ -28,7 +28,7 @@ export const userstatus = async (navigate, header) => {
     });
 }
 
-export const permission =  window.Notification?.permission;
+export const permission = window.Notification?.permission;
 
 export function requestPermission() {
     window.Notification.requestPermission(function (permission) {
@@ -50,7 +50,7 @@ export function showNotification(title, body) {
     }
 
     // navigator.serviceWorker.ready.then(function(registration) {
-    //     registration.showNotification(title, { body, icon }).then((result) => {window.parent?.focus()})
+    //     registration.showNotification(title, { body, icon })
     //   });
 
 }

@@ -28,9 +28,20 @@ input, .form-control{
     cursor: pointer;
     margin-left: 3px;
     margin-bottom: 1px;
-    color: #be9191;
+    color: #be919188;
 }
 
 .messagedel:hover{
     color: #ff4545;
+}
+
+.hoverRow:hover{
+    color: #f87204 !important;
+    background-color: #32e0ff34 !important;
+    
+}
+
+.hoverRow:hover .messagedel{
+    color: #ff4545 !important;
+    
 }

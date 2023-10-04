@@ -71,20 +71,20 @@ function Home() {
   const deleteChat = (id) => {
     Swal.fire({
       text: 'Are you sure you want to delete ?',
-      icon:'question',
+      icon: 'question',
       showCancelButton: true,
-      reverseButtons:true,
+      reverseButtons: true,
       confirmButtonColor: '#ff3d3d',
-      toast:true
-    }).then((result)=>{
-      if(result.isConfirmed){
+      toast: true
+    }).then((result) => {
+      if (result.isConfirmed) {
         axios({
-          method:'delete',
-          url:`${base_url}/deletechat/${id}`,
-          headers:header
-        }).then((response)=>{
-          alert('deleted successfully','success')
-        }).catch((error)=>{
+          method: 'delete',
+          url: `${base_url}/deletechat/${id}`,
+          headers: header
+        }).then((response) => {
+          alert('deleted successfully', 'success')
+        }).catch((error) => {
           alert('Error while deleting')
         })
       }
@@ -102,6 +102,8 @@ function Home() {
       list?.length !== 0 && getchatlist();
     }, 1000);
   }, [update]);
+
+
   return (
     <>
       {loadingFunc(loading)}
@@ -125,14 +127,14 @@ function Home() {
           list?.map((item, index) => (
             <div
               key={index}
-              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center p-1"
+              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 border-bottom-0"
             >
               <div className='col-11' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
                 <img src={profile} width={40} className='mr-3' /> {item?.name}
               </div>
               <div className='col-1 text-right'>
                 {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 rounded'>{item?.newmsg}</span>}
-                <button className='btn btn-link' title='delete chat' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash text-danger'></i></button>
+                <button className='btn btn-link messagedel' title='delete chat' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
               </div>
             </div>
           ))
