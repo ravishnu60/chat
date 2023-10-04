@@ -18,3 +18,19 @@ input, .form-control{
 .input-send{
     background-color: rgb(51, 255, 0) !important;
 }
+
+.header{
+    background-color: darkcyan;
+    color: lightcyan;
+}
+
+.messagedel{
+    cursor: pointer;
+    margin-left: 3px;
+    margin-bottom: 1px;
+    color: #be9191;
+}
+
+.messagedel:hover{
+    color: #ff4545;
+}

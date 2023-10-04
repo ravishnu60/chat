@@ -1,7 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { alert, base_url, loadingFunc } from '../Utils/Utility';
+import { alert, base_url, loadingFunc, showNotification } from '../Utils/Utility';
 import { useNavigate } from 'react-router-dom';
 import '../Style/style.css';
 import logo from '../Assets/logo.png'
@@ -64,7 +64,7 @@ function Login() {
   return (
     <div>
       <div className='fixed-top'>
-        <div className='text-center p-2 bg-primary text-light d-flex justify-content-between align-items-center'>
+        <div className='text-center p-2 d-flex justify-content-between align-items-center header'>
           <div> </div>
           <div className=' h4 fw-bold'>Connect <img src={logo} width={25} /></div>
           <div> </div>
@@ -80,6 +80,7 @@ function Login() {
               {step == 0 ?
                 <>
                   <div className="form mb-4">
+                    <button onClick={()=>showNotification('dewe','dewdes')}>notify</button>
                     <label className="form-label" >Mobile No.</label>
                     <input type="number"
                       className="form-control"

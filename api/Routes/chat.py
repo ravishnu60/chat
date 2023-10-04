@@ -173,3 +173,28 @@ def typingStatus(data:TypingSchema,db: Session= Depends(get_DB), get_curr_user= 
         db.add(newData)
         db.commit()
     return {"status_code":200,"status":"success","detail":"status changed"}
+
+@app.delete("/deletechat/{to_id}")
+def deleteChat(to_id:int, res: Response, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
+    get_chat= db.query(Message).filter(or_(\
+        and_(Message.from_id== get_curr_user['id'], Message.to_id==to_id),
+        and_(Message.from_id== to_id, Message.to_id==get_curr_user['id'])))
+    
+    if get_chat.first():
+        get_chat.delete(synchronize_session=False)
+        db.commit()
+    
+    res.status_code= status.HTTP_204_NO_CONTENT
+    return {"status_code":204,"status":"success","detail":"Chat deleted successfully"}
+
+@app.delete("/deletemsg/{msg_id}")
+def deleteChat(msg_id:int, res: Response, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
+    get_msg= db.query(Message).filter(Message.msg_id == msg_id, Message.from_id == get_curr_user['id'])
+
+    if get_msg.first():
+        get_msg.delete(synchronize_session=False)
+        db.commit()
+    else:
+        print("no")
+    res.status_code= status.HTTP_204_NO_CONTENT
+    return {"status_code":204,"status":"success","detail":"Chat deleted successfully"}

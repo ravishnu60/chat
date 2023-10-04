@@ -6,6 +6,7 @@ import '../Style/style.css';
 import findperson from '../Assets/find-person.png'
 import profile from '../Assets/profile.png'
 import { useForm } from 'react-hook-form';
+import Swal from 'sweetalert2';
 
 function Home() {
   const [list, setList] = useState([]);
@@ -65,6 +66,29 @@ function Home() {
   const getUser = async () => {
     const data = await userstatus(navigate, header);
     setUser(data?.data)
+  };
+
+  const deleteChat = (id) => {
+    Swal.fire({
+      text: 'Are you sure you want to delete ?',
+      icon:'question',
+      showCancelButton: true,
+      reverseButtons:true,
+      confirmButtonColor: '#ff3d3d',
+      toast:true
+    }).then((result)=>{
+      if(result.isConfirmed){
+        axios({
+          method:'delete',
+          url:`${base_url}/deletechat/${id}`,
+          headers:header
+        }).then((response)=>{
+          alert('deleted successfully','success')
+        }).catch((error)=>{
+          alert('Error while deleting')
+        })
+      }
+    })
   }
 
   useEffect(() => {
@@ -101,11 +125,15 @@ function Home() {
           list?.map((item, index) => (
             <div
               key={index}
-              onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}
-              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between"
+              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center p-1"
             >
-              <div><img src={profile} width={30} className='mr-3'/> {item?.name}</div>
-              {item?.newmsg !== 0 && <div className='bg-info text-light px-2 rounded'>{item?.newmsg}</div>}
+              <div className='col-11' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
+                <img src={profile} width={40} className='mr-3' /> {item?.name}
+              </div>
+              <div className='col-1 text-right'>
+                {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 rounded'>{item?.newmsg}</span>}
+                <button className='btn btn-link' title='delete chat' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash text-danger'></i></button>
+              </div>
             </div>
           ))
         }
