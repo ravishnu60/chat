@@ -174,9 +174,7 @@ def typingStatus(data:TypingSchema,db: Session= Depends(get_DB), get_curr_user= 
 
 @app.delete("/deletechat/{to_id}")
 def deleteChat(to_id:int, res: Response, db: Session= Depends(get_DB), get_curr_user= Depends(token.get_current_user)):
-    get_chat= db.query(Message).filter(or_(\
-        and_(Message.from_id== get_curr_user['id'], Message.to_id==to_id),
-        and_(Message.from_id== to_id, Message.to_id==get_curr_user['id'])))
+    get_chat= db.query(Message).filter(Message.from_id== get_curr_user['id'], Message.to_id==to_id)
     
     if get_chat.first():
         get_chat.delete(synchronize_session=False)
