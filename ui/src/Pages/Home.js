@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { alert, base_url, loadingFunc, showNotification, userstatus } from '../Utils/Utility';
+import { alert, base_url, loadingFunc, permission, showNotification, userstatus } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
 import findperson from '../Assets/find-person.png'
+import profile from '../Assets/profile.png'
 import { useForm } from 'react-hook-form';
 
 function Home() {
@@ -31,10 +32,12 @@ function Home() {
             popup = true;
         });
       }
-      popup && showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
-      setUpdate(!update);
-      list?.length == 0 && setLoading(false);
       setList(temp);
+      if (popup)
+        showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
+
+      setUpdate(!update);
+      setLoading(false);
     }).catch((err) => {
       userstatus(navigate, header);
       // setList([]);
@@ -65,7 +68,7 @@ function Home() {
   }
 
   useEffect(() => {
-    Notification?.requestPermission();
+    permission !== "granted" && Notification?.requestPermission();
     getchatlist();
     getUser();
   }, []);
@@ -83,7 +86,7 @@ function Home() {
           <input type="number" class="form-control"
             autoComplete='off'
             placeholder="Enter mobile no."
-            {...register('search', {required:true, minLength: 10 })}
+            {...register('search', { required: true, minLength: 10 })}
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div class="input-group-append">
@@ -93,17 +96,15 @@ function Home() {
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
 
-      <div className='list-group mt-2 border border-success rounded' >
+      <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer' }} >
         {
           list?.map((item, index) => (
             <div
+              key={index}
               onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}
-              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between border-bottom-5"
-            // style={index % 2 == 0 ?
-            //   { background: 'linear-gradient(45deg, #65deff8f, #e6fffb00)', cursor: 'pointer' } :
-            //   { background: 'linear-gradient(45deg, #65deff8f, #e6fffb00)', cursor: 'pointer' }}
+              className="list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between"
             >
-              <div>{item?.name}</div>
+              <div><img src={profile} width={30} className='mr-3'/> {item?.name}</div>
               {item?.newmsg !== 0 && <div className='bg-info text-light px-2 rounded'>{item?.newmsg}</div>}
             </div>
           ))

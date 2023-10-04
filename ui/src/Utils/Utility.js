@@ -38,7 +38,7 @@ export function requestPermission() {
     });
 }
 
-navigator?.serviceWorker?.register('sw.js');
+navigator.serviceWorker?.register('sw.js');
 
 export function showNotification(title, body) {
     let icon = logo;
@@ -48,6 +48,10 @@ export function showNotification(title, body) {
         notification?.close();
         window.parent?.focus();
     }
+
+    // navigator.serviceWorker.ready.then(function(registration) {
+    //     registration.showNotification(title, { body, icon }).then((result) => {window.parent?.focus()})
+    //   });
 
 }
 
