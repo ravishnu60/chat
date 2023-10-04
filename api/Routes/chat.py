@@ -61,8 +61,6 @@ def getChatList(res: Response, db: Session= Depends(get_DB), get_curr_user= Depe
     if not get_chat:
         res.status_code= status.HTTP_404_NOT_FOUND
         return {"status_code":404,"status":"failed","detail":"No chats"}
-
-    latest_text= db.query(Message)
     
     ids=[]
     newtext={}

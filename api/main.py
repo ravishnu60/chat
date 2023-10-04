@@ -1,7 +1,5 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from db import engine
-from Models.model import base
 from Routes import chat
 from fastapi.middleware.cors import CORSMiddleware
 
