@@ -121,7 +121,6 @@ function Home() {
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
-
       <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer' }} >
         {
           list?.map((item, index) => (

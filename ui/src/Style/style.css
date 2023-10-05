@@ -28,7 +28,7 @@ input, .form-control{
     cursor: pointer;
     margin-left: 3px;
     margin-bottom: 1px;
-    color: #be919188;
+    color: #cf616142;
 }
 
 .messagedel:hover{
@@ -37,11 +37,37 @@ input, .form-control{
 
 .hoverRow:hover{
     color: #f87204 !important;
-    background-color: #32e0ff34 !important;
+    background-color: #32e0ff5d !important;
     
 }
 
 .hoverRow:hover .messagedel{
     color: #ff4545 !important;
     
+}
+
+.messagetext1{
+    background-color: #b0e0e6ab ;
+}
+
+.messagetext2{
+    background-color: #90ee9059;
+}
+
+.msgtime1, .msgtime2{
+    color: #0014ff;
+}
+
+@media only screen and (max-width: 768px) {
+    .messagedel{
+        cursor: pointer;
+        margin-left: 3px;
+        margin-bottom: 1px;
+        color: #f03a3aaf;
+        font-size: 12px;
+    }
+
+    .messagetext1, .messagetext2{
+        font-size: 86%;
+    }
 }

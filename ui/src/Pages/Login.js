@@ -66,7 +66,7 @@ function Login() {
       <div className='fixed-top'>
         <div className='text-center p-2 d-flex justify-content-between align-items-center header'>
           <div> </div>
-          <div className=' h4 fw-bold'>Connect <img src={logo} width={25} /></div>
+          <div className=' h5 fw-bold'>Connect <img src={logo} width={25} /></div>
           <div> </div>
         </div>
       </div>

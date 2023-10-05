@@ -162,9 +162,9 @@ function Chat() {
       {loadingFunc(loading)}
       <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
         <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#ade7ff' }}>
-          <div className='ml-3 mt-1 h4 d-flex align-items-center'><img src={profile} width={40} className='mr-2' /> <div>{userData?.name} </div></div>
+          <div className='ml-2 mt-1 d-flex align-items-end'><img src={profile} width={40} className='mr-2' /> <div className='h6'>{userData?.name} </div></div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
-            <img src={back} width={50} />  
+            <img src={back} width={35} />  
           </button>
 
         </div>
@@ -173,22 +173,22 @@ function Chat() {
             <div className='row p-2' key={index} id={`first${index}`}>
               {data?.from_id ?
                 <>
-                  <div className='col-5'></div> {/* send */}
-                  <div className='col-7'>
-                    <div className='d-flex flex-row-reverse align-items-end'>
+                  <div className='col-2'></div> {/* send */}
+                  <div className='col-10 pr-2'>
+                    <div className='d-flex flex-row-reverse align-items-center'>
                       <i className='fa fa-trash fa-sm messagedel' onClick={()=> deleteMsg(data?.msg_id)}></i>
-                      <div className='border border-primary rounded p-2'>{data?.message}</div>
+                      <div className='border border-primary rounded p-2 messagetext1'>{data?.message}</div>
                     </div>
-                    <div className='text-right small text-primary'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
+                    <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
                   </div>
                 </>
                 :
                 <>{data?.from_id == false ?
-                  <div className='col-7'>{/* receive */}
+                  <div className='col-10 pl-2'>{/* receive */}
                     <div className='d-flex'>
-                      <div className='border border-success rounded p-2'>{data?.message}</div>
+                      <div className='border border-success rounded p-2 messagetext2'>{data?.message}</div>
                     </div>
-                    <div className='small text-primary' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
+                    <div className='small msgtime2' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
 
                   </div> : <div className='col-10 offset-1 text-center font-weight-bold' style={{ color: 'chocolate' }}>{data?.date}</div>}</>
               }
@@ -200,11 +200,11 @@ function Chat() {
       </div>
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
-          <input className='form-control border-secondary p-2 mx-2' autoComplete='off'
+          <input className='form-control border-secondary p-1 mx-1' autoComplete='off'
             placeholder='Message here'
             {...register('msg', { required: true, onChange: (e) => { typing(true, e.target.value) }, onBlur: () => { typing(false) } })} />
           <button className='btn btn-link' type='submit' title='Send'>
-            {getValues('msg') ? <img src={sendIcon} width={40} /> : <img src={sendIcon1} width={40} />}
+            {getValues('msg') ? <img src={sendIcon} width={35} /> : <img src={sendIcon1} width={35} />}
           </button>
         </form>
       </div>
