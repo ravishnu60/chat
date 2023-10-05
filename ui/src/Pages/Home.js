@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { alert, base_url, loadingFunc, permission, showNotification, userstatus } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
@@ -7,6 +7,7 @@ import findperson from '../Assets/find-person.png'
 import profile from '../Assets/profile.png'
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
+import { Notifications } from 'react-push-notification';
 
 function Home() {
   const [list, setList] = useState([]);
@@ -103,10 +104,10 @@ function Home() {
     }, 1000);
   }, [update]);
 
-
   return (
     <>
       {loadingFunc(loading)}
+      <Notifications />
       <form onSubmit={handleSubmit(newChat)}>
         <div class="input-group">
           <input type="number" class="form-control"
@@ -116,12 +117,12 @@ function Home() {
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div class="input-group-append">
-            <button class="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} /></button>
+            <button class="input-group-text py-0" onClick={()=>{showNotification("hi","hello")}} type='submit' title='search' ><img src={findperson} width={30} /></button>
           </div>
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
-      <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto'}} >
+      <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
         {
           list?.map((item, index) => (
             <div
@@ -136,7 +137,7 @@ function Home() {
                 </span>
               </div>
               <div className='col-lg-1 col-2 text-right'>
-                <button className='btn btn-link messagedel' title='delete chat' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
+                <button className='btn btn-link messagedel' title='delete all text you sent' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
               </div>
             </div>
           ))

@@ -169,7 +169,7 @@ function Chat() {
 
         </div>
         <div id="chatDiv" className='p-2' style={{ maxHeight: '65vh', overflowX: 'hidden', overflowY: 'auto' }}>
-          {chat?.message?.map((data, index) =>
+          {chat?.message?.length!==1 && chat?.message?.map((data, index) =>
             <div className='row p-2' key={index} id={`first${index}`}>
               {data?.from_id ?
                 <>
@@ -194,7 +194,7 @@ function Chat() {
               }
             </div>
           )}
-          {loading ? <div className=" text-secondary text-center">Loading...</div> : chat == undefined && <div className=" text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
+          {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length == 1 || !chat?.message) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={30} />}
         </div>
       </div>

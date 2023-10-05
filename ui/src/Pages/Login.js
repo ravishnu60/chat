@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { alert, base_url, loadingFunc } from '../Utils/Utility';
 import { useNavigate } from 'react-router-dom';
@@ -51,7 +51,7 @@ function Login() {
   }
 
   const handlePage = (page) => {
-    if (step == 0) {
+    if (step === 0) {
       setStep(1);
       regReset();
     } else {
@@ -66,7 +66,7 @@ function Login() {
       <div className='fixed-top'>
         <div className='text-center p-2 d-flex justify-content-between align-items-center header'>
           <div> </div>
-          <div className=' h5 fw-bold'>Connect <img src={logo} width={25} /></div>
+          <div className=' h5 fw-bold'>Connect <img src={logo} width={25} alt='Logo'/></div>
           <div> </div>
         </div>
       </div>
@@ -77,7 +77,7 @@ function Login() {
             <form style={{ background: 'linear-gradient(138deg,#73ebff6b,#94ff764f)' }} className={error ? 'border border-danger rounded p-3' : 'border border-success rounded p-3'} onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
               {error && <div className="text-danger text-center h5">Invalid credentials</div>}
               <h5 className='bg-info p-2 text-light text-center'>{step ? "Create Account" : "Login to your Account"}</h5>
-              {step == 0 ?
+              {step === 0 ?
                 <>
                   <div className="form mb-4">
                     <label className="form-label" >Mobile No.</label>
