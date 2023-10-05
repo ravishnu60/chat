@@ -43,15 +43,26 @@ navigator.serviceWorker.register("sw.js");
 
 export function showNotification(title, body) {
 
-    addNotification({
-        title: title,
-        message: body,
-        theme: 'darkblue',
-        native: true,
-        icon:logo,
-        backgroundBottom:'green',
-        onClick:()=>{window.parent.focus()}
-    });
+    const isMobile = window.innerWidth <= 768;
+
+    console.log(isMobile);
+
+    if (isMobile) {
+        navigator.serviceWorker.ready.then((registration) => {
+            // Show a notification that includes an action titled Archive.
+            registration.showNotification(title, { body: body, icon: logo })
+        });
+    } else {
+        addNotification({
+            title: title,
+            message: body,
+            theme: 'darkblue',
+            native: true,
+            icon: logo,
+            backgroundBottom: 'green',
+            onClick: () => { window.parent.focus() }
+        });
+    }
 }
 
 
