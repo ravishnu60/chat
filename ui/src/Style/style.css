@@ -58,6 +58,10 @@ input, .form-control{
     color: #0014ff;
 }
 
+.newmsgcount{
+    border-radius: 11px !important;
+}
+
 @media only screen and (max-width: 768px) {
     .messagedel{
         cursor: pointer;

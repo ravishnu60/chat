@@ -121,7 +121,7 @@ function Home() {
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
-      <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer' }} >
+      <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto'}} >
         {
           list?.map((item, index) => (
             <div
@@ -129,10 +129,13 @@ function Home() {
               className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 border-bottom-0"
             >
               <div className='col-lg-11 col-10' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
-                <img src={profile} width={40} className='mr-3' /> {item?.name}
+                <img src={profile} width={40} className='mr-3' />
+                {item?.name}
+                <span className='ml-2'>
+                  {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
+                </span>
               </div>
               <div className='col-lg-1 col-2 text-right'>
-                {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 rounded'>{item?.newmsg}</span>}
                 <button className='btn btn-link messagedel' title='delete chat' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
               </div>
             </div>

@@ -90,7 +90,7 @@ function Login() {
                   <div className="form-outline mb-4">
                     <label className="form-label" >Password</label>
                     <div className='input-group'>
-                      <input type={view ? "text" : "password"} className="form-control border-right-0"
+                      <input type={view ? "text" : "password"} autoComplete='off' className="form-control border-right-0"
                         {...register('password', { required: true })} onFocus={() => { setError(false) }} />
                       <div className='input-group-text' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye'></i> : <i className='fa fa-eye-slash'></i>}</div>
                     </div>

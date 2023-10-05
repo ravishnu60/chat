@@ -168,7 +168,7 @@ function Chat() {
           </button>
 
         </div>
-        <div id="chatDiv" className='p-2' style={{ maxHeight: '65vh', maxHeight: '65vh', overflowX: 'hidden', overflowY: 'auto' }}>
+        <div id="chatDiv" className='p-2' style={{ maxHeight: '65vh', overflowX: 'hidden', overflowY: 'auto' }}>
           {chat?.message?.map((data, index) =>
             <div className='row p-2' key={index} id={`first${index}`}>
               {data?.from_id ?
@@ -200,7 +200,7 @@ function Chat() {
       </div>
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
-          <input className='form-control border-secondary p-1 mx-1' autoComplete='off'
+          <input className='form-control border-secondary p-1' autoComplete='off'
             placeholder='Message here'
             {...register('msg', { required: true, onChange: (e) => { typing(true, e.target.value) }, onBlur: () => { typing(false) } })} />
           <button className='btn btn-link' type='submit' title='Send'>
