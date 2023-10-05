@@ -117,7 +117,7 @@ function Home() {
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div class="input-group-append">
-            <button class="input-group-text py-0" onClick={()=>{showNotification("hi","hello")}} type='submit' title='search' ><img src={findperson} width={30} /></button>
+            <button class="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} /></button>
           </div>
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
