@@ -4,7 +4,7 @@ import { alert, base_url, loadingFunc, permission, showNotification, userstatus 
 import axios from 'axios';
 import '../Style/style.css';
 import findperson from '../Assets/find-person.png'
-import profile from '../Assets/profile.png'
+import profile from '../Assets/profile.png';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { Notifications } from 'react-push-notification';
@@ -127,10 +127,10 @@ function Home() {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 border-bottom-0"
+              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 py-1 border-bottom-0"
             >
-              <div className='col-lg-11 col-10' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
-                <img src={profile} width={40} className='mr-3' />
+              <div className='col-lg-11 col-10 d-flex align-items-center' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
+                <div className='profile mr-3' style={{backgroundImage:`url(${profile})`}}></div>
                 {item?.name}
                 <span className='ml-2'>
                   {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}

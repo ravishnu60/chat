@@ -1,69 +1,84 @@
-.list-group-item{
-    background-color: #a2e9ee38 !important ;
+.list-group-item {
+    background-color: #a2e9ee38 !important;
     /* color: #3efaff !important; */
 }
 
-.input-group-text{
+.input-group-text {
     background-color: #ffffff00 !important;
     border-left: none;
     border-color: #000000 !important;
     border-radius: 0px 4px 4px 0px;
 }
 
-input, .form-control{
+input,
+.form-control {
     background-color: #ffffff00 !important;
     border-color: #000000 !important;
 }
 
-.input-send{
+.input-send {
     background-color: rgb(51, 255, 0) !important;
 }
 
-.header{
+.header {
     background-color: darkcyan;
     color: lightcyan;
 }
 
-.messagedel{
+.messagedel {
     cursor: pointer;
     margin-left: 3px;
     margin-bottom: 1px;
     color: #cf616142;
 }
 
-.messagedel:hover{
+.messagedel:hover {
     color: #ff4545;
 }
 
-.hoverRow:hover{
+.hoverRow:hover {
     color: #f87204 !important;
     background-color: #32e0ff5d !important;
-    
+
 }
 
-.hoverRow:hover .messagedel{
+.hoverRow:hover .messagedel {
     color: #ff4545 !important;
-    
+
 }
 
-.messagetext1{
-    background-color: #b0e0e6ab ;
+.messagetext1 {
+    background-color: #b0e0e6ab;
 }
 
-.messagetext2{
+.messagetext2 {
     background-color: #90ee9059;
 }
 
-.msgtime1, .msgtime2{
+.msgtime1,
+.msgtime2 {
     color: #0014ff;
 }
 
-.newmsgcount{
+.newmsgcount {
     border-radius: 11px !important;
 }
 
+.profile{
+    width: 9vh;
+    height: 8vh;
+    overflow: hidden;
+    border-radius: 51%;
+    background-size: cover;
+}
+
+.profile img{
+    height: inherit;
+    width: inherit;
+}
+
 @media only screen and (max-width: 768px) {
-    .messagedel{
+    .messagedel {
         cursor: pointer;
         margin-left: 3px;
         margin-bottom: 1px;
@@ -71,7 +86,8 @@ input, .form-control{
         font-size: 12px;
     }
 
-    .messagetext1, .messagetext2{
+    .messagetext1,
+    .messagetext2 {
         font-size: 94%;
     }
 }
