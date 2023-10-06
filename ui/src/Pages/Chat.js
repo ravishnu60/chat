@@ -120,7 +120,7 @@ function Chat() {
   const delay = (setval) => {
     setTimeout(() => {
       setval({});
-    }, 400);
+    }, 500);
   }
 
   const deleteMsg = (id) => {
