@@ -117,14 +117,14 @@ function Chat() {
     }).catch(err => { });
   }
 
-  const delay=(setval)=>{
+  const delay = (setval) => {
     setTimeout(() => {
       setval({});
     }, 400);
   }
 
   const deleteMsg = (id) => {
-    setLoadingdel({[id]:true});
+    setLoadingdel({ [id]: true });
     axios({
       method: 'delete',
       url: `${base_url}/deletemsg/${id}`,
@@ -173,7 +173,9 @@ function Chat() {
       {loadingFunc(loading)}
       <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
         <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#ade7ff' }}>
-          <div className='ml-2 mt-1 d-flex align-items-end'><img src={profile} width={40} className='mr-2' /> <div className='h6'>{userData?.name} </div></div>
+          <div className='p-1 d-flex align-items-end'>
+            <div className='profile-small mr-2' style={{ backgroundImage: `url(${profile})` }}></div>
+            <div className='h6'>{userData?.name} </div></div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
             <img src={back} width={35} />
           </button>
@@ -187,7 +189,7 @@ function Chat() {
                   <div className='col-2'></div> {/* send */}
                   <div className='col-10 pr-2'>
                     <div className='d-flex flex-row-reverse align-items-center'>
-                      {loadingdel?.[data?.msg_id] ? <img src={load} width={30} /> :<i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
+                      {loadingdel?.[data?.msg_id] ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
                       <div className='border border-primary rounded p-2 messagetext1'>{data?.message}</div>
                     </div>
                     <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>

@@ -65,14 +65,22 @@ input,
 }
 
 .profile{
-    width: 9vh;
-    height: 8vh;
+    width: 43px;
+    height: 43px;
     overflow: hidden;
-    border-radius: 51%;
+    border-radius: 55%;
     background-size: cover;
 }
 
-.profile img{
+.profile-small{
+    width: 39px;
+    height: 38px;
+    overflow: hidden;
+    border-radius: 50%;
+    background-size: cover;
+}
+
+.profile img, .profile-small img{
     height: inherit;
     width: inherit;
 }
