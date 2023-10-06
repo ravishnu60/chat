@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
 import { alert, base_url, loadingFunc } from '../Utils/Utility';
 import { useNavigate } from 'react-router-dom';
@@ -60,6 +60,11 @@ function Login() {
     }
     setView(false);
   }
+
+  useEffect(() => {
+    localStorage.clear();
+  }, [])
+  
   
   return (
     <div>
