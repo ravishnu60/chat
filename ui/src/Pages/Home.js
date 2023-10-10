@@ -17,35 +17,7 @@ function Home() {
   const [loading, setLoading] = useState(true);
   const header = { "Authorization": "bearer " + localStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
-
-
-  const getchatlist = () => {
-    list?.length == 0 && setLoading(true);
-    axios({
-      method: 'get',
-      url: `${base_url}/chatlist`,
-      headers: header
-    }).then((res) => {
-      let temp = res.data?.data;
-      let popup = false;
-      if (list?.length !== 0) {
-        temp?.forEach((element, index) => {
-          if (element?.newmsg != list[index].newmsg)
-            popup = true;
-        });
-      }
-      setList(temp);
-      if (popup)
-        showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
-
-      setUpdate(!update);
-      setLoading(false);
-    }).catch((err) => {
-      userstatus(navigate, header);
-      // setList([]);
-      setLoading(false);
-    })
-  }
+  const listRef = useRef();
 
   const newChat = (data) => {
     const search = data.search;
@@ -94,15 +66,39 @@ function Home() {
 
   useEffect(() => {
     permission !== "granted" && Notification?.requestPermission();
-    getchatlist();
     getUser();
   }, []);
 
+
+  const onmessage = (event) => {
+    setLoading(false);
+    setList(JSON.parse(event.data));
+  }
+
+  //websocket event
   useEffect(() => {
-    setTimeout(() => {
-      list?.length !== 0 && getchatlist();
-    }, 1000);
-  }, [update]);
+    if (user !== undefined) {
+      setLoading(true);
+      const ws = new WebSocket('ws://localhost:8000/chat/chatlist/' + user?.id);
+
+      ws.onopen = () => {
+        ws.send("Connect")
+      }
+
+      ws.onmessage = onmessage
+
+      let interval = setInterval(() => {
+        ws.send("connect")
+      }, 1000);
+
+      listRef.current = { ws: ws, interval: interval }
+    }
+
+    return () => {
+      listRef.current?.ws?.close()
+      clearInterval(listRef.current?.interval)
+    }
+  }, [user])
 
   return (
     <>
@@ -130,7 +126,7 @@ function Home() {
               className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 py-1 border-bottom-0"
             >
               <div className='col-lg-11 col-10 d-flex align-items-center' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
-                <div className='profile mr-3' style={{backgroundImage:`url(${profile})`}}></div>
+                <div className='profile mr-3' style={{ backgroundImage: `url(${profile})` }}></div>
                 {item?.name}
                 <span className='ml-2'>
                   {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
