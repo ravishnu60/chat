@@ -72,14 +72,31 @@ function Home() {
 
   const onmessage = (event) => {
     setLoading(false);
-    setList(JSON.parse(event.data));
+    let temp = JSON.parse(event.data);
+    setList(temp);
+
   }
+
+  useEffect(() => {
+    let popup = false;
+    let temp= listRef.current?.data
+    if (list?.length !== 0 && listRef.current?.data) {
+      temp?.forEach((element, index) => {
+        if (element?.newmsg != list[index].newmsg)
+          popup = true;
+      });
+    }
+    if (popup)
+      showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
+    
+      listRef.current = { ...listRef.current, data: list }
+  }, [list])
 
   //websocket event
   useEffect(() => {
     if (user !== undefined) {
       setLoading(true);
-      const ws = new WebSocket(webSocketUrl+'/chatlist/' + user?.id);
+      const ws = new WebSocket(webSocketUrl + '/chatlist/' + user?.id);
 
       ws.onopen = () => {
         ws.send("Connect")
