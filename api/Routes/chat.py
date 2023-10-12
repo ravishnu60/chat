@@ -111,7 +111,7 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
             print("Connection closed",Err)
             break
 
-@app.get('/pastchat/{id}')
+@app.get('/pastchat')
 def getchat(id: int, res: Response, limit: int = 10, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
     # update viewed status
     queryobj = db.query(Message).filter(
