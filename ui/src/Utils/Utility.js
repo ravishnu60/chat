@@ -8,7 +8,7 @@ import addNotification from "react-push-notification";
 export const base_url = "https://chat-api-zu97.onrender.com/chat";
 
 // export const webSocketUrl= "ws://localhost:8000/chat";
-export const webSocketUrl= "ws://chat-api-zu97.onrender.com/chat";
+export const webSocketUrl= "wss://chat-api-zu97.onrender.com/chat";
 
 export const alert = (text, status) => {
     Swal.fire({
