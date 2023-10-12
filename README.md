@@ -1,7 +1,7 @@
-# Real time chat application
-It contains the floowing features
-  .Chat with people who using this with registered mobile number
-  .Get notification when receive new message
-  .Typing and viwed updates
-# Features may added in future ...
-##### Stay connect with people ######
+# Real-time chat application
+It contains the following features
+  .Chat with people who using this with a registered mobile number
+  .Get a notification when receive a new message
+  .Typing and viewing updates
+# Features may added in the future ...
+##### Stay connected with people ######
