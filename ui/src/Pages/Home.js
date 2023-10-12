@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { alert, base_url, loadingFunc, permission, showNotification, userstatus } from '../Utils/Utility';
+import { alert, base_url, loadingFunc, permission, showNotification, userstatus, webSocketUrl } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
 import findperson from '../Assets/find-person.png'
@@ -79,7 +79,7 @@ function Home() {
   useEffect(() => {
     if (user !== undefined) {
       setLoading(true);
-      const ws = new WebSocket('ws://localhost:8000/chat/chatlist/' + user?.id);
+      const ws = new WebSocket(webSocketUrl+'/chatlist/' + user?.id);
 
       ws.onopen = () => {
         ws.send("Connect")
