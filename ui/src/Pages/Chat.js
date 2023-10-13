@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc } from '../Utils/Utility';
+import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl } from '../Utils/Utility';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
+import { set, useForm } from 'react-hook-form';
 import typing_gif from '../Assets/typing.gif';
 import '../Style/style.css';
 import sendIcon from '../Assets/send.gif';
@@ -24,6 +24,9 @@ function Chat() {
   const [count, setCount] = useState(false); //for continuous call
   const { register, reset, handleSubmit, getValues } = useForm();
   const [limit, setLimit] = useState(10);
+  const [user, setUser] = useState();
+  const chatref= useRef({limit:10})
+
   // const [preload, setPreload] = useState(false);
 
   //scroll element
@@ -31,42 +34,10 @@ function Chat() {
 
   const header = { "Authorization": "bearer " + localStorage.getItem('token') };
 
-  const continuousAPI = () => {
-    let tempEle = document.getElementById('first0')
-    axios({
-      method: 'get',
-      url: `${base_url}/pastchat?id=${userData?.id}&limit=${limit}`,
-      headers: header
-    }).then((res) => {
-      let temp = res?.data?.data;
-      //chek new msg for alert and scroll
-      if (chat?.message?.length !== undefined && chat?.message?.[chat?.message?.length - 1]?.message != temp?.message?.[temp?.message?.length - 1]?.message) {
-        if (permission === "granted") {
-          if (temp?.message?.[temp?.message?.length - 1]?.from_id == false) {
-            showNotification(`Message from ${userData?.name}`, temp?.message[temp?.message?.length - 1]?.message);
-          }
-        } else if (permission === "default") {
-          requestPermission();
-        }
-        setScroll(!scroll);
-      }
-      //align div for prev chat view
-      if (chat?.message?.length !== undefined && chat?.message?.length !== temp?.message?.length) {
-        limit != 10 && divEle?.scrollTo(0, tempEle.scrollHeight * 5 + 25)
-      }
-      chat == undefined && setScroll(true);
-      setChat(temp);
-      setCount(!count);
-      setTimeout(() => {
-        setLoading(false);
-      }, 200);
-    }).catch((err) => {
-      userstatus(navigate, header);
-      setChat();
-      setCount(!count);
-      setLoading(false);
-    })
-  }
+  const getUser = async () => {
+    const data = await userstatus(navigate, header);
+    setUser(data?.data)
+  };
 
   const sendMsg = (data) => {
     setTimeout(() => {
@@ -91,17 +62,17 @@ function Chat() {
     }
   }
 
-  const markasread = () => {
-    axios({
-      method: 'put',
-      url: `${base_url}/markasread/${userData?.id}`,
-      headers: header,
-    }).then(res => {
+  // const markasread = () => {
+  //   axios({
+  //     method: 'put',
+  //     url: `${base_url}/markasread/${userData?.id}`,
+  //     headers: header,
+  //   }).then(res => {
 
-    }).catch(err => {
+  //   }).catch(err => {
 
-    });
-  }
+  //   });
+  // }
 
   const typing = (status, val) => {
     if (!val) {
@@ -113,7 +84,6 @@ function Chat() {
       data: { to_id: userData?.id, typing: status },
       headers: header
     }).then(res => {
-      // console.log(res.data);
     }).catch(err => { });
   }
 
@@ -140,25 +110,79 @@ function Chat() {
 
   //initialize the call
   useEffect(() => {
-    userstatus(navigate, header);
-    markasread();
+    !userData?.id && navigate('/home')
+    getUser()
+    // markasread();
   }, []);
 
-  //to call api continuously
-  useEffect(() => {
-    !userData?.id && navigate('/home')
-    setTimeout(() => {
-      continuousAPI();
-    }, 1000);
-  }, [count])
 
+  const onmessage = (event) => {
+    setLoading(false);
+    setChat(JSON.parse(event.data));
+
+  }
+
+  useEffect(() => {
+    let tempEle = document.getElementById('first0')
+    let temp= chatref.current?.data
+
+      //chek new msg for alert and scroll
+      if (temp?.message?.length !== undefined && temp?.message?.[temp?.message?.length - 1]?.message != chat?.message?.[chat?.message?.length - 1]?.message) {
+        if (permission === "granted") {
+          if (chat?.message?.[chat?.message?.length - 1]?.from_id == false) {
+            showNotification(`Message from ${userData?.name}`, chat?.message[chat?.message?.length - 1]?.message);
+          }
+        } else if (permission === "default") {
+          requestPermission();
+        }
+        setScroll(!scroll);
+      }
+      //align div for prev chat view
+      if (temp?.message?.length !== undefined && temp?.message?.length !== chat?.message?.length) {
+        limit != 10 && divEle?.scrollTo(0, tempEle.scrollHeight * 5 + 25)
+      }
+      chatref.current?.data == undefined && setTimeout(() => {
+        setScroll(true)
+      }, 70);
+    
+      chatref.current = { ...chatref.current, data: chat }
+  }, [chat])
+
+  //websocket event
+  useEffect(() => {
+    if (user !== undefined) {
+      setLoading(true);
+      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${userData?.id}`);
+
+      ws.onopen = () => {
+        ws.send(chatref.current.limit)
+      }
+
+      ws.onmessage = onmessage
+
+      let interval = setInterval(() => {
+        ws.send(chatref.current.limit)
+      }, 2500);
+
+      chatref.current = { ws: ws, interval: interval, ...chatref.current }
+    }
+
+    return () => {
+      chatref.current?.ws?.close()
+      clearInterval(chatref.current?.interval)
+    }
+  }, [user])
+
+  useEffect(()=>{
+    if(limit!== chatref.current.limit){
+      chatref.current.limit=limit
+    }
+  },[limit])
 
   //UseEffect to scroll end
   useEffect(() => {
     chat?.message?.length !== 0 && divEle?.scrollTo(0, divEle?.scrollHeight);
   }, [scroll, chat?.typing == true])
-
-  // console.log(document.getElementById(`date${chat.length}`)?.scrollHeight)
 
   divEle?.addEventListener('scroll', () => {
     if (divEle?.scrollTop == 0) {
@@ -211,11 +235,12 @@ function Chat() {
           {chat?.typing && <img src={typing_gif} width={30} />}
         </div>
       </div>
+      {/* Input message */}
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
           <input className='form-control border-secondary p-1' autoComplete='off'
-            placeholder='Message here'
-            {...register('msg', { required: true, onChange: (e) => { typing(true, e.target.value) }, onBlur: () => { typing(false) } })} />
+            placeholder='Message here' onFocus={(e)=>typing(true, e.target.value)}
+            {...register('msg', { required: true, onBlur: () => { typing(false) } })} />
           <button className='btn btn-link' type='submit' title='Send'>
             {getValues('msg') ? <img src={sendIcon} width={35} /> : <img src={sendIcon1} width={35} />}
           </button>

@@ -111,55 +111,80 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
             print("Connection closed",Err)
             break
 
-@app.get('/pastchat')
-def getchat(id: int, res: Response, limit: int = 10, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
-    # update viewed status
-    queryobj = db.query(Message).filter(
-        Message.to_id == get_curr_user['id'], Message.from_id == id, Message.is_read == False)
+#get messages
+def getmsg(user_id,id,limit, db):
+     # update viewed status
+    queryobj =db.query(Message).filter(
+        Message.to_id == user_id, Message.from_id == id, Message.is_read == False)
     if queryobj.first():
         queryobj.update({"is_read": True}, synchronize_session=False)
         db.commit()
 
-    # get messages latest 10
+    # get messages latest based on limit initial-10
     my_msg = db.query(Message)\
         .options(load_only(Message.message, Message.is_read, Message.from_id, Message.createdAt))\
-        .filter(or_(and_(Message.from_id == get_curr_user['id'], Message.to_id == id),
-                    and_(Message.to_id == get_curr_user['id'], Message.from_id == id)))\
+        .filter(or_(and_(Message.from_id == user_id, Message.to_id == id),
+                    and_(Message.to_id == user_id, Message.from_id == id)))\
         .order_by(Message.createdAt.desc()).limit(limit).all()
     aligned_msg = []
     temp_date = None
+    
     # Add Date in list
     for msg in my_msg:
-        msg.createdAt = msg.createdAt.astimezone(pytz.timezone('Asia/Kolkata'))
+        temp={}
+        temp['is_read']= msg.is_read
+        temp['from_id']= msg.from_id
+        temp['createdAt']= msg.createdAt
+        temp['message']= msg.message
+        temp['msg_id']= msg.msg_id
+        
+        temp['createdAt'] = msg.createdAt.astimezone(pytz.timezone('Asia/Kolkata'))
         if temp_date == None:
-            temp_date = msg.createdAt.strftime('%d/%m/%Y')
+            temp_date = temp['createdAt'].strftime('%d/%m/%Y')
 
-        if temp_date != msg.createdAt.strftime('%d/%m/%Y'):
+        if temp_date != temp['createdAt'].strftime('%d/%m/%Y'):
             aligned_msg.append({"date": temp_date})
-            temp_date = msg.createdAt.strftime('%d/%m/%Y')
+            temp_date =temp['createdAt'].strftime('%d/%m/%Y')
 
-        msg.from_id = msg.from_id == get_curr_user['id']
-        msg.createdAt = msg.createdAt.strftime('%I:%M %p')
-        aligned_msg.append(msg)
+        temp['from_id'] = msg.from_id == user_id
+        temp['createdAt'] = temp['createdAt'].strftime('%I:%M %p')
+        aligned_msg.append(temp)
 
     # insert latest date into list
     aligned_msg.append({"date": temp_date})
 
+    #latest data first (reversing)
     my_msg = aligned_msg.copy()
     aligned_msg.clear()
     for num in range(len(my_msg)):
         aligned_msg.append(my_msg[len(my_msg)-(num+1)])
 
+
     # send typing status
     type_status = db.query(Typing.typing).filter(
-        Typing.to_id == get_curr_user['id'], Typing.from_id == id).first()
+        Typing.to_id == user_id, Typing.from_id == id).first()
     if not type_status:
         type_status = {"typing": False}
     else:
         type_status = {"typing": type_status[0]}
+    
+    return {"message":aligned_msg, **type_status}
 
-    return {"status_code": 200, "status": "success", "detail": "chat found", "data": {"message": aligned_msg, **type_status}}
-
+@app.websocket('/getchat/{user_id}')
+async def getchat(websocket:WebSocket,user_id:int, id: int, res: Response, db: Session = Depends(get_DB)):
+    await websocket.accept()
+    
+    while True:
+        try:
+            #receive
+            receive= await websocket.receive_text()
+            # send message
+            newData=getmsg(user_id,id,int(receive),db)
+            if newData:
+                await websocket.send_json(newData)
+        except Exception as Err:
+            print("Connection closed",Err)
+            break
 
 @app.post('/message')
 def chat(data: MsgSchma, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):

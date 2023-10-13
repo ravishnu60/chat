@@ -72,11 +72,11 @@ function Home() {
 
   const onmessage = (event) => {
     setLoading(false);
-    let temp = JSON.parse(event.data);
-    setList(temp);
+    setList(JSON.parse(event.data));
 
   }
 
+  //Notify for new messages
   useEffect(() => {
     let popup = false;
     let temp= listRef.current?.data
@@ -105,8 +105,8 @@ function Home() {
       ws.onmessage = onmessage
 
       let interval = setInterval(() => {
-        ws.send("connect")
-      }, 1000);
+        ws.send("getList")
+      }, 2500);
 
       listRef.current = { ws: ws, interval: interval }
     }
