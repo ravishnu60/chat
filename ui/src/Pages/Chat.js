@@ -74,10 +74,7 @@ function Chat() {
   //   });
   // }
 
-  const typing = (status, val) => {
-    if (!val) {
-      status = false;
-    }
+  const typing = (status) => {
     axios({
       method: 'put',
       url: `${base_url}/typing`,
@@ -167,7 +164,8 @@ function Chat() {
 
     return () => {
       chatref.current?.ws?.close()
-      clearInterval(chatref.current?.interval)
+      clearInterval(chatref.current?.interval);
+      typing(false);
     }
   }, [user])
 
@@ -237,7 +235,7 @@ function Chat() {
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
           <input className='form-control border-secondary p-1' autoComplete='off'
-            placeholder='Message here' onFocus={(e)=>typing(true, e.target.value)}
+            placeholder='Message here' onFocus={()=>typing(true)}
             {...register('msg', { required: true, onBlur: () => { typing(false) } })} />
           <button className='btn btn-link' type='submit' title='Send'>
             {getValues('msg') ? <img src={sendIcon} width={35} /> : <img src={sendIcon1} width={35} />}
