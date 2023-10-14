@@ -117,9 +117,9 @@ function Chat() {
 
 
   const onmessage = (event) => {
-    setLoading(false);
     setChat(JSON.parse(event.data));
-
+    setLoading(false);
+    chatref.current?.data == undefined && setScroll(true)
   }
 
   useEffect(() => {
@@ -141,9 +141,7 @@ function Chat() {
       if (temp?.message?.length !== undefined && temp?.message?.length !== chat?.message?.length) {
         limit != 10 && divEle?.scrollTo(0, tempEle.scrollHeight * 5 + 25)
       }
-      chatref.current?.data == undefined && setTimeout(() => {
-        setScroll(true)
-      }, 70);
+
     
       chatref.current = { ...chatref.current, data: chat }
   }, [chat])
