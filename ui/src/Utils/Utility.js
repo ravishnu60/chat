@@ -47,9 +47,6 @@ navigator.serviceWorker.register("sw.js");
 export function showNotification(title, body) {
 
     const isMobile = window.innerWidth <= 768;
-
-    console.log(isMobile);
-
     if (isMobile) {
         navigator.serviceWorker.ready.then((registration) => {
             // Show a notification that includes an action titled Archive.
