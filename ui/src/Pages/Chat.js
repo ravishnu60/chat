@@ -62,17 +62,17 @@ function Chat() {
     }
   }
 
-  // const markasread = () => {
-  //   axios({
-  //     method: 'put',
-  //     url: `${base_url}/markasread/${userData?.id}`,
-  //     headers: header,
-  //   }).then(res => {
+  const markasread = () => {
+    axios({
+      method: 'put',
+      url: `${base_url}/markasread/${userData?.id}`,
+      headers: header,
+    }).then(res => {
 
-  //   }).catch(err => {
+    }).catch(err => {
 
-  //   });
-  // }
+    });
+  }
 
   const typing = (status) => {
     axios({
@@ -109,7 +109,7 @@ function Chat() {
   useEffect(() => {
     !userData?.id && navigate('/home')
     getUser()
-    // markasread();
+    markasread();
   }, []);
 
 
@@ -235,8 +235,8 @@ function Chat() {
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
           <input className='form-control border-secondary p-1' autoComplete='off'
-            placeholder='Message here' onFocus={()=>typing(true)}
-            {...register('msg', { required: true, onBlur: () => { typing(false) } })} />
+            placeholder='Message here' onFocus={()=>typing(true)} onBlur={() =>typing(false)}
+            {...register('msg', { required: true})} />
           <button className='btn btn-link' type='submit' title='Send'>
             {getValues('msg') ? <img src={sendIcon} width={35} /> : <img src={sendIcon1} width={35} />}
           </button>
