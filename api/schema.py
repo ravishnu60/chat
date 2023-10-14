@@ -6,7 +6,7 @@ class userSchma(BaseModel):
     phone_no: int
     password : str
     
-class MsgSchma(BaseModel):
+class MsgSchma():
     from_id:Optional[int]=0
     to_id:int
     message:str

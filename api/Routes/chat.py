@@ -1,3 +1,4 @@
+import json
 from fastapi import APIRouter, Depends, Response, status, WebSocket
 import pytz
 from db import get_DB
@@ -170,29 +171,37 @@ def getmsg(user_id,id,limit, db):
     
     return {"message":aligned_msg, **type_status}
 
+
 @app.websocket('/getchat/{user_id}')
-async def getchat(websocket:WebSocket,user_id:int, id: int, res: Response, db: Session = Depends(get_DB)):
+async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depends(get_DB)):
     await websocket.accept()
     
     while True:
         try:
             #receive
             receive= await websocket.receive_text()
+            receive= json.loads(receive)
+            #save msg
+            if receive.get('msg'):
+                data=receive['msg']
+                msg = Message(from_id=user_id, to_id=data['to_id'], message=data['message'])
+                db.add(msg)
+                db.commit()
             # send message
-            newData=getmsg(user_id,id,int(receive),db)
+            newData=getmsg(user_id,id,int(receive['limit']),db)
             if newData:
                 await websocket.send_json(newData)
         except Exception as Err:
             print("Connection closed",Err)
             break
 
-@app.post('/message')
-def chat(data: MsgSchma, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
-    data.from_id = get_curr_user['id']
-    msg = Message(**data.model_dump())
-    db.add(msg)
-    db.commit()
-    return {"status_code": 200, "status": "success", "detail": "sent successfully"}
+# @app.post('/message')
+# def chat(data: MsgSchma, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
+#     data.from_id = get_curr_user['id']
+#     msg = Message(**data.model_dump())
+#     db.add(msg)
+#     db.commit()
+#     return {"status_code": 200, "status": "success", "detail": "sent successfully"}
 
 
 @app.put('/markasread/{sender_id}')

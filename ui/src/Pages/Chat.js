@@ -17,17 +17,14 @@ function Chat() {
   const navigate = useNavigate();
 
   const userData = location.state;
-  const [chat, setChat] = useState();
+  const [chat, setChat] = useState({typing:false,message:[]});
   const [scroll, setScroll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingdel, setLoadingdel] = useState({});
-  const [count, setCount] = useState(false); //for continuous call
   const { register, reset, handleSubmit, getValues } = useForm();
   const [limit, setLimit] = useState(10);
   const [user, setUser] = useState();
-  const chatref= useRef({limit:10})
-
-  // const [preload, setPreload] = useState(false);
+  const chatref= useRef({limit:10,message:null});
 
   //scroll element
   const divEle = document.getElementById('chatDiv');
@@ -44,21 +41,15 @@ function Chat() {
       typing(false);
     }, 200);
     if (data.msg !== '') {
-      let temp = {
+      chatref.current.message = {
         to_id: userData?.id,
         message: data.msg
       }
-
-      axios({
-        method: 'POST',
-        url: `${base_url}/message`,
-        headers: header,
-        data: temp
-      }).then((res) => {
-        reset();
-      }).catch((err) => {
-
-      });
+      let temp= chat
+      temp.message.push({from_id:true,message:data.msg, load:true, msg_id:chat.message[chat.message.length-1].msg_id+1});
+      setChat(temp);
+      setScroll(!scroll)
+      reset();
     }
   }
 
@@ -114,7 +105,13 @@ function Chat() {
 
 
   const onmessage = (event) => {
-    setChat(JSON.parse(event.data));
+    let temp= JSON.parse(event.data);
+    let msg_id= chatref.current?.data?.message?.filter((item)=>item?.load==true)[0]?.msg_id;
+    if(temp?.message?.filter((item)=>item?.msg_id == msg_id)){
+      setChat(temp);
+    }else if (!msg_id){
+      setChat(temp);
+    }
     setLoading(false);
     chatref.current?.data == undefined && setScroll(true)
   }
@@ -150,14 +147,15 @@ function Chat() {
       const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${userData?.id}`);
 
       ws.onopen = () => {
-        ws.send(chatref.current.limit)
+        ws.send(JSON.stringify({limit:chatref.current.limit,msg:chatref.current.message}))
       }
 
       ws.onmessage = onmessage
 
       let interval = setInterval(() => {
-        ws.send(chatref.current.limit)
-      }, 2500);
+        ws.send(JSON.stringify({limit:chatref.current.limit,msg:chatref.current.message}))
+        chatref.current.message && (chatref.current.message=null)
+      }, 1000);
 
       chatref.current = { ws: ws, interval: interval, ...chatref.current }
     }
@@ -209,7 +207,7 @@ function Chat() {
                   <div className='col-2'></div> {/* send */}
                   <div className='col-10 pr-2'>
                     <div className='d-flex flex-row-reverse align-items-center'>
-                      {loadingdel?.[data?.msg_id] ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
+                      {(loadingdel?.[data?.msg_id]|| data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
                       <div className='border border-primary rounded p-2 messagetext1'>{data?.message}</div>
                     </div>
                     <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
@@ -227,7 +225,7 @@ function Chat() {
               }
             </div>
           )}
-          {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length == 1 || !chat?.message) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
+          {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={30} />}
         </div>
       </div>
