@@ -99,3 +99,19 @@ input,
         font-size: 94%;
     }
 }
+
+.selImg{
+    cursor: pointer;
+    border: 1px solid ;
+    border-radius: 10px;
+    /* margin-left: -15px; */
+}
+
+.plus{
+    visibility: hidden;
+    rotate: 40deg;
+}
+.imgDiv:hover .plus{
+    z-index: 999;
+    visibility: visible;
+}

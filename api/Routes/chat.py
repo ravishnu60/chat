@@ -1,13 +1,14 @@
-import json
-from fastapi import APIRouter, Depends, Response, status, WebSocket
-import pytz
+from fastapi import APIRouter, Depends, Response, status, WebSocket, Form, UploadFile, File
+from fastapi.responses import FileResponse
 from db import get_DB
 from sqlalchemy.orm import Session, load_only
-from schema import userSchma, MsgSchma, TypingSchema
+from schema import userSchma, MediaScm, TypingSchema
 from Authorize import hash, token
-from Models.model import User, Message, Typing
+from Models.model import User, Message, Typing, Media
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import or_, and_
+import json,pytz,os, random
+from utils import secret
 
 app = APIRouter(
     prefix='/chat',
@@ -55,6 +56,14 @@ def findUser(phone_no: int, res: Response, db: Session = Depends(get_DB), get_cu
         return {"status_code": 404, "status": "failed", "detail": "User not found"}
     del user.password
     return {"status_code": 200, "status": "success", "detail": "User found", "data": user}
+
+#set typing off when end chat
+def typingOff(db, id):
+    query= db.query(Typing).filter(Typing.from_id ==id)
+    
+    if query.first():
+        query.update({"typing": False}, synchronize_session=False)
+        db.commit()
 
 # get chat list by websocket
 def newchat(user_id, db):
@@ -123,7 +132,7 @@ def getmsg(user_id,id,limit, db):
 
     # get messages latest based on limit initial-10
     my_msg = db.query(Message)\
-        .options(load_only(Message.message, Message.is_read, Message.from_id, Message.createdAt))\
+        .options(load_only(Message.message, Message.is_read, Message.from_id,Message.is_media, Message.createdAt))\
         .filter(or_(and_(Message.from_id == user_id, Message.to_id == id),
                     and_(Message.to_id == user_id, Message.from_id == id)))\
         .order_by(Message.createdAt.desc()).limit(limit).all()
@@ -137,6 +146,7 @@ def getmsg(user_id,id,limit, db):
         temp['from_id']= msg.from_id
         temp['createdAt']= msg.createdAt
         temp['message']= msg.message
+        temp['is_media']= msg.is_media
         temp['msg_id']= msg.msg_id
         
         temp['createdAt'] = msg.createdAt.astimezone(pytz.timezone('Asia/Kolkata'))
@@ -175,7 +185,7 @@ def getmsg(user_id,id,limit, db):
 @app.websocket('/getchat/{user_id}')
 async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depends(get_DB)):
     await websocket.accept()
-    
+    # user_id=> from_id, id=> to_id
     while True:
         try:
             #receive
@@ -193,16 +203,54 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
                 await websocket.send_json(newData)
         except Exception as Err:
             print("Connection closed",Err)
+            typingOff(db, user_id)
             break
 
-# @app.post('/message')
-# def chat(data: MsgSchma, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
-#     data.from_id = get_curr_user['id']
-#     msg = Message(**data.model_dump())
-#     db.add(msg)
-#     db.commit()
-#     return {"status_code": 200, "status": "success", "detail": "sent successfully"}
+def checkPathAvailable(file_loc, name, path):
+    if os.path.exists(file_loc):
+        num=random.randint(1,1000)
+        file_type=os.path.splitext(name)
+        newname=file_type[0]+str(num)+file_type[1]
+        file_new = (f"{path}/{newname}")
+        return checkPathAvailable(file_new, name, path)
+    else:
+        return file_loc
 
+@app.post('/media')
+def addMedia(res: Response, data:str=Form(),source:UploadFile=File(), db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
+    try:
+        data= json.loads(data)
+    except:
+        res.status_code= status.HTTP_422_UNPROCESSABLE_ENTITY
+        return {"status_code":422, "status":'Unprocessable Entity',"detail":"Construct data properly"}
+    path = os.path.join("Assets",f"{get_curr_user['id']}_{data['to_id']}")
+    file_loc= f"{path}/{source.filename}"
+    file_loc= checkPathAvailable(file_loc, source.filename, path)
+    
+    media= Media(media_loc= file_loc)
+    db.add(media)
+    db.commit()
+    db.refresh(media)
+    try:
+        msg = Message(from_id=get_curr_user['id'], to_id=data['to_id'], message=media.media_id, is_media=True)
+        db.add(msg)
+        db.commit()
+        if not os.path.exists(path):
+            os.makedirs(path)
+
+        with open(file_loc, "wb+") as file_object:
+            file_object.write(source.file.read())
+    except:
+        res.status_code=status.HTTP_409_CONFLICT
+        return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}   
+    return {"status_code": 200, "status": "success", "detail": "sent successfully"}
+
+@app.get('/media/{id}')
+def getMedia(id:int,db: Session = Depends(get_DB)):
+    source= db.query(Media).filter(Media.media_id == id).first()
+    if not source:
+        return {"status_code": 404, "status": "failed", "detail": "file not found"}
+    return FileResponse(source.media_loc)
 
 @app.put('/markasread/{sender_id}')
 def markAsRead(sender_id: int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
@@ -246,15 +294,24 @@ def deleteChat(to_id: int, res: Response, db: Session = Depends(get_DB), get_cur
     return {"status_code": 204, "status": "success", "detail": "Chat deleted successfully"}
 
 
-@app.delete("/deletemsg/{msg_id}")
-def deleteChat(msg_id: int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
+@app.delete("/deletemsg/{msg_id}/{media_id}")
+def deleteChat(msg_id: int,media_id:int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
     get_msg = db.query(Message).filter(
         Message.msg_id == msg_id, Message.from_id == get_curr_user['id'])
-
+    
+    get_media= db.query(Media).filter(Media.media_id == media_id)
+    if get_media.first():
+        try: 
+            os.remove(get_media.first().media_loc)
+        except OSError as error:
+            pass
+        get_media.delete(synchronize_session=False)
+        db.commit()
+        
     if get_msg.first():
         get_msg.delete(synchronize_session=False)
         db.commit()
     else:
-        print("no")
+        pass
     res.status_code = status.HTTP_204_NO_CONTENT
     return {"status_code": 204, "status": "success", "detail": "Chat deleted successfully"}

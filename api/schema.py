@@ -6,11 +6,9 @@ class userSchma(BaseModel):
     phone_no: int
     password : str
     
-class MsgSchma():
+class MediaScm():
     from_id:Optional[int]=0
     to_id:int
-    message:str
-    is_read:Optional[bool]=False
 
 class TypingSchema(BaseModel):
     from_id:Optional[int]=0

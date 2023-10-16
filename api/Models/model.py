@@ -16,7 +16,7 @@ class Message(base):
     to_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     message= Column(String, nullable= False)
     is_read= Column(Boolean, nullable= False,server_default='false')
-    sent=Column(Boolean,nullable= False, server_default='true')
+    is_media=Column(Boolean,nullable= False, server_default='false')
     createdAt= Column(DateTime, nullable= False, server_default=func.now())
     from_delete= Column(Boolean,nullable= False, server_default='false')
     to_delete= Column(Boolean,nullable= False, server_default='false')
@@ -31,6 +31,4 @@ class Typing(base):
 class Media(base):
     __tablename__ = 'media'
     media_id= Column(Integer, primary_key=True,nullable= False)
-    from_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
-    to_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     media_loc= Column(String,nullable= False)
