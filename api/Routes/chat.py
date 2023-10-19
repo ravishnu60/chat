@@ -121,15 +121,17 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
             print("Connection closed",Err)
             break
 
-#get messages
-def getmsg(user_id,id,limit, db):
-     # update viewed status
+#updated viewwd status
+def updateView(user_id,id,db):
+    # update viewed status
     queryobj =db.query(Message).filter(
         Message.to_id == user_id, Message.from_id == id, Message.is_read == False)
     if queryobj.first():
         queryobj.update({"is_read": True}, synchronize_session=False)
         db.commit()
-
+        
+#get messages
+def getmsg(user_id,id,limit, db):
     # get messages latest based on limit initial-10
     my_msg = db.query(Message)\
         .options(load_only(Message.message, Message.is_read, Message.from_id,Message.is_media, Message.createdAt))\
@@ -201,6 +203,7 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
             newData=getmsg(user_id,id,int(receive['limit']),db)
             if newData:
                 await websocket.send_json(newData)
+            updateView(user_id,id,db)
         except Exception as Err:
             print("Connection closed",Err)
             typingOff(db, user_id)

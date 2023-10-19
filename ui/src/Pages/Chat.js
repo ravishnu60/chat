@@ -69,7 +69,11 @@ function Chat() {
     });
   }
 
-  const typing = (status) => {
+  const typing = (status, value) => {
+    if (!value) {
+      status = false;
+    }
+
     axios({
       method: 'put',
       url: `${base_url}/typing`,
@@ -85,7 +89,7 @@ function Chat() {
     }, 500);
   }
 
-  const deleteMsg = (id,media) => {
+  const deleteMsg = (id, media) => {
     setLoadingdel({ [id]: true });
     axios({
       method: 'delete',
@@ -104,7 +108,7 @@ function Chat() {
   useEffect(() => {
     !userData?.id && navigate('/home')
     getUser()
-    markasread();
+    // markasread();
   }, []);
 
 
@@ -128,14 +132,21 @@ function Chat() {
     //chek new msg for alert and scroll
     if (temp?.message?.[temp?.message?.length - 1]?.message != chat?.message?.[chat?.message?.length - 1]?.message) {
       if (temp?.message?.length !== 0 && permission === "granted") {
-        if (chat?.message?.[chat?.message?.length - 1]?.from_id == false) {
-          showNotification(`Message from ${userData?.name}`, chat?.message[chat?.message?.length - 1]?.message);
+        if (chat?.message?.[chat?.message?.length - 1]?.from_id == false && chat?.message[chat?.message?.length - 1]?.is_read === false) {
+          showNotification(`Message from ${userData?.name}`, chat?.message[chat?.message?.length - 1]?.is_media ? "Send an image" : chat?.message[chat?.message?.length - 1]?.message);
         }
       } else if (permission === "default") {
         requestPermission();
       }
       setScroll(!scroll);
     }
+
+    if (chat?.message[chat?.message?.length - 1]?.is_media && chat?.message[chat?.message?.length - 1]?.is_read === false) {
+      setTimeout(() => {
+        setScroll(!scroll);
+      }, 400);
+    }
+
     //align div for prev chat view
     if (temp?.message?.length !== undefined && temp?.message?.length !== chat?.message?.length) {
       limit != 10 && divEle?.scrollTo(0, tempEle.scrollHeight * 5 + 25)
@@ -252,14 +263,18 @@ function Chat() {
                   <div className='col-10 pr-2'>
                     <div className='d-flex flex-row-reverse align-items-center'>
                       {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id, data?.is_media ? data?.message : 0)}></i>}
-                      {data?.is_media ?
-                        <img src={base_url + "/media/" + data?.message}
-                          alt='Loading'
-                          data-toggle="modal"
-                          data-target="#exampleModal"
-                          style={{ cursor: 'pointer' }}
-                          width={80} onClick={() => setOneImg(base_url + "/media/" + data?.message)} /> :
-                        <div className='border border-primary rounded p-2 messagetext1'>{data?.message}</div>}
+                      <div className='border border-primary rounded p-2 messagetext1'>
+                        {data?.is_media ?
+                          <img src={base_url + "/media/" + data?.message}
+                            onl
+                            alt='Loading'
+                            data-toggle="modal"
+                            data-target="#exampleModal"
+                            style={{ cursor: 'pointer' }}
+                            width={80} onClick={() => setOneImg(base_url + "/media/" + data?.message)} /> :
+                          data?.message
+                        }
+                      </div>
                     </div>
                     <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
                   </div>
@@ -268,14 +283,17 @@ function Chat() {
                 <>{data?.from_id == false ?
                   <div className='col-10 pl-2'>{/* receive */}
                     <div className='d-flex'>
-                    {data?.is_media ?
-                        <img src={base_url + "/media/" + data?.message}
-                          alt='Loading'
-                          data-toggle="modal"
-                          data-target="#exampleModal"
-                          style={{ cursor: 'pointer' }}
-                          width={80} onClick={() => setOneImg(base_url + "/media/" + data?.message)} /> :
-                      <div className='border border-success rounded p-2 messagetext2'>{data?.message}</div>}
+                      <div className='border border-success rounded p-2 messagetext2'>
+                        {data?.is_media ?
+                          <img src={base_url + "/media/" + data?.message}
+                            alt='Loading'
+                            data-toggle="modal"
+                            data-target="#exampleModal"
+                            style={{ cursor: 'pointer' }}
+                            width={80} onClick={() => setOneImg(base_url + "/media/" + data?.message)} /> :
+                          data?.message
+                        }
+                      </div>
                     </div>
                     <div className='small msgtime2' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
 
@@ -295,8 +313,8 @@ function Chat() {
           </button>
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
           <input className='form-control border-secondary p-1' autoComplete='off'
-            placeholder='Message here' onFocus={() => typing(true)}
-            {...register('msg', { required: true, onBlur: () => typing(false) })} />
+            placeholder='Message here'
+            {...register('msg', { required: true, onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
 
           {imgFile?.url &&
             // <div className='ml-2 d-flex imgDiv' >
