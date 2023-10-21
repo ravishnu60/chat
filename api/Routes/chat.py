@@ -44,8 +44,15 @@ def login(res: Response, data: OAuth2PasswordRequestForm = Depends(), db: Sessio
 
 
 @app.get('/userinfo')
-def userData(res: Response, get_curr_user=Depends(token.get_current_user)):
-    return {"status_code": 200, "status": "success", "detail": "User found", "data": get_curr_user}
+def userData(db: Session = Depends(get_DB),  get_curr_user=Depends(token.get_current_user)):
+    query= db.query(User).filter(User.user_id== get_curr_user['id'])
+    if not query.first().alive:
+        query.update({"alive":True}, synchronize_session=False)
+        db.commit()
+    temp=query.first()
+    data:dict={}
+    data['name'],data['phone_no'],data['id']= temp.name, temp.phone_no, temp.user_id
+    return {"status_code": 200, "status": "success", "detail": "User found", "data": data}
 
 
 @app.get('/find/{phone_no}')
@@ -96,7 +103,7 @@ def newchat(user_id, db):
 
     get_name = []
     for id in ids:
-        temp = db.query(User).options(load_only(User.name)).filter(User.user_id == id).first()
+        temp = db.query(User).options(load_only(User.name, User.alive)).filter(User.user_id == id).first()
         temp.newmsg = newtext[str(id)]
         temp= temp.__dict__
         temp.pop('_sa_instance_state')
@@ -119,6 +126,9 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
                 await websocket.send_json(newData)
         except Exception as Err:
             print("Connection closed",Err)
+            query= db.query(User).filter(User.user_id== id)
+            query.update({"alive":False}, synchronize_session=False)
+            db.commit()
             break
 
 #updated viewwd status

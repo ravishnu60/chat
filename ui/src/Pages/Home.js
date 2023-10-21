@@ -9,15 +9,16 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { Notifications } from 'react-push-notification';
 
-function Home() {
+function Home(props) {
   const [list, setList] = useState([]);
-  const [update, setUpdate] = useState(false);
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
   const header = { "Authorization": "bearer " + localStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
+  const { register: profileReg, formState: { errors: profileErr }, reset: ProfileReset, handleSubmit: ProfileSubmit, } = useForm();
   const listRef = useRef();
+  const [step, setStep] = useState(0);
 
   const newChat = (data) => {
     const search = data.search;
@@ -79,17 +80,23 @@ function Home() {
   //Notify for new messages
   useEffect(() => {
     let popup = false;
-    let temp= listRef.current?.data
+    let alive = false;
+    let temp = listRef.current?.data
     if (list?.length !== 0 && listRef.current?.data) {
       temp?.forEach((element, index) => {
-        if (element?.newmsg != list[index].newmsg)
+        if (element?.newmsg != list[index].newmsg) {
           popup = true;
+        }
+        if (element?.alive == false && list[index]?.alive)
+          alive = true;
       });
     }
     if (popup)
       showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
-    
-      listRef.current = { ...listRef.current, data: list }
+    if (alive)
+      showNotification(`Excuse me ${user?.name}`, 'Your friends are online now');
+
+    listRef.current = { ...listRef.current, data: list }
   }, [list])
 
   //websocket event
@@ -117,6 +124,13 @@ function Home() {
     }
   }, [user])
 
+  useEffect(() => {
+    ProfileReset(user)
+    props?.click && document.getElementById('modalBtn').click();
+  }, [props?.click])
+
+
+
   return (
     <>
       {loadingFunc(loading)}
@@ -140,9 +154,9 @@ function Home() {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items-center px-0 py-1 border-bottom-0"
-            >
-              <div className='col-lg-11 col-10 d-flex align-items-center' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
+              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items px-1 py-1 border-bottom-0"
+            ><div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
+              <div className='col-lg-11 col-10 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
                 <div className='profile mr-3' style={{ backgroundImage: `url(${profile})` }}></div>
                 {item?.name}
                 <span className='ml-2'>
@@ -156,6 +170,44 @@ function Home() {
           ))
         }
         {(list?.length == 0 && !loading) && <div className='text-center text-secondary h4'>No chats</div>}
+      </div>
+
+      {/* modal */}
+      <button data-toggle="modal" data-target="#profile" id="modalBtn" style={{ display: 'none' }}></button>
+
+      <div class="modal" tabindex="-1" role="dialog" id="profile" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">User Profile</h5>
+            </div>
+            <div class="modal-body">
+              <div className='row'>
+                <div className='col-7'>
+                  <div className='col-12'>
+                    <label className='text-secondary'>Name</label>
+                    <input className='form-control' name='name' {...profileReg("name", { required: true })} />
+                  </div>
+                  <div className='col-12 mt-2'>
+                    <label className='text-secondary'>Mobile No</label>
+                    <input className='form-control' name='phone_no' {...profileReg("phone_no", { required: true })} />
+                  </div>
+                  <div className='text-center mt-2'>
+                    <button type="button" class="btn btn-sm btn-success">Update</button>
+                  </div>
+                </div>
+                <div className='col-5'>
+                  <img alt='No img' /> <br/>
+                  <button className='btn btn-sm btn-primary'>change</button>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button className='btn  btn-sm btn-primary'>Change Password</button>
+              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal" onClick={() => { props?.onClick(false) }}>Close</button>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )
