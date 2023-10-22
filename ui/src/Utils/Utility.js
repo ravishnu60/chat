@@ -4,7 +4,7 @@ import logo from '../Assets/logo.png'
 import loading_gif from '../Assets/loading1.gif';
 import addNotification from "react-push-notification";
 
-// export const base_url = "http://127.0.0.1:8000/chat";
+// export const base_url = "http://127.0.0.1:8000/";
 export const base_url = "https://chat-api-zu97.onrender.com/chat";
 
 // export const webSocketUrl = "ws://localhost:8000/chat";
@@ -23,7 +23,7 @@ export const alert = (text, status) => {
 export const userstatus = async (navigate, header) => {
     return await axios({
         method: 'GET',
-        url: `${base_url}/userinfo`,
+        url: `${base_url}user/userinfo`,
         headers: header
     }).then((res) => {
         return res.data;

@@ -7,10 +7,10 @@ const Home = React.lazy(() => import('../Pages/Home.js'));
 const Chat = React.lazy(() => import('../Pages/Chat.js'));
 
 function Main() {
-    const [refresh, setRefresh] = useState(false)
+    const [refresh, setRefresh] = useState({click:false,refresh:false})
     return (
         <div>
-            <Header onClick={setRefresh} />
+            <Header onClick={setRefresh} click={refresh} />
             <div className=' container-fluid mt-3 pt-5'>
                 <Suspense>
                     <Routes>

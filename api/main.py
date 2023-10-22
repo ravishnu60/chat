@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
-from Routes import chat
+from Routes import chat, user
 from fastapi.middleware.cors import CORSMiddleware
 
 app=FastAPI()
@@ -22,6 +22,7 @@ def root():
     return {"status_code":200,"status":"success","detail":"API is running"}
 
 app.include_router(chat.app)
+app.include_router(user.app)
 
 api_detail = get_openapi(
     title="Chat API",

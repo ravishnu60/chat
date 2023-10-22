@@ -21,7 +21,7 @@ function Login() {
     formdata.append('username', data.username);
     formdata.append('password', data.password);
 
-    axios.post(`${base_url}/login`, formdata).then((res) => {
+    axios.post(`${base_url}user/login`, formdata).then((res) => {
       localStorage.setItem('token', res.data.access_token);
       setTimeout(() => {
         navigate('/home');
@@ -38,7 +38,7 @@ function Login() {
     setLoading(true);
     axios({
       method: 'POST',
-      url: `${base_url}/new`,
+      url: `${base_url}user/new`,
       data: data
     }).then((res) => {
       alert('Registered successfully', true);

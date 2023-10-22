@@ -9,6 +9,7 @@ class User(base):
     password= Column(String, nullable= False)
     createdAt= Column(DateTime, nullable= False, server_default= func.now())
     alive= Column(Boolean, server_default='false')
+    profile= Column(String, nullable= True)
     
 class Message(base):
     __tablename__= 'messages'

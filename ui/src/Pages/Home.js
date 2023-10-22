@@ -16,16 +16,17 @@ function Home(props) {
   const [loading, setLoading] = useState(true);
   const header = { "Authorization": "bearer " + localStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
-  const { register: profileReg, formState: { errors: profileErr }, reset: ProfileReset, handleSubmit: ProfileSubmit, } = useForm();
+  const { register: profileReg, formState: { errors: profileErr }, reset: ProfileReset, handleSubmit: ProfileSubmit, getValues } = useForm();
   const listRef = useRef();
   const [step, setStep] = useState(0);
+  const [profilePic, setProfile] = useState();
 
   const newChat = (data) => {
     const search = data.search;
     if (search && search?.toString()?.length > 9) {
       axios({
         method: 'get',
-        url: `${base_url}/find/${search}`,
+        url: `${base_url}user/find/${search}`,
         headers: header
       }).then((res) => {
         reset();
@@ -39,7 +40,8 @@ function Home(props) {
 
   const getUser = async () => {
     const data = await userstatus(navigate, header);
-    setUser(data?.data)
+    setUser(data?.data);
+    props?.onClick(pre=>({...pre,refresh:!pre.refresh}))
   };
 
   const deleteChat = (id) => {
@@ -54,7 +56,7 @@ function Home(props) {
       if (result.isConfirmed) {
         axios({
           method: 'delete',
-          url: `${base_url}/deletechat/${id}`,
+          url: `${base_url}chat/deletechat/${id}`,
           headers: header
         }).then((response) => {
           alert('deleted successfully', 'success')
@@ -126,25 +128,87 @@ function Home(props) {
 
   useEffect(() => {
     ProfileReset(user)
-    props?.click && document.getElementById('modalBtn').click();
-  }, [props?.click])
+    props?.click?.click && document.getElementById('modalBtn').click();
+  }, [props?.click?.click])
 
+  const updateProfile = (data) => {
+    const url= `${base_url}user/${step==0 ? 'update' : 'password'}`;
 
+    axios({
+      method:'put',
+      url:url,
+      data:data,
+      headers:header
+    }).then((res)=>{
+      console.log(res);
+      if(step==0){
+        alert('updated successfully','success');
+        setTimeout(() => {
+        getUser();
+        }, 300);
+      }else{
+        alert('Password changed', 'success');
+        setStep(0);
+      }
+    }).catch((err)=>{
+      if(step==0){
+        alert('Error while update, try later');
+      }else{
+        alert(err?.response?.data?.detail);
+      }
+    })
+  }
+
+  const addPic = (e) => {
+    if (e.target.files?.length) {
+      var allowedExtensions = /(\.jpg|\.jpeg|\.png|)$/i;
+
+      if (!allowedExtensions.exec(e.target.value)) {
+        alert("Image files only");
+        return;
+      }
+      if (e.target.files[0].size > 100e5) {
+        alert("Large image files");
+        return;
+      }
+      setProfile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]) });
+    } else {
+      setProfile();
+    }
+  }
+
+  const updatePic = () => {
+    const fm = new FormData();
+    fm.append('source', profilePic?.file);
+
+    axios({
+      method:'put',
+      url:base_url+'user/profilepic',
+      data:fm,
+      headers:header
+    }).then((res)=>{
+      alert("profile updated",'success');
+      getUser();
+    }).catch(err =>{
+      console.log(err);
+      alert("Error, try later")
+    })
+  }
 
   return (
     <>
       {loadingFunc(loading)}
       <Notifications />
       <form onSubmit={handleSubmit(newChat)}>
-        <div class="input-group">
-          <input type="number" class="form-control"
+        <div className="input-group">
+          <input type="number" className="form-control"
             autoComplete='off'
             placeholder="Enter mobile no."
             {...register('search', { required: true, minLength: 10 })}
             aria-invalid={errors?.password ? "true" : "false"}
           />
-          <div class="input-group-append">
-            <button class="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} /></button>
+          <div className="input-group-append">
+            <button className="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} /></button>
           </div>
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
@@ -175,36 +239,70 @@ function Home(props) {
       {/* modal */}
       <button data-toggle="modal" data-target="#profile" id="modalBtn" style={{ display: 'none' }}></button>
 
-      <div class="modal" tabindex="-1" role="dialog" id="profile" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title">User Profile</h5>
+      <div className="modal" tabIndex="-1" role="dialog" id="profile" data-backdrop="static" data-keyboard="false">
+        <div className="modal-dialog" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">User Profile</h5>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={()=>props?.onClick(pre=>({...pre,click:false}))}>
+                <span aria-hidden="true">&times;</span>
+              </button>
             </div>
-            <div class="modal-body">
-              <div className='row'>
-                <div className='col-7'>
-                  <div className='col-12'>
-                    <label className='text-secondary'>Name</label>
-                    <input className='form-control' name='name' {...profileReg("name", { required: true })} />
+            <div className="modal-body">
+              <form onSubmit={ProfileSubmit(updateProfile)}>
+                {step == 0 ?
+                  <div className='row'>
+                    <div className='col-7'>
+                      <div className='col-12'>
+                        <label className='text-secondary'>Name</label>
+                        <input className='form-control' name='name' {...profileReg("name", { required: true })} />
+                      </div>
+                      <div className='col-12 mt-2'>
+                        <label className='text-secondary'>Mobile No</label>
+                        <input className='form-control' name='phone_no' {...profileReg("phone_no", { required: true })} />
+                      </div>
+                      <div className='text-center mt-3'>
+                        <button className='btn  btn-sm btn-success' >Update</button>
+                        <button className='btn  btn-sm btn-primary ml-3'
+                          onClick={() => { setStep(1); ProfileReset({ password: null, new_password: null, confirm_pwd: null }) }}
+                        >Change Password</button>
+                      </div>
+                    </div>
+                    <div className='col-5 text-center'>
+                      <img src={profilePic ? profilePic?.url : user?.profile ? user?.profile : profile} width={140} />
+                      <div className='align-bottom'>
+                        <button type='button' className='btn btn-primary btn-sm mt-4' onClick={() => document.getElementById('profilesel')?.click()}>change pic</button>
+                        {profilePic && <button type='button' className='btn btn-success btn-sm mt-4 ml-3' onClick={updatePic}>update</button>}
+                        <input type='file' id='profilesel' style={{ display: 'none' }} onChange={addPic} />
+                      </div>
+                    </div>
                   </div>
-                  <div className='col-12 mt-2'>
-                    <label className='text-secondary'>Mobile No</label>
-                    <input className='form-control' name='phone_no' {...profileReg("phone_no", { required: true })} />
-                  </div>
-                  <div className='text-center mt-2'>
-                    <button type="button" class="btn btn-sm btn-success">Update</button>
-                  </div>
-                </div>
-                <div className='col-5'>
-                  <img alt='No img' /> <br/>
-                  <button className='btn btn-sm btn-primary'>change</button>
-                </div>
-              </div>
-            </div>
-            <div class="modal-footer">
-              <button className='btn  btn-sm btn-primary'>Change Password</button>
-              <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal" onClick={() => { props?.onClick(false) }}>Close</button>
+                  :
+                  <>
+                    <div className='row'>
+                      <div className='col-12'>
+                        <label className='text-secondary'>Current password</label>
+                        <input className='form-control' type='password' autoComplete='off' name='password' {...profileReg("password", { required: true })} />
+                      </div>
+                      <div className='col-12'>
+                        <label className='text-secondary'>New password</label>
+                        <input className='form-control' type='password' autoComplete='off' name='new_password' {...profileReg("new_password", { required: true })} />
+                      </div>
+                      <div className='col-12'>
+                        <label className='text-secondary'>Confirm password</label>
+                        <input className='form-control' name='confirm_pwd'
+                          type='password' autoComplete='off'
+                          {...profileReg("confirm_pwd", { required: true, validate: value => value === getValues("new_password") })} />
+                        {profileErr?.confirm_pwd?.type=='validate' && <div className='text-danger'>Password not match</div>}
+
+                      </div>
+                    </div>
+                    <div className='text-center mt-2'>
+                      <button type="submit" className="btn btn-sm btn-success">Update</button>
+                      <button type='button' className='btn btn-sm btn-secondary ml-3' onClick={() => { setStep(0); ProfileReset(user) }} >Back</button>
+                    </div>
+                  </>}
+              </form>
             </div>
           </div>
         </div>
