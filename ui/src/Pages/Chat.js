@@ -60,7 +60,7 @@ function Chat() {
   const markasread = () => {
     axios({
       method: 'put',
-      url: `${base_url}/markasread/${userData?.id}`,
+      url: `${base_url}chat/markasread/${userData?.id}`,
       headers: header,
     }).then(res => {
 
@@ -76,7 +76,7 @@ function Chat() {
 
     axios({
       method: 'put',
-      url: `${base_url}/typing`,
+      url: `${base_url}chat/typing`,
       data: { to_id: userData?.id, typing: status },
       headers: header
     }).then(res => {
@@ -93,7 +93,7 @@ function Chat() {
     setLoadingdel({ [id]: true });
     axios({
       method: 'delete',
-      url: `${base_url}/deletemsg/${id}/${media}`,
+      url: `${base_url}chat/deletemsg/${id}/${media}`,
       headers: header
     }).then((response) => {
       //removed
@@ -230,7 +230,7 @@ function Chat() {
 
       axios({
         method: 'POST',
-        url: base_url + '/media',
+        url: base_url + 'chat/media',
         data: fm,
         headers: header
       }).then((response) => {
@@ -331,15 +331,15 @@ function Chat() {
         </form>
       </div>
       {/* Modal */}
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
-          <div class="modal-content bg-dark">
+      <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
+          <div className="modal-content bg-dark">
             <div className='model-header'>
-              <button type="button" class="close px-2" data-dismiss='modal' aria-label="Close" style={{ color: 'white' }}>
+              <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" style={{ color: 'white' }}>
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div class="modal-body" >
+            <div className="modal-body" >
               <div style={{ overflow: 'auto' }}>
                 <img src={oneImg} width={isMobile ? 350 : 760} />
               </div>

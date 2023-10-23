@@ -2,67 +2,16 @@ from fastapi import APIRouter, Depends, Response, status, WebSocket, Form, Uploa
 from fastapi.responses import FileResponse
 from db import get_DB
 from sqlalchemy.orm import Session, load_only
-from schema import userSchma, MediaScm, TypingSchema
-from Authorize import hash, token
+from schema import  TypingSchema
+from Authorize import  token
 from Models.model import User, Message, Typing, Media
-from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 from sqlalchemy import or_, and_
 import json,pytz,os, random
-from utils import secret
 
 app = APIRouter(
     prefix='/chat',
     tags=['Chat']
 )
-
-@app.post('/new')
-def newUser(data: userSchma, res: Response, db: Session = Depends(get_DB)):
-    check_exist = db.query(User).filter(User.phone_no == data.phone_no).first()
-    if check_exist:
-        res.status_code = status.HTTP_409_CONFLICT
-        return {"status_code": 409, "status": "failed", "detail": "Mobile number already in use"}
-    data.password = hash.encrypt(data.password)
-    newUserObj = User(**data.model_dump())
-    db.add(newUserObj)
-    db.commit()
-    db.refresh(newUserObj)
-    return {"status_code": 200, "status": "success", "detail": "Registered successfully"}
-
-
-@app.post('/login')
-def login(res: Response, data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_DB)):
-    get_user = db.query(User).filter(User.phone_no == data.username).first()
-    if not get_user:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return {"status_code": 404, "status": "failed", "detail": "User not found"}
-    if not hash.verify(data.password, get_user.password):
-        res.status_code = status.HTTP_403_FORBIDDEN
-        return {"status_code": 403, "status": "failed", "detail": "Username or password is invalid"}
-    acc_token = token.get_token(
-        {"id": get_user.user_id, "name": get_user.name})
-    return {"status_code": 200, "status": "success", "detail": "Logged in successfully", "access_token": acc_token, "token_type": "bearer"}
-
-
-@app.get('/userinfo')
-def userData(db: Session = Depends(get_DB),  get_curr_user=Depends(token.get_current_user)):
-    query= db.query(User).filter(User.user_id== get_curr_user['id'])
-    if not query.first().alive:
-        query.update({"alive":True}, synchronize_session=False)
-        db.commit()
-    temp=query.first()
-    data:dict={}
-    data['name'],data['phone_no'],data['id']= temp.name, temp.phone_no, temp.user_id
-    return {"status_code": 200, "status": "success", "detail": "User found", "data": data}
-
-
-@app.get('/find/{phone_no}')
-def findUser(phone_no: int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
-    user = db.query(User).filter(User.phone_no == phone_no).first()
-    if not user or user.user_id == get_curr_user['id']:
-        res.status_code = status.HTTP_404_NOT_FOUND
-        return {"status_code": 404, "status": "failed", "detail": "User not found"}
-    del user.password
-    return {"status_code": 200, "status": "success", "detail": "User found", "data": user}
 
 #set typing off when end chat
 def typingOff(db, id):
