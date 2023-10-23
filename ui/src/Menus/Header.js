@@ -25,7 +25,7 @@ function Header(props) {
       if (!(location.pathname == '/'))
         getUser();
     }, 400);
-  }, [props])
+  }, [])
   return (
     <div className='fixed-top'>
       <div className='text-center p-1 d-flex justify-content-between align-items-center header'>
@@ -35,7 +35,7 @@ function Header(props) {
           <button className='btn btn-danger btn-sm' title='sign out' hidden={location.pathname === '/login' ? true : false} onClick={signout}><i className='fas fa-sign-out-alt'></i></button>
         </div>
       </div>
-      {user?.name && <div className='text-center bg-white h6 p-1'>Welcome <Link to='/home' className='text-success'><u>{user?.name}</u> </Link></div>}
+      {user?.name && <div className='text-center bg-white h6 p-1'>Welcome <Link onClick={()=>location.pathname !== '/chat' && props.onClick(true)} className='text-success'><u>{user?.name}</u> </Link></div>}
     </div>
   )
 }

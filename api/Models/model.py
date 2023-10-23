@@ -8,6 +8,7 @@ class User(base):
     phone_no= Column(BigInteger, nullable= False)
     password= Column(String, nullable= False)
     createdAt= Column(DateTime, nullable= False, server_default= func.now())
+    alive= Column(Boolean, server_default='false')
     
 class Message(base):
     __tablename__= 'messages'
@@ -18,8 +19,6 @@ class Message(base):
     is_read= Column(Boolean, nullable= False,server_default='false')
     is_media=Column(Boolean,nullable= False, server_default='false')
     createdAt= Column(DateTime, nullable= False, server_default=func.now())
-    from_delete= Column(Boolean,nullable= False, server_default='false')
-    to_delete= Column(Boolean,nullable= False, server_default='false')
 
 class Typing(base):
     __tablename__= 'typing'

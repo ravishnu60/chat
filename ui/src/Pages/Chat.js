@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
-import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl, alert } from '../Utils/Utility';
+import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl, alert, isMobile } from '../Utils/Utility';
 import axios from 'axios';
 import { set, useForm } from 'react-hook-form';
 import typing_gif from '../Assets/typing.gif';
@@ -214,6 +214,7 @@ function Chat() {
         return;
       }
       setImgFile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]) });
+      document.getElementById('sendbtn').focus();
     } else {
       setImgFile();
     }
@@ -267,7 +268,7 @@ function Chat() {
                         {data?.is_media ?
                           <img src={base_url + "/media/" + data?.message}
                             onl
-                            alt='Loading'
+                            alt='No img'
                             data-toggle="modal"
                             data-target="#exampleModal"
                             style={{ cursor: 'pointer' }}
@@ -286,7 +287,7 @@ function Chat() {
                       <div className='border border-success rounded p-2 messagetext2'>
                         {data?.is_media ?
                           <img src={base_url + "/media/" + data?.message}
-                            alt='Loading'
+                            alt='No img'
                             data-toggle="modal"
                             data-target="#exampleModal"
                             style={{ cursor: 'pointer' }}
@@ -305,16 +306,17 @@ function Chat() {
           {chat?.typing && <img src={typing_gif} width={30} />}
         </div>
       </div>
+
       {/* Input message */}
       <div className='mt-2'>
-        <form className='d-flex align-items-center' onSubmit={handleSubmit(sendMsg)}>
+        <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
           <button type='button' className='btn btn-link' title='choose media' onClick={() => document.getElementById('fileSource').click()}>
             <img src={img_static} width={35} />
           </button>
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
           <input className='form-control border-secondary p-1' autoComplete='off'
             placeholder='Message here'
-            {...register('msg', { required: true, onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
+            {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
 
           {imgFile?.url &&
             // <div className='ml-2 d-flex imgDiv' >
@@ -323,18 +325,23 @@ function Chat() {
             // </div>
           }
           {imgFile?.load ? <img src={load} width={40} /> :
-            <button className='btn btn-link' type={imgFile ? "button" : 'submit'} title='Send' onClick={postImg}>
+            <button className='btn btn-link' type='submit' id='sendbtn' title='Send'>
               {getValues('msg') ? <img src={sendIcon} width={35} /> : <img src={sendIcon1} width={35} />}
             </button>}
         </form>
       </div>
-
+      {/* Modal */}
       <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
           <div class="modal-content bg-dark">
+            <div className='model-header'>
+              <button type="button" class="close px-2" data-dismiss='modal' aria-label="Close" style={{ color: 'white' }}>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
             <div class="modal-body" >
               <div style={{ overflow: 'auto' }}>
-                <img src={oneImg} width={760} />
+                <img src={oneImg} width={isMobile ? 350 : 760} />
               </div>
             </div>
           </div>
