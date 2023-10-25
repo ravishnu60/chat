@@ -227,7 +227,7 @@ function Home(props) {
             >
               <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
               
-              <div className='profile mx-2' style={{ backgroundImage: `url(${item?.profile ? item?.profile : profile})` }} onClick={() => { item?.profile && setProfile(pre=>({...pre, urls: item?.profile })); document.getElementById('profileview').click() }}></div>
+              <div className='profile mx-2' style={{ backgroundImage: `url(${item?.profile ? item?.profile : profile})` }} onClick={() => { item?.profile && setProfile({urls: item?.profile }); document.getElementById('profileview').click() }}></div>
               
               <div className='col-lg-10 col-9 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null} }) }}>
                 {item?.name}
@@ -324,7 +324,7 @@ function Home(props) {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">Profile</h5>
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => props?.onClick(pre => ({ ...pre, click: false }))}>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => setProfile()}>
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
