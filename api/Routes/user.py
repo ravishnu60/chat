@@ -7,6 +7,8 @@ from schema import userSchma, Profile, Password
 from Authorize import hash, token
 from Models.model import User
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
+from utils import secret
+import shutil
 
 app = APIRouter(
     prefix='/user',
@@ -49,7 +51,8 @@ def userData(db: Session = Depends(get_DB),  get_curr_user=Depends(token.get_cur
         db.commit()
     temp=query.first()
     data:dict={}
-    data['name'],data['phone_no'],data['id'], data['profile']= temp.name, temp.phone_no, temp.user_id, temp.profile
+    data['name'],data['phone_no'],data['id']= temp.name, temp.phone_no, temp.user_id
+    data['profile']= f"{secret.base_url}user/profile/{get_curr_user['id']}" if temp.profile else None
     return {"status_code": 200, "status": "success", "detail": "User found", "data": data}
 
 
@@ -92,6 +95,9 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
     file_loc= f"{path}/{source.filename}"
     
     try:
+        if os.path.exists(path):
+            shutil.rmtree(path)
+            os.makedirs(path)
         if not os.path.exists(path):
             os.makedirs(path)
 

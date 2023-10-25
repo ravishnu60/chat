@@ -173,6 +173,11 @@ function Chat() {
         chatref.current.message && (chatref.current.message = null)
       }, 1000);
 
+      ws.onerror= ()=>{
+        clearInterval(interval);
+        setLoading(false);
+      }
+
       chatref.current = { ws: ws, interval: interval, ...chatref.current }
     }
 

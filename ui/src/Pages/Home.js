@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { alert, base_url, loadingFunc, permission, showNotification, userstatus, webSocketUrl } from '../Utils/Utility';
+import { alert, base_url, isMobile, loadingFunc, permission, showNotification, userstatus, webSocketUrl } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
 import findperson from '../Assets/find-person.png'
@@ -41,7 +41,7 @@ function Home(props) {
   const getUser = async () => {
     const data = await userstatus(navigate, header);
     setUser(data?.data);
-    props?.onClick(pre=>({...pre,refresh:!pre.refresh}))
+    props?.onClick(pre => ({ ...pre, refresh: !pre.refresh }))
   };
 
   const deleteChat = (id) => {
@@ -110,12 +110,15 @@ function Home(props) {
       ws.onopen = () => {
         ws.send("Connect")
       }
-
       ws.onmessage = onmessage
 
       let interval = setInterval(() => {
         ws.send("getList")
       }, 2500);
+      ws.onerror= ()=>{
+        clearInterval(interval);
+        setLoading(false);
+      }
 
       listRef.current = { ws: ws, interval: interval }
     }
@@ -132,28 +135,28 @@ function Home(props) {
   }, [props?.click?.click])
 
   const updateProfile = (data) => {
-    const url= `${base_url}user/${step==0 ? 'update' : 'password'}`;
+    const url = `${base_url}user/${step == 0 ? 'update' : 'password'}`;
 
     axios({
-      method:'put',
-      url:url,
-      data:data,
-      headers:header
-    }).then((res)=>{
+      method: 'put',
+      url: url,
+      data: data,
+      headers: header
+    }).then((res) => {
       console.log(res);
-      if(step==0){
-        alert('updated successfully','success');
+      if (step == 0) {
+        alert('updated successfully', 'success');
         setTimeout(() => {
-        getUser();
+          getUser();
         }, 300);
-      }else{
+      } else {
         alert('Password changed', 'success');
         setStep(0);
       }
-    }).catch((err)=>{
-      if(step==0){
+    }).catch((err) => {
+      if (step == 0) {
         alert('Error while update, try later');
-      }else{
+      } else {
         alert(err?.response?.data?.detail);
       }
     })
@@ -182,14 +185,16 @@ function Home(props) {
     fm.append('source', profilePic?.file);
 
     axios({
-      method:'put',
-      url:base_url+'user/profilepic',
-      data:fm,
-      headers:header
-    }).then((res)=>{
-      alert("profile updated",'success');
+      method: 'put',
+      url: base_url + 'user/profilepic',
+      data: fm,
+      headers: header
+    }).then((res) => {
+      alert("profile updated", 'success');
       getUser();
-    }).catch(err =>{
+      setProfile();
+      window.location.reload();
+    }).catch(err => {
       console.log(err);
       alert("Error, try later")
     })
@@ -218,10 +223,13 @@ function Home(props) {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex justify-content-between align-items px-1 py-1 border-bottom-0"
-            ><div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
-              <div className='col-lg-11 col-10 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
-                <div className='profile mr-3' style={{ backgroundImage: `url(${profile})` }}></div>
+              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex align-items-center px-1 py-1 border-bottom-0"
+            >
+              <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
+              
+              <div className='profile mx-2' style={{ backgroundImage: `url(${item?.profile ? item?.profile : profile})` }} onClick={() => { item?.profile && setProfile({ urls: item?.profile }); document.getElementById('profileview').click() }}></div>
+              
+              <div className='col-lg-10 col-9 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name } }) }}>
                 {item?.name}
                 <span className='ml-2'>
                   {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
@@ -244,7 +252,7 @@ function Home(props) {
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">User Profile</h5>
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={()=>props?.onClick(pre=>({...pre,click:false}))}>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => props?.onClick(pre => ({ ...pre, click: false }))}>
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -270,8 +278,8 @@ function Home(props) {
                     </div>
                     <div className='col-5 text-center'>
                       <img src={profilePic ? profilePic?.url : user?.profile ? user?.profile : profile} width={140} />
-                      <div className='align-bottom'>
-                        <button type='button' className='btn btn-primary btn-sm mt-4' onClick={() => document.getElementById('profilesel')?.click()}>change pic</button>
+                      <div className='d-flex justify-content-center'>
+                        <button type='button' className='btn btn-primary btn-sm mt-4 text-nowrap' onClick={() => document.getElementById('profilesel')?.click()}>change pic</button>
                         {profilePic && <button type='button' className='btn btn-success btn-sm mt-4 ml-3' onClick={updatePic}>update</button>}
                         <input type='file' id='profilesel' style={{ display: 'none' }} onChange={addPic} />
                       </div>
@@ -293,7 +301,7 @@ function Home(props) {
                         <input className='form-control' name='confirm_pwd'
                           type='password' autoComplete='off'
                           {...profileReg("confirm_pwd", { required: true, validate: value => value === getValues("new_password") })} />
-                        {profileErr?.confirm_pwd?.type=='validate' && <div className='text-danger'>Password not match</div>}
+                        {profileErr?.confirm_pwd?.type == 'validate' && <div className='text-danger'>Password not match</div>}
 
                       </div>
                     </div>
@@ -303,6 +311,27 @@ function Home(props) {
                     </div>
                   </>}
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button data-toggle="modal" data-target="#profileModel" id="profileview" style={{ display: 'none' }}></button>
+
+      {/* Model to view profile */}
+      <div className="modal" tabIndex="-1" role="dialog" id="profileModel" data-backdrop="static" data-keyboard="false">
+        <div className="modal-dialog modal-dialog-scrollable" role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h5 className="modal-title">Profile</h5>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => props?.onClick(pre => ({ ...pre, click: false }))}>
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div className="modal-body">
+            <div style={{ overflow: 'auto' }}>
+                <img src={profilePic?.urls} width={isMobile ? 350 : 500} />
+              </div>
             </div>
           </div>
         </div>

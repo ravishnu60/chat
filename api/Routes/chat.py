@@ -7,6 +7,7 @@ from Authorize import  token
 from Models.model import User, Message, Typing, Media
 from sqlalchemy import or_, and_
 import json,pytz,os, random
+from utils import secret
 
 app = APIRouter(
     prefix='/chat',
@@ -52,10 +53,11 @@ def newchat(user_id, db):
 
     get_name = []
     for id in ids:
-        temp = db.query(User).options(load_only(User.name, User.alive)).filter(User.user_id == id).first()
+        temp = db.query(User).options(load_only(User.name, User.alive, User.profile)).filter(User.user_id == id).first()
         temp.newmsg = newtext[str(id)]
         temp= temp.__dict__
         temp.pop('_sa_instance_state')
+        temp['profile']= secret.base_url+f"user/profile/{temp['user_id']}" if temp['profile'] else None
         get_name.append(temp)
     
     return get_name
@@ -80,6 +82,23 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
             db.commit()
             break
 
+
+@app.websocket("/ws")
+async def send_data(websocket:WebSocket):
+    print('CONNECTING...')
+    await websocket.accept()
+    while True:
+        try:
+            await websocket.receive_text()
+            resp = {
+            "message":"message from websocket"
+            }
+            await websocket.send_json(resp)
+        except Exception as e:
+            print(e)
+            break
+    print("CONNECTION DEAD...")
+    
 #updated viewwd status
 def updateView(user_id,id,db):
     # update viewed status

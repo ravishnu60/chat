@@ -1,5 +1,25 @@
-from sqlalchemy import Column, Integer, String, DateTime, BigInteger, ForeignKey, Boolean, func
+from sqlalchemy import Column, Integer, String, DateTime, BigInteger, ForeignKey, Boolean, func, TypeDecorator, LargeBinary, type_coerce
 from db import base
+from utils import secret
+
+key=secret.key
+
+#TypeDecorator - Create a type which can add additional functionality of an existing type
+class PGPString(TypeDecorator):
+    impl = LargeBinary # Assign the type LargerBinary to large values
+
+    def __init__(self):
+        super(PGPString, self).__init__()  # Initialize with superclass
+
+    def bind_expression(self, bindvalue):
+        # type_coerce use to aasociate with sql expression with specific type
+        #pgp_sym_encrypt - is used to encrypt
+        return func.pgp_sym_encrypt(type_coerce(bindvalue,String), key)
+    
+    def column_expression(self, col):
+        #pgp_sym_decrypt - is used to decrypt
+        return func.pgp_sym_decrypt(col, key)
+
 
 class User(base):
     __tablename__ = 'users'
