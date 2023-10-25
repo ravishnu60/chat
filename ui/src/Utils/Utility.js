@@ -5,7 +5,7 @@ import loading_gif from '../Assets/loading1.gif';
 import addNotification from "react-push-notification";
 
 // export const base_url = "http://127.0.0.1:8000/";
-export const base_url = "https://chat-api-zu97.onrender.com/chat";
+export const base_url = "https://chat-api-zu97.onrender.com/";
 
 // export const webSocketUrl = "ws://localhost:8000/chat";
 export const webSocketUrl= "wss://chat-api-zu97.onrender.com/chat";
@@ -47,28 +47,27 @@ navigator.serviceWorker.register("sw.js");
 export const isMobile = window.innerWidth <= 768;
 
 export function showNotification(title, body) {
-
-    try {
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-            navigator?.serviceWorker?.ready?.then((registration) => {
-                // Show a notification that includes an action titled Archive.
-                registration?.showNotification(title, { body: body, icon: logo })
-            });
-        } else {
-            addNotification({
-                title: title,
-                message: body,
-                theme: 'darkblue',
-                native: true,
-                icon: logo,
-                backgroundBottom: 'green',
-                onClick: () => { window.parent.focus() }
-            });
+        if (permission === "granted") {
+            const isMobile = window.innerWidth <= 768;
+            if (isMobile) {
+                navigator?.serviceWorker?.ready?.then((registration) => {
+                    // Show a notification that includes an action titled Archive.
+                    registration?.showNotification(title, { body: body, icon: logo })
+                });
+            } else {
+                addNotification({
+                    title: title,
+                    message: body,
+                    theme: 'darkblue',
+                    native: true,
+                    icon: logo,
+                    backgroundBottom: 'green',
+                    onClick: () => { window.parent.focus() }
+                });
+            }
+        }else{
+            requestPermission();
         }
-    }catch{
-        //error on notification
-    }
 }
 
 
