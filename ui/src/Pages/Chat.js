@@ -253,7 +253,7 @@ function Chat() {
       <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
         <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#ade7ff' }}>
           <div className='p-1 d-flex align-items-end'>
-            <div className='profile-small mr-2' style={{ backgroundImage: `url(${profile})` }}></div>
+            <div className='profile-small mr-2' style={{ backgroundImage: `url(${userData?.profile ? userData?.profile : profile})` }}></div>
             <div className='h6'>{userData?.name} </div></div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
             <img src={back} width={35} />
