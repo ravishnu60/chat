@@ -98,6 +98,14 @@ input,
     .messagetext2 {
         font-size: 94%;
     }
+
+    .profile{
+        width: 39px;
+        height: 38px;
+        overflow: hidden;
+        border-radius: 50%;
+        background-size: cover;
+    }
 }
 
 .selImg{

@@ -271,7 +271,7 @@ function Chat() {
                       {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id, data?.is_media ? data?.message : 0)}></i>}
                       <div className='border border-primary rounded p-2 messagetext1'>
                         {data?.is_media ?
-                          <img src={base_url + "/media/" + data?.message}
+                          <img src={base_url + "chat/media/" + data?.message}
                             onl
                             alt='No img'
                             data-toggle="modal"
