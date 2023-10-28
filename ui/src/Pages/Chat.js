@@ -10,9 +10,8 @@ import sendIcon1 from '../Assets/send.png';
 import profile from '../Assets/profile.png';
 import back from '../Assets/back.png';
 import load from '../Assets/loading.gif';
-import img_send from '../Assets/add_img.gif';
 import img_static from '../Assets/img_static.png';
-
+import EmojiPicker from 'emoji-picker-react';
 
 function Chat() {
   const location = useLocation();
@@ -23,12 +22,13 @@ function Chat() {
   const [scroll, setScroll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [loadingdel, setLoadingdel] = useState({});
-  const { register, reset, handleSubmit, getValues } = useForm();
+  const { register, reset, handleSubmit, getValues, setValue } = useForm();
   const [limit, setLimit] = useState(10);
   const [user, setUser] = useState();
   const chatref = useRef({ limit: 10, message: null });
   const [imgFile, setImgFile] = useState();
   const [oneImg, setOneImg] = useState();
+  const [emoji, setEmoji] = useState({click:false,size:'65vh'});
 
   //scroll element
   const divEle = document.getElementById('chatDiv');
@@ -51,6 +51,7 @@ function Chat() {
       setChat(temp);
       setScroll(!scroll)
       reset();
+      setEmoji({click:false,size:'65vh'})
     }
     setTimeout(() => {
       typing(false);
@@ -173,7 +174,7 @@ function Chat() {
         chatref.current.message && (chatref.current.message = null)
       }, 1000);
 
-      ws.onerror= ()=>{
+      ws.onerror = () => {
         clearInterval(interval);
         setLoading(false);
       }
@@ -196,7 +197,7 @@ function Chat() {
   //UseEffect to scroll end
   useEffect(() => {
     chat?.message?.length !== 0 && divEle?.scrollTo(0, divEle?.scrollHeight);
-  }, [scroll, chat?.typing == true])
+  }, [scroll, chat?.typing == true, emoji])
 
   divEle?.addEventListener('scroll', () => {
     if (divEle?.scrollTop == 0) {
@@ -253,14 +254,17 @@ function Chat() {
       <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
         <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#ade7ff' }}>
           <div className='p-1 d-flex align-items-end'>
-            <div className='profile-small mr-2' style={{ backgroundImage: `url(${userData?.profile ? userData?.profile : profile})` }}></div>
+            <div>
+              <img className='profile-small mr-2' id="profileimg"
+                src={userData?.profile ? userData?.profile : profile}
+                onError={()=>document.getElementById("profileimg").src=profile} /></div>
             <div className='h6'>{userData?.name} </div></div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
-            <img src={back} width={35} />
+            <img src={back} width={35} alt='back' />
           </button>
 
         </div>
-        <div id="chatDiv" className='p-2' style={{ maxHeight: '65vh', overflowX: 'hidden', overflowY: 'auto' }}>
+        <div id="chatDiv" className='p-2' style={{ minHeight: emoji.size, maxHeight: emoji.size, overflowX: 'hidden', overflowY: 'auto' }}>
           {chat?.message?.length !== 1 && chat?.message?.map((data, index) =>
             <div className='row p-2' key={index} id={`first${index}`}>
               {data?.from_id ?
@@ -272,12 +276,11 @@ function Chat() {
                       <div className='border border-primary rounded p-2 messagetext1'>
                         {data?.is_media ?
                           <img src={base_url + "chat/media/" + data?.message}
-                            onl
-                            alt='No img'
+                            alt='No image'
                             data-toggle="modal"
                             data-target="#exampleModal"
                             style={{ cursor: 'pointer' }}
-                            width={80} onClick={() => setOneImg(base_url + "/media/" + data?.message)} /> :
+                            width={80} onClick={() => setOneImg(base_url + "chat/media/" + data?.message)} /> :
                           data?.message
                         }
                       </div>
@@ -291,12 +294,12 @@ function Chat() {
                     <div className='d-flex'>
                       <div className='border border-success rounded p-2 messagetext2'>
                         {data?.is_media ?
-                          <img src={base_url + "/media/" + data?.message}
-                            alt='No img'
+                          <img src={base_url + "chat/media/" + data?.message}
+                            alt='No image'
                             data-toggle="modal"
                             data-target="#exampleModal"
                             style={{ cursor: 'pointer' }}
-                            width={80} onClick={() => setOneImg(base_url + "/media/" + data?.message)} /> :
+                            width={80} onClick={() => setOneImg(base_url + "chat/media/" + data?.message)} /> :
                           data?.message
                         }
                       </div>
@@ -308,16 +311,17 @@ function Chat() {
             </div>
           )}
           {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
-          {chat?.typing && <img src={typing_gif} width={30} />}
+          {chat?.typing && <img src={typing_gif} width={30} alt='typing' />}
         </div>
       </div>
 
       {/* Input message */}
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
-          <button type='button' className='btn btn-link' title='choose media' onClick={() => document.getElementById('fileSource').click()}>
-            <img src={img_static} width={35} />
+          <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => document.getElementById('fileSource').click()}>
+            <img src={img_static} width={30} alt='select image' />
           </button>
+          <button type='button' className='btn btn-link' onClick={()=>{setEmoji(pre=>({click:!pre.click,size:pre.click ?'65vh':'20vh'})); }}><i className='far fa-smile fa-lg'></i></button>
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
           <input className='form-control border-secondary p-1' autoComplete='off'
             placeholder='Message here'
@@ -326,14 +330,17 @@ function Chat() {
           {imgFile?.url &&
             // <div className='ml-2 d-flex imgDiv' >
             //   <i className='fa fa-plus fa-sm plus text-danger font-weight-bold'></i>
-            <img className='ml-2 selImg' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />
+            <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />
             // </div>
           }
-          {imgFile?.load ? <img src={load} width={40} /> :
+          {imgFile?.load ? <img src={load} width={40} alt='load' /> :
             <button className='btn btn-link' type='submit' id='sendbtn' title='Send'>
-              {getValues('msg') ? <img src={sendIcon} width={35} /> : <img src={sendIcon1} width={35} />}
+              {getValues('msg') ? <img src={sendIcon} width={30} alt='send' /> : <img src={sendIcon1} width={30} alt='send' />}
             </button>}
         </form>
+        { emoji.click && <div>
+          <EmojiPicker onEmojiClick={(e)=>{setValue("msg",getValues('msg')+e.emoji); document.getElementById('sendbtn').focus();}} previewConfig={{showPreview: false}} height="47vh" width={"100%"}/>
+        </div>}
       </div>
       {/* Modal */}
       <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

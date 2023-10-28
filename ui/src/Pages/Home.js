@@ -108,7 +108,8 @@ function Home(props) {
       const ws = new WebSocket(webSocketUrl + '/chatlist/' + user?.id);
 
       ws.onopen = () => {
-        ws.send("Connect")
+        ws.send("Connect");
+        setLoading(false);
       }
       ws.onmessage = onmessage
 
@@ -143,7 +144,6 @@ function Home(props) {
       data: data,
       headers: header
     }).then((res) => {
-      console.log(res);
       if (step == 0) {
         alert('updated successfully', 'success');
         setTimeout(() => {
@@ -195,7 +195,6 @@ function Home(props) {
       setProfile();
       window.location.reload();
     }).catch(err => {
-      console.log(err);
       alert("Error, try later")
     })
   }
@@ -213,7 +212,7 @@ function Home(props) {
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div className="input-group-append">
-            <button className="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} /></button>
+            <button className="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} alt='search' /></button>
           </div>
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
@@ -227,7 +226,15 @@ function Home(props) {
             >
               <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
               
-              <div className='profile mx-2' style={{ backgroundImage: `url(${item?.profile ? item?.profile : profile})` }} onClick={() => { item?.profile && setProfile({urls: item?.profile }); document.getElementById('profileview').click() }}></div>
+              <div>
+                <img
+                  id={`imgpr_${index}`}
+                  alt='profile'
+                  className='profile mx-2' 
+                  src={item?.profile ? item?.profile : profile}
+                  onError={()=>document.getElementById(`imgpr_${index}`).src=profile}
+                  onClick={() => { if(item?.profile){setProfile({urls: item?.profile }); document.getElementById('profileview').click()} }} />
+              </div>
               
               <div className='col-lg-10 col-7 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null} }) }}>
                 {item?.name}
@@ -277,7 +284,11 @@ function Home(props) {
                       </div>
                     </div>
                     <div className='col-5 text-center'>
-                      <img src={profilePic ? profilePic?.url : user?.profile ? user?.profile : profile} width={140} />
+                      <img 
+                        id="setProfilePic" 
+                        alt='profile'
+                        onError={()=>document.getElementById('setProfilePic').src=profile}
+                        src={profilePic ? profilePic?.url : user?.profile ? user?.profile : profile} width={140} />
                       <div className='d-flex justify-content-center'>
                         <button type='button' className='btn btn-primary btn-sm mt-4 text-nowrap' onClick={() => document.getElementById('profilesel')?.click()}>change pic</button>
                         {profilePic && <button type='button' className='btn btn-success btn-sm mt-4 ml-3' onClick={updatePic}>update</button>}
@@ -330,7 +341,7 @@ function Home(props) {
             </div>
             <div className="modal-body">
             <div style={{ overflow: 'auto' }}>
-                <img src={profilePic?.urls} width={isMobile ? 350 : 500} />
+                <img src={profilePic?.urls} width={isMobile ? 350 : 500} alt='profile not found' />
               </div>
             </div>
           </div>
