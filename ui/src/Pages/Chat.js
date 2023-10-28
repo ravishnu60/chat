@@ -339,7 +339,7 @@ function Chat() {
             </button>}
         </form>
         { emoji.click && <div>
-          <EmojiPicker onEmojiClick={(e)=>{setValue("msg",getValues('msg')+e.emoji); document.getElementById('sendbtn').focus();}} previewConfig={{showPreview: false}} height="47vh" width={"100%"}/>
+          <EmojiPicker autoFocusSearch={false} onEmojiClick={(e)=>{setValue("msg",getValues('msg')+e.emoji); document.getElementById('sendbtn').focus();}} previewConfig={{showPreview: false}} height="47vh" width={"100%"}/>
         </div>}
       </div>
       {/* Modal */}
