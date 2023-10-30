@@ -4,10 +4,9 @@ from fastapi.responses import FileResponse
 from db import get_DB
 from sqlalchemy.orm import Session
 from schema import userSchma, Profile, Password
-from Authorize import hash, token
+from Authorize import hash, token, firecloud
 from Models.model import User
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
-from utils import secret
 import shutil
 
 app = APIRouter(
@@ -52,7 +51,14 @@ def userData(db: Session = Depends(get_DB),  get_curr_user=Depends(token.get_cur
     temp=query.first()
     data:dict={}
     data['name'],data['phone_no'],data['id']= temp.name, temp.phone_no, temp.user_id
-    data['profile']= f"{secret.base_url}user/profile/{get_curr_user['id']}" if temp.profile else None
+    if temp.profile:
+        output= firecloud.getFile(temp.profile)
+        if output:
+            data['profile']= output
+    else:
+        data['profile']=None
+        
+    # data['profile']= f"{secret.base_url}user/profile/{get_curr_user['id']}" if temp.profile else None
     return {"status_code": 200, "status": "success", "detail": "User found", "data": data}
 
 
@@ -88,30 +94,41 @@ def changePwd(data:Password, res:Response, db: Session = Depends(get_DB), get_cu
     res.status_code= status.HTTP_400_BAD_REQUEST
     return {"status_code": 400, "status": "failed", "detail": "Old password is incorrect"}
 
+def delPath(path):
+    # remove local file after upload
+    if os.path.exists(path):
+        shutil.rmtree(path)
+
 @app.put('/profilepic')
 def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
 
     path = os.path.join("Assets",f"profile/{get_curr_user['id']}")
     file_loc= f"{path}/{source.filename}"
-    
+    query= db.query(User).filter(User.user_id == get_curr_user['id'])
+    data= query.first()
+    old_loc= data.profile if data.profile else None
     try:
-        if os.path.exists(path):
-            shutil.rmtree(path)
-            os.makedirs(path)
         if not os.path.exists(path):
             os.makedirs(path)
 
         with open(file_loc, "wb+") as file_object:
             file_object.write(source.file.read())
-        query= db.query(User).filter(User.user_id == get_curr_user['id'])
+            
+        output= firecloud.uploadFile(file_loc, old_loc)
+        if not output:
+            delPath(path)
+            return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}
+        
         query.update({"profile":file_loc}, synchronize_session=False)
         db.commit()
+        delPath(path)
     except Exception as err:
         print(err)
         res.status_code=status.HTTP_409_CONFLICT
         return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}   
     return {"status_code": 200, "status": "success", "detail": "profile updated"}
 
+#No use manage in firebase
 @app.get('/profile/{id}')
 def getMedia(id:int,db: Session = Depends(get_DB)):
     source= db.query(User).filter(User.user_id == id).first()

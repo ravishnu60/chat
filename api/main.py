@@ -3,7 +3,11 @@ from fastapi.openapi.utils import get_openapi
 from Routes import chat, user
 from fastapi.middleware.cors import CORSMiddleware
 
-app=FastAPI()
+app=FastAPI(
+    title="Connect API",
+    version="2.0",
+    description="Communicate with people"
+)
 # base.metadata.drop_all(engine)
 
 origins=['*']
@@ -24,9 +28,9 @@ def root():
 app.include_router(chat.app)
 app.include_router(user.app)
 
-api_detail = get_openapi(
-    title="Chat API",
-    version="1.0",
-    routes=app.routes,
-)
-app.openapi_schema= api_detail
+# api_detail = get_openapi(
+#     title="Chat API",
+#     version="1.0",
+#     routes=app.routes,
+# )
+# app.openapi_schema= api_detail

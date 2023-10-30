@@ -67,3 +67,5 @@ watchfiles
 websockets
 zope.interface
 pydantic-settings
+pyrebase
+firebase_admin

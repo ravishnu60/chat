@@ -12,6 +12,7 @@ import back from '../Assets/back.png';
 import load from '../Assets/loading.gif';
 import img_static from '../Assets/img_static.png';
 import EmojiPicker from 'emoji-picker-react';
+import file from '../Assets/fileicon.png'
 
 function Chat() {
   const location = useLocation();
@@ -227,6 +228,22 @@ function Chat() {
 
   }
 
+  const getImg =(url) => {
+    setLoading(true);
+    axios({
+      method:'get',
+      url:url,
+      headers: header
+    }).then(response =>{
+      setOneImg(response.data?.url);
+      document.getElementById('viewbtn').click();
+      setLoading(false);
+    }).catch(error=>{
+      setLoading(false);
+      alert("Can't load image");
+    })
+  }
+
   const postImg = () => {
     if (imgFile?.file) {
       setImgFile(pre => ({ ...pre, load: true }))
@@ -275,12 +292,11 @@ function Chat() {
                       {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id, data?.is_media ? data?.message : 0)}></i>}
                       <div className='border border-primary rounded p-2 messagetext1'>
                         {data?.is_media ?
-                          <img src={base_url + "chat/media/" + data?.message}
+                          <img src={file}
+                          title='file'
                             alt='No image'
-                            data-toggle="modal"
-                            data-target="#exampleModal"
                             style={{ cursor: 'pointer' }}
-                            width={80} onClick={() => setOneImg(base_url + "chat/media/" + data?.message)} /> :
+                            width={50} onClick={() => getImg(base_url + "chat/media?id=" + data?.message)} /> :
                           data?.message
                         }
                       </div>
@@ -294,12 +310,11 @@ function Chat() {
                     <div className='d-flex'>
                       <div className='border border-success rounded p-2 messagetext2'>
                         {data?.is_media ?
-                          <img src={base_url + "chat/media/" + data?.message}
+                          <img src={file}
+                            title='file'
                             alt='No image'
-                            data-toggle="modal"
-                            data-target="#exampleModal"
                             style={{ cursor: 'pointer' }}
-                            width={80} onClick={() => setOneImg(base_url + "chat/media/" + data?.message)} /> :
+                            width={50} onClick={() => getImg(base_url + "chat/media?id=" + data?.message)} /> :
                           data?.message
                         }
                       </div>
@@ -342,6 +357,7 @@ function Chat() {
           <EmojiPicker autoFocusSearch={false} onEmojiClick={(e)=>{setValue("msg",getValues('msg')+e.emoji); document.getElementById('sendbtn').focus();}} previewConfig={{showPreview: false}} height="47vh" width={"100%"}/>
         </div>}
       </div>
+      <button id='viewbtn' data-toggle="modal" data-target="#exampleModal" style={{display:'none'}}></button>
       {/* Modal */}
       <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">

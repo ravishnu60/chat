@@ -3,11 +3,11 @@ from fastapi.responses import FileResponse
 from db import get_DB
 from sqlalchemy.orm import Session, load_only
 from schema import  TypingSchema
-from Authorize import  token
+from Authorize import  token, firecloud
 from Models.model import User, Message, Typing, Media
 from sqlalchemy import or_, and_
 import json,pytz,os, random
-from utils import secret
+import shutil
 
 app = APIRouter(
     prefix='/chat',
@@ -57,7 +57,12 @@ def newchat(user_id, db):
         temp.newmsg = newtext[str(id)]
         temp= temp.__dict__
         temp.pop('_sa_instance_state')
-        temp['profile']= secret.base_url+f"user/profile/{temp['user_id']}" if temp['profile'] else None
+        if temp['profile']:
+            output= firecloud.getFile(temp['profile'])
+            if output:
+                temp['profile']= output
+        else:
+            temp['profile']=None
         get_name.append(temp)
     
     return get_name
@@ -82,22 +87,6 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
             db.commit()
             break
 
-
-@app.websocket("/ws")
-async def send_data(websocket:WebSocket):
-    print('CONNECTING...')
-    await websocket.accept()
-    while True:
-        try:
-            await websocket.receive_text()
-            resp = {
-            "message":"message from websocket"
-            }
-            await websocket.send_json(resp)
-        except Exception as e:
-            print(e)
-            break
-    print("CONNECTION DEAD...")
     
 #updated viewwd status
 def updateView(user_id,id,db):
@@ -211,31 +200,39 @@ def addMedia(res: Response, data:str=Form(),source:UploadFile=File(), db: Sessio
     file_loc= f"{path}/{source.filename}"
     file_loc= checkPathAvailable(file_loc, source.filename, path)
     
-    media= Media(media_loc= file_loc)
-    db.add(media)
-    db.commit()
-    db.refresh(media)
+  
     try:
-        msg = Message(from_id=get_curr_user['id'], to_id=data['to_id'], message=media.media_id, is_media=True)
-        db.add(msg)
-        db.commit()
         if not os.path.exists(path):
             os.makedirs(path)
 
         with open(file_loc, "wb+") as file_object:
             file_object.write(source.file.read())
+        output= firecloud.uploadFile(file_loc,None)
+        
+        #remove local files
+        if os.path.exists(path):
+            shutil.rmtree(path)
+        
+        # add in db once success
+        if output:            
+            msg = Message(from_id=get_curr_user['id'], to_id=data['to_id'], message=file_loc, is_media=True)
+            db.add(msg)
+            db.commit()
+        
     except:
         res.status_code=status.HTTP_409_CONFLICT
         return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}   
     return {"status_code": 200, "status": "success", "detail": "sent successfully"}
 
-@app.get('/media/{id}')
-def getMedia(id:int,db: Session = Depends(get_DB)):
-    source= db.query(Media).filter(Media.media_id == id).first()
-    check_file= os.path.exists(source.media_loc)
-    if not source or check_file:
+@app.get('/media')
+def getMedia(id:str,res: Response, db: Session = Depends(get_DB),get_curr_user=Depends(token.get_current_user) ):
+    print(id)
+    output= firecloud.getFile(id)
+    if not output:
+        res.status_code= status.HTTP_404_NOT_FOUND
         return {"status_code": 404, "status": "failed", "detail": "file not found"}
-    return FileResponse(source.media_loc)
+    return {"status_code": 200, "status": "success", "url": output}
+    
 
 @app.put('/markasread/{sender_id}')
 def markAsRead(sender_id: int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
@@ -272,6 +269,8 @@ def deleteChat(to_id: int, res: Response, db: Session = Depends(get_DB), get_cur
                                         get_curr_user['id'], Message.to_id == to_id)
 
     if get_chat.first():
+        path = os.path.join("Assets",f"{get_curr_user['id']}_{to_id}")
+        firecloud.removeFile(path)
         get_chat.delete(synchronize_session=False)
         db.commit()
 
@@ -286,10 +285,8 @@ def deleteChat(msg_id: int,media_id:int, res: Response, db: Session = Depends(ge
     
     get_media= db.query(Media).filter(Media.media_id == media_id)
     if get_media.first():
-        try: 
-            os.remove(get_media.first().media_loc)
-        except OSError as error:
-            pass
+        #remove cloud file
+        firecloud.removeFile(get_media.first().media_loc)
         get_media.delete(synchronize_session=False)
         db.commit()
         
