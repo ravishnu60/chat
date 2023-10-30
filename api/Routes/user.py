@@ -115,6 +115,7 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
 @app.get('/profile/{id}')
 def getMedia(id:int,db: Session = Depends(get_DB)):
     source= db.query(User).filter(User.user_id == id).first()
-    if not source:
+    check_file= os.path.exists(source.profile)
+    if not source or check_file:
         return {"status_code": 404, "status": "failed", "detail": "file not found"}
     return FileResponse(source.profile)

@@ -7,6 +7,7 @@ Create Date: 2023-09-25 17:12:00.480765
 """
 from alembic import op
 import sqlalchemy as sa
+from Models import model
 
 
 # revision identifiers, used by Alembic.
@@ -30,7 +31,7 @@ def upgrade() -> None:
     sa.Column('msg_id', sa.Integer(), nullable=False),
     sa.Column('from_id', sa.Integer(), nullable=False),
     sa.Column('to_id', sa.Integer(), nullable=False),
-    sa.Column('message', sa.String(), nullable=False),
+    sa.Column('message', model.PGPString(), nullable=False),
     sa.Column('is_read', sa.Boolean(), server_default='false', nullable=False),
     sa.Column('sent', sa.Boolean(), server_default='true', nullable=False),
     sa.Column('createdAt', sa.DateTime(), server_default=sa.text('now()'), nullable=False),

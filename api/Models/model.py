@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, DateTime, BigInteger, ForeignKey, Boolean, func, TypeDecorator, LargeBinary, type_coerce
+from sqlalchemy import Integer, Column, String, TypeDecorator, func, type_coerce,LargeBinary, BigInteger, DateTime, Boolean, ForeignKey
 from db import base
 from utils import secret
 
@@ -36,7 +36,7 @@ class Message(base):
     msg_id= Column(Integer, primary_key=True,nullable= False)
     from_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     to_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
-    message= Column(String, nullable= False)
+    message= Column(PGPString)
     is_read= Column(Boolean, nullable= False,server_default='false')
     is_media=Column(Boolean,nullable= False, server_default='false')
     createdAt= Column(DateTime, nullable= False, server_default=func.now())

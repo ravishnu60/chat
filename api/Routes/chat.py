@@ -232,7 +232,8 @@ def addMedia(res: Response, data:str=Form(),source:UploadFile=File(), db: Sessio
 @app.get('/media/{id}')
 def getMedia(id:int,db: Session = Depends(get_DB)):
     source= db.query(Media).filter(Media.media_id == id).first()
-    if not source:
+    check_file= os.path.exists(source.media_loc)
+    if not source or check_file:
         return {"status_code": 404, "status": "failed", "detail": "file not found"}
     return FileResponse(source.media_loc)
 
