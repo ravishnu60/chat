@@ -50,7 +50,6 @@ python-jose
 python-multipart
 pytz
 PyYAML
-requests
 rfc3986
 rsa
 seaborn
@@ -69,6 +68,7 @@ zope.interface
 pydantic-settings
 pyrebase
 firebase_admin
-requests
+requests-toolbelt==0.7.0
+requests==2.27.1
 lxml
 cssselect
