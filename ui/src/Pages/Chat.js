@@ -307,8 +307,8 @@ function Chat() {
                   <div className='col-10 pl-2'>{/* receive */}
                     <div className='d-flex'>
                       <div className='border border-success rounded'>
-                        {data?.pin && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px' }}>
-                          {data?.pin}
+                      {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px',cursor:'pointer' }} onClick={()=>document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
+                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted'/> : data?.pin?.msg}
                         </div>}
                         <div className=' p-2 messagetext2'>
                           {data?.is_media ?
