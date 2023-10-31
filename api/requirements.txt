@@ -73,7 +73,6 @@ google-cloud-storage
 google-crc32c
 google-resumable-media
 googleapis-common-protos
-graphdb python
 greenlet
 grpcio
 grpcio-status
