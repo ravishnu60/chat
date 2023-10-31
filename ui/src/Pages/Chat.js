@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom';
 import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl, alert, isMobile } from '../Utils/Utility';
 import axios from 'axios';
-import { set, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import typing_gif from '../Assets/typing.gif';
 import '../Style/style.css';
 import sendIcon from '../Assets/send.gif';
@@ -12,7 +12,7 @@ import back from '../Assets/back.png';
 import load from '../Assets/loading.gif';
 import img_static from '../Assets/img_static.png';
 import EmojiPicker from 'emoji-picker-react';
-import file from '../Assets/fileicon.png'
+import reply from '../Assets/reply.png'
 
 function Chat() {
   const location = useLocation();
@@ -29,7 +29,8 @@ function Chat() {
   const chatref = useRef({ limit: 10, message: null });
   const [imgFile, setImgFile] = useState();
   const [oneImg, setOneImg] = useState();
-  const [emoji, setEmoji] = useState({click:false,size:'65vh'});
+  const [emoji, setEmoji] = useState({ click: false, size: '65vh' });
+  const [pin, setPin] = useState({ id: null, msg: null })
 
   //scroll element
   const divEle = document.getElementById('chatDiv');
@@ -45,14 +46,18 @@ function Chat() {
     if (data.msg !== '') {
       chatref.current.message = {
         to_id: userData?.id,
-        message: data.msg
+        message: data.msg,
+        pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
       }
       let temp = chat
       temp.message.push({ from_id: true, message: data.msg, load: true, msg_id: chat.message[chat.message.length - 1].msg_id + 1 });
       setChat(temp);
-      setScroll(!scroll)
+      setTimeout(() => {
+        setScroll(!scroll)
+      }, 200);
       reset();
-      setEmoji({click:false,size:'65vh'})
+      setEmoji({ click: false, size: '65vh' });
+      setPin({ id: null, msg: null })
     }
     setTimeout(() => {
       typing(false);
@@ -91,11 +96,11 @@ function Chat() {
     }, 500);
   }
 
-  const deleteMsg = (id, media) => {
+  const deleteMsg = (id) => {
     setLoadingdel({ [id]: true });
     axios({
       method: 'delete',
-      url: `${base_url}chat/deletemsg/${id}/${media}`,
+      url: `${base_url}chat/deletemsg/${id}`,
       headers: header
     }).then((response) => {
       //removed
@@ -140,7 +145,9 @@ function Chat() {
       } else if (permission === "default") {
         requestPermission();
       }
-      setScroll(!scroll);
+      setTimeout(() => {
+        setScroll(!scroll)
+      }, 200);
     }
 
     if (chat?.message[chat?.message?.length - 1]?.is_media && chat?.message[chat?.message?.length - 1]?.is_read === false) {
@@ -198,7 +205,7 @@ function Chat() {
   //UseEffect to scroll end
   useEffect(() => {
     chat?.message?.length !== 0 && divEle?.scrollTo(0, divEle?.scrollHeight);
-  }, [scroll, chat?.typing == true, emoji])
+  }, [scroll, chat?.typing == true, emoji, pin])
 
   divEle?.addEventListener('scroll', () => {
     if (divEle?.scrollTop == 0) {
@@ -226,22 +233,6 @@ function Chat() {
       setImgFile();
     }
 
-  }
-
-  const getImg =(url) => {
-    setLoading(true);
-    axios({
-      method:'get',
-      url:url,
-      headers: header
-    }).then(response =>{
-      setOneImg(response.data?.url);
-      document.getElementById('viewbtn').click();
-      setLoading(false);
-    }).catch(error=>{
-      setLoading(false);
-      alert("Can't load image");
-    })
   }
 
   const postImg = () => {
@@ -274,7 +265,7 @@ function Chat() {
             <div>
               <img className='profile-small mr-2' id="profileimg"
                 src={userData?.profile ? userData?.profile : profile}
-                onError={()=>document.getElementById("profileimg").src=profile} /></div>
+                onError={() => document.getElementById("profileimg").src = profile} /></div>
             <div className='h6'>{userData?.name} </div></div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
             <img src={back} width={35} alt='back' />
@@ -288,18 +279,25 @@ function Chat() {
                 <>
                   <div className='col-2'></div> {/* send */}
                   <div className='col-10 pr-2'>
-                    <div className='d-flex flex-row-reverse align-items-center'>
-                      {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id, data?.is_media ? data?.message : 0)}></i>}
-                      <div className='border border-primary rounded p-2 messagetext1'>
-                        {data?.is_media ?
-                          <img src={file}
-                          title='file'
-                            alt='No image'
-                            style={{ cursor: 'pointer' }}
-                            width={50} onClick={() => getImg(base_url + "chat/media?id=" + data?.message)} /> :
-                          data?.message
-                        }
+                    <div className='d-flex flex-row-reverse align-items-center' >
+                      {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
+                      <div className='border border-primary rounded' id={`msg_id${data?.msg_id}`}>
+                        {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px',cursor:'pointer' }} onClick={()=>document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
+                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted'/> : data?.pin?.msg}
+                        </div>}
+                        <div className='p-2 messagetext1'>
+                          {data?.is_media ?
+                            <img src={data?.message}
+                              title='file'
+                              alt='No image'
+                              data-toggle="modal" data-target="#exampleModal"
+                              style={{ cursor: 'pointer' }}
+                              width={70} onClick={() => setOneImg(data?.message)} /> :
+                            data?.message
+                          }
+                        </div>
                       </div>
+                      <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                     </div>
                     <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
                   </div>
@@ -308,15 +306,25 @@ function Chat() {
                 <>{data?.from_id == false ?
                   <div className='col-10 pl-2'>{/* receive */}
                     <div className='d-flex'>
-                      <div className='border border-success rounded p-2 messagetext2'>
-                        {data?.is_media ?
-                          <img src={file}
-                            title='file'
-                            alt='No image'
-                            style={{ cursor: 'pointer' }}
-                            width={50} onClick={() => getImg(base_url + "chat/media?id=" + data?.message)} /> :
-                          data?.message
-                        }
+                      <div className='border border-success rounded'>
+                        {data?.pin && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px' }}>
+                          {data?.pin}
+                        </div>}
+                        <div className=' p-2 messagetext2'>
+                          {data?.is_media ?
+                            <img src={data.message}
+                              title='file'
+                              alt='No image'
+                              data-toggle="modal" data-target="#exampleModal"
+                              style={{ cursor: 'pointer' }}
+                              width={70} onClick={() => setOneImg(data?.message)} /> :
+                            data?.message
+                          }
+                        </div>
+                      </div>
+
+                      <div>
+                        <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                       </div>
                     </div>
                     <div className='small msgtime2' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
@@ -327,6 +335,20 @@ function Chat() {
           )}
           {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={30} alt='typing' />}
+          {pin.id &&
+            <div className='row'>
+              <div className='col-11 pr-2'>
+                <div className='d-flex flex-row-reverse align-items-center'>
+                  <div className='border border-primary rounded p-2 messagetext3'>
+                    {pin?.is_media ? <img src={pin?.msg} width={30} /> : pin?.msg}
+                    <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" onClick={() => setPin({ id: null, msg: null })}>
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
         </div>
       </div>
 
@@ -334,11 +356,11 @@ function Chat() {
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
           <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => document.getElementById('fileSource').click()}>
-            <img src={img_static} width={30} alt='select image' />
+            <img src={img_static} width={28} alt='select image' />
           </button>
-          <button type='button' className='btn btn-link' onClick={()=>{setEmoji(pre=>({click:!pre.click,size:pre.click ?'65vh':'20vh'})); }}><i className='far fa-smile fa-lg'></i></button>
+          <button type='button' className='btn btn-link' onClick={() => { setEmoji(pre => ({ click: !pre.click, size: pre.click ? '65vh' : '20vh' })); }}><i className='far fa-smile fa-lg'></i></button>
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
-          <input className='form-control border-secondary p-1' autoComplete='off'
+          <input id="msg_input" className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
             placeholder='Message here'
             {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
 
@@ -348,16 +370,16 @@ function Chat() {
             <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />
             // </div>
           }
-          {imgFile?.load ? <img src={load} width={40} alt='load' /> :
-            <button className='btn btn-link' type='submit' id='sendbtn' title='Send'>
-              {getValues('msg') ? <img src={sendIcon} width={30} alt='send' /> : <img src={sendIcon1} width={30} alt='send' />}
+          {imgFile?.load ? <img src={load} width={38} alt='load' /> :
+            <button className='btn btn-link p-1' type='submit' id='sendbtn' title='Send'>
+              {getValues('msg') ? <img src={sendIcon} width={28} alt='send' /> : <img src={sendIcon1} width={28} alt='send' />}
             </button>}
         </form>
-        { emoji.click && <div>
-          <EmojiPicker autoFocusSearch={false} onEmojiClick={(e)=>{setValue("msg",getValues('msg')+e.emoji); document.getElementById('sendbtn').focus();}} previewConfig={{showPreview: false}} height="47vh" width={"100%"}/>
+        {emoji.click && <div>
+          <EmojiPicker autoFocusSearch={false} onEmojiClick={(e) => { setValue("msg", getValues('msg') + e.emoji); document.getElementById('sendbtn').focus(); }} previewConfig={{ showPreview: false }} height="47vh" width={"100%"} />
         </div>}
       </div>
-      <button id='viewbtn' data-toggle="modal" data-target="#exampleModal" style={{display:'none'}}></button>
+
       {/* Modal */}
       <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">

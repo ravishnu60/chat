@@ -116,7 +116,7 @@ function Home(props) {
       let interval = setInterval(() => {
         ws.send("getList")
       }, 2500);
-      ws.onerror= ()=>{
+      ws.onerror = () => {
         clearInterval(interval);
         setLoading(false);
       }
@@ -183,7 +183,7 @@ function Home(props) {
   const updatePic = () => {
     const fm = new FormData();
     fm.append('source', profilePic?.file);
-
+    setLoading(true);
     axios({
       method: 'put',
       url: base_url + 'user/profilepic',
@@ -193,9 +193,12 @@ function Home(props) {
       alert("profile updated", 'success');
       getUser();
       setProfile();
+      setLoading(false);
       window.location.reload();
     }).catch(err => {
-      alert("Error, try later")
+      alert("Error, try later");
+      setLoading(false);
+
     })
   }
 
@@ -225,18 +228,18 @@ function Home(props) {
               className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex align-items-center px-1 py-1 border-bottom-0"
             >
               <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
-              
+
               <div>
                 <img
                   id={`imgpr_${index}`}
                   alt='profile'
-                  className='profile mx-2' 
+                  className='profile mx-2'
                   src={item?.profile ? item?.profile : profile}
-                  onError={()=>document.getElementById(`imgpr_${index}`).src=profile}
-                  onClick={() => { if(item?.profile){setProfile({urls: item?.profile }); document.getElementById('profileview').click()} }} />
+                  onError={() => document.getElementById(`imgpr_${index}`).src = profile}
+                  onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} />
               </div>
-              
-              <div className='col-lg-10 col-7 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null} }) }}>
+
+              <div className='col-lg-10 col-7 d-flex align-items-center px-1' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null } }) }}>
                 {item?.name}
                 <span className='ml-2'>
                   {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
@@ -284,10 +287,10 @@ function Home(props) {
                       </div>
                     </div>
                     <div className='col-5 text-center'>
-                      <img 
-                        id="setProfilePic" 
+                      <img
+                        id="setProfilePic"
                         alt='profile'
-                        onError={()=>document.getElementById('setProfilePic').src=profile}
+                        onError={() => document.getElementById('setProfilePic').src = profile}
                         src={profilePic ? profilePic?.url : user?.profile ? user?.profile : profile} width={140} />
                       <div className='d-flex justify-content-center'>
                         <button type='button' className='btn btn-primary btn-sm mt-4 text-nowrap' onClick={() => document.getElementById('profilesel')?.click()}>change pic</button>
@@ -340,7 +343,7 @@ function Home(props) {
               </button>
             </div>
             <div className="modal-body">
-            <div style={{ overflow: 'auto' }}>
+              <div style={{ overflow: 'auto' }}>
                 <img src={profilePic?.urls} width={isMobile ? 350 : 500} alt='profile not found' />
               </div>
             </div>

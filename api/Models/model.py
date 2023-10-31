@@ -29,6 +29,7 @@ class User(base):
     password= Column(String, nullable= False)
     createdAt= Column(DateTime, nullable= False, server_default= func.now())
     alive= Column(Boolean, server_default='false')
+    last_seen= Column(DateTime)
     profile= Column(String, nullable= True)
     
 class Message(base):
@@ -36,10 +37,11 @@ class Message(base):
     msg_id= Column(Integer, primary_key=True,nullable= False)
     from_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     to_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
-    message= Column(PGPString)
+    message= Column(PGPString, nullable= False)
     is_read= Column(Boolean, nullable= False,server_default='false')
     is_media=Column(Boolean,nullable= False, server_default='false')
     createdAt= Column(DateTime, nullable= False, server_default=func.now())
+    pin=Column(String)
 
 class Typing(base):
     __tablename__= 'typing'
@@ -47,8 +49,3 @@ class Typing(base):
     from_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     to_id= Column(Integer, ForeignKey('users.user_id',ondelete='CASCADE'), nullable= False)
     typing= Column(Boolean, nullable= False,server_default='false')
-    
-class Media(base):
-    __tablename__ = 'media'
-    media_id= Column(Integer, primary_key=True,nullable= False)
-    media_loc= Column(String,nullable= False)

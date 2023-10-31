@@ -4,7 +4,7 @@ from db import get_DB
 from sqlalchemy.orm import Session, load_only
 from schema import  TypingSchema
 from Authorize import  token, firecloud
-from Models.model import User, Message, Typing, Media
+from Models.model import User, Message, Typing
 from sqlalchemy import or_, and_
 import json,pytz,os, random
 import shutil
@@ -58,7 +58,8 @@ def newchat(user_id, db):
         temp= temp.__dict__
         temp.pop('_sa_instance_state')
         if temp['profile']:
-            output= firecloud.getFile(temp['profile'])
+            # output= firecloud.getFile(temp['profile'])
+            output= temp['profile'].split("##")[0]
             if output:
                 temp['profile']= output
         else:
@@ -117,7 +118,18 @@ def getmsg(user_id,id,limit, db):
         temp['message']= msg.message
         temp['is_media']= msg.is_media
         temp['msg_id']= msg.msg_id
+        if msg.pin:
+            pindata=json.loads(msg.pin)
         
+            getmsg= db.query(Message.message).filter(Message.msg_id == pindata['id']).first()
+            pinmsg="Message deleted"
+            try:
+                pinmsg = getmsg[0]
+            except:
+                pass
+            temp['pin']={"media":pindata['media'],"msg":pinmsg,"id":pindata['id']}
+        if temp['is_media']:
+            temp['message']= temp['message'].split("##")[0]
         temp['createdAt'] = msg.createdAt.astimezone(pytz.timezone('Asia/Kolkata'))
         if temp_date == None:
             temp_date = temp['createdAt'].strftime('%d/%m/%Y')
@@ -163,7 +175,7 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
             #save msg
             if receive.get('msg'):
                 data=receive['msg']
-                msg = Message(from_id=user_id, to_id=data['to_id'], message=data['message'])
+                msg = Message(from_id=user_id, to_id=data['to_id'], message=data['message'], pin= data['pin'] if data.get('pin') else None)
                 db.add(msg)
                 db.commit()
             # send message
@@ -208,14 +220,14 @@ def addMedia(res: Response, data:str=Form(),source:UploadFile=File(), db: Sessio
         with open(file_loc, "wb+") as file_object:
             file_object.write(source.file.read())
         output= firecloud.uploadFile(file_loc,None)
-        
+        link= firecloud.getFile(file_loc)
         #remove local files
         if os.path.exists(path):
             shutil.rmtree(path)
         
         # add in db once success
         if output:            
-            msg = Message(from_id=get_curr_user['id'], to_id=data['to_id'], message=file_loc, is_media=True)
+            msg = Message(from_id=get_curr_user['id'], to_id=data['to_id'], message=f"{link}##{file_loc}", is_media=True)
             db.add(msg)
             db.commit()
         
@@ -223,16 +235,6 @@ def addMedia(res: Response, data:str=Form(),source:UploadFile=File(), db: Sessio
         res.status_code=status.HTTP_409_CONFLICT
         return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}   
     return {"status_code": 200, "status": "success", "detail": "sent successfully"}
-
-@app.get('/media')
-def getMedia(id:str,res: Response, db: Session = Depends(get_DB),get_curr_user=Depends(token.get_current_user) ):
-    print(id)
-    output= firecloud.getFile(id)
-    if not output:
-        res.status_code= status.HTTP_404_NOT_FOUND
-        return {"status_code": 404, "status": "failed", "detail": "file not found"}
-    return {"status_code": 200, "status": "success", "url": output}
-    
 
 @app.put('/markasread/{sender_id}')
 def markAsRead(sender_id: int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
@@ -278,19 +280,16 @@ def deleteChat(to_id: int, res: Response, db: Session = Depends(get_DB), get_cur
     return {"status_code": 204, "status": "success", "detail": "Chat deleted successfully"}
 
 
-@app.delete("/deletemsg/{msg_id}/{media_id}")
-def deleteChat(msg_id: int,media_id:int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
-    get_msg = db.query(Message).filter(
-        Message.msg_id == msg_id, Message.from_id == get_curr_user['id'])
-    
-    get_media= db.query(Media).filter(Media.media_id == media_id)
-    if get_media.first():
-        #remove cloud file
-        firecloud.removeFile(get_media.first().media_loc)
-        get_media.delete(synchronize_session=False)
-        db.commit()
-        
+@app.delete("/deletemsg/{msg_id}")
+def deleteChat(msg_id: int, res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
+    get_msg = db.query(Message).filter(Message.msg_id == msg_id, Message.from_id == get_curr_user['id'])
+
     if get_msg.first():
+        #remove cloud file
+        try:
+            firecloud.removeFile(get_msg.first().message.split("##")[1])
+        except:
+            pass
         get_msg.delete(synchronize_session=False)
         db.commit()
     else:
