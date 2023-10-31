@@ -68,7 +68,5 @@ zope.interface
 pydantic-settings
 pyrebase
 firebase_admin
-requests-toolbelt==0.7.0
-requests==2.27.1
-lxml
-cssselect
+requests-toolbelt
+requests
