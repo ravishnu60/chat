@@ -60,7 +60,7 @@ SQLAlchemy
 starlette
 typing_extensions
 ujson
-urllib3
+urllib3==1.19.1
 uvicorn
 virtualenv
 watchfiles
@@ -70,3 +70,5 @@ pydantic-settings
 pyrebase
 firebase_admin
 requests
+lxml
+cssselect
