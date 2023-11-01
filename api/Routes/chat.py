@@ -123,7 +123,9 @@ def getmsg(user_id,id,limit, db):
         temp['is_media']= msg.is_media
         temp['msg_id']= msg.msg_id
         temp['alive']= receiver.alive
-        temp['last_seen']= receiver.last_seen.strftime('%I:%M %p, %d/%m/%Y')
+        temp['last_seen']= receiver.last_seen
+        if receiver.last_seen:
+            temp['last_seen']= receiver.last_seen.strftime('%I:%M %p, %d/%m/%Y')
         if msg.pin:
             pindata=json.loads(msg.pin)
         
