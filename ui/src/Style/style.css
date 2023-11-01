@@ -69,17 +69,15 @@ input,
 }
 
 .profile{
-    width: 43px;
-    height: 43px;
-    overflow: hidden;
+    width: 50px;
+    height: 50px;
     border-radius: 55%;
     background-size: cover;
 }
 
 .profile-small{
-    width: 39px;
-    height: 38px;
-    overflow: hidden;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     background-size: cover;
 }
@@ -104,9 +102,8 @@ input,
     }
 
     .profile{
-        width: 39px;
-        height: 38px;
-        overflow: hidden;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         background-size: cover;
     }

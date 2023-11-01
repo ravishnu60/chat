@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi
 from Routes import chat, user
 from fastapi.middleware.cors import CORSMiddleware
+import time, requests
 
 app=FastAPI(
     title="Connect API",
@@ -27,6 +27,17 @@ def root():
 
 app.include_router(chat.app)
 app.include_router(user.app)
+
+@app.on_event("shutdown")
+def close():
+    while True:
+        try:
+            for i in range(3):
+                data= requests.get("https://chat-api-zu97.onrender.com")
+                time.sleep(30)
+            break
+        except:
+            time.sleep(30)
 
 # api_detail = get_openapi(
 #     title="Chat API",

@@ -8,6 +8,7 @@ from Models.model import User, Message, Typing
 from sqlalchemy import or_, and_
 import json,pytz,os, random
 import shutil
+from datetime import datetime
 
 app = APIRouter(
     prefix='/chat',
@@ -53,10 +54,12 @@ def newchat(user_id, db):
 
     get_name = []
     for id in ids:
-        temp = db.query(User).options(load_only(User.name, User.alive, User.profile)).filter(User.user_id == id).first()
+        temp = db.query(User).options(load_only(User.name, User.alive, User.profile, User.last_seen)).filter(User.user_id == id).first()
         temp.newmsg = newtext[str(id)]
         temp= temp.__dict__
         temp.pop('_sa_instance_state')
+        if temp['last_seen']:
+            temp['last_seen']= temp['last_seen'].strftime('%I:%M %p, %d/%m/%Y')
         if temp['profile']:
             # output= firecloud.getFile(temp['profile'])
             output= temp['profile'].split("##")[0]
@@ -84,7 +87,7 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
         except Exception as Err:
             print("Connection closed",Err)
             query= db.query(User).filter(User.user_id== id)
-            query.update({"alive":False}, synchronize_session=False)
+            query.update({"alive":False,"last_seen":datetime.today()}, synchronize_session=False)
             db.commit()
             break
 
@@ -106,6 +109,7 @@ def getmsg(user_id,id,limit, db):
         .filter(or_(and_(Message.from_id == user_id, Message.to_id == id),
                     and_(Message.to_id == user_id, Message.from_id == id)))\
         .order_by(Message.createdAt.desc()).limit(limit).all()
+    receiver= db.query(User).filter(User.user_id == id).first()
     aligned_msg = []
     temp_date = None
     
@@ -118,6 +122,8 @@ def getmsg(user_id,id,limit, db):
         temp['message']= msg.message
         temp['is_media']= msg.is_media
         temp['msg_id']= msg.msg_id
+        temp['alive']= receiver.alive
+        temp['last_seen']= receiver.last_seen.strftime('%I:%M %p, %d/%m/%Y')
         if msg.pin:
             pindata=json.loads(msg.pin)
         
@@ -186,7 +192,7 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
         except Exception as Err:
             print("Connection closed",Err)
             query= db.query(User).filter(User.user_id== user_id)
-            query.update({"alive":False}, synchronize_session=False)
+            query.update({"alive":False,"last_seen":datetime.today()}, synchronize_session=False)
             db.commit()
             typingOff(db, user_id)
             break

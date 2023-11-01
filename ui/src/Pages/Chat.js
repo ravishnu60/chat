@@ -172,7 +172,7 @@ function Chat() {
       const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${userData?.id}`);
 
       ws.onopen = () => {
-        ws.send(JSON.stringify({ limit: chatref.current.limit, msg: chatref.current.message }))
+        ws?.send(JSON.stringify({ limit: chatref.current.limit, msg: chatref.current.message }))
       }
 
       ws.onmessage = onmessage
@@ -266,7 +266,11 @@ function Chat() {
               <img className='profile-small mr-2' id="profileimg"
                 src={userData?.profile ? userData?.profile : profile}
                 onError={() => document.getElementById("profileimg").src = profile} /></div>
-            <div className='h6'>{userData?.name} </div></div>
+            <div >
+              <div className='h6 mb-0 font-weight-bold'>{userData?.name} </div>
+              <div className={'small font-weight-bold' +chat?.message?.[chat?.message?.length-1]?.alive ? 'text-success' : ''}>{chat?.message?.[chat?.message?.length-1]?.alive ? 'online' :chat?.message?.[chat?.message?.length-1]?.last_seen }</div>
+            </div>
+            </div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
             <img src={back} width={35} alt='back' />
           </button>
