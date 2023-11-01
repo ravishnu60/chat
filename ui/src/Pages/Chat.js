@@ -77,17 +77,19 @@ function Chat() {
   }
 
   const typing = (status, value) => {
-    if (!value) {
-      status = false;
-    }
+    if (value?.length < 2) {
+      if (!value || value?.length == 0) {
+        status = false;
+      }
 
-    axios({
-      method: 'put',
-      url: `${base_url}chat/typing`,
-      data: { to_id: userData?.id, typing: status },
-      headers: header
-    }).then(res => {
-    }).catch(err => { });
+      axios({
+        method: 'put',
+        url: `${base_url}chat/typing`,
+        data: { to_id: userData?.id, typing: status },
+        headers: header
+      }).then(res => {
+      }).catch(err => { });
+    }
   }
 
   const delay = (setval) => {
@@ -138,7 +140,7 @@ function Chat() {
 
     //chek new msg for alert and scroll
     if (temp?.message?.[temp?.message?.length - 1]?.message != chat?.message?.[chat?.message?.length - 1]?.message) {
-      if (temp?.message?.length !== 0 && permission === "granted") {
+      if (temp?.message?.length !== 0 && permission === "granted" && document.visibilityState == 'hidden') {
         if (chat?.message?.[chat?.message?.length - 1]?.from_id == false && chat?.message[chat?.message?.length - 1]?.is_read === false) {
           showNotification(`Message from ${userData?.name}`, chat?.message[chat?.message?.length - 1]?.is_media ? "Send an image" : chat?.message[chat?.message?.length - 1]?.message);
         }
@@ -268,9 +270,9 @@ function Chat() {
                 onError={() => document.getElementById("profileimg").src = profile} /></div>
             <div >
               <div className='h6 mb-0 font-weight-bold'>{userData?.name} </div>
-              <div className={`small font-weight-bold${chat?.message?.[chat?.message?.length-1]?.alive ? 'text-success' : ''}`}>{chat?.message?.[chat?.message?.length-1]?.alive ? 'online' :chat?.message?.[chat?.message?.length-1]?.last_seen }</div>
+              <div className={`small font-weight-bold${chat?.message?.[chat?.message?.length - 1]?.alive ? ' text-success' : ''}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
             </div>
-            </div>
+          </div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
             <img src={back} width={35} alt='back' />
           </button>
@@ -286,8 +288,8 @@ function Chat() {
                     <div className='d-flex flex-row-reverse align-items-center' >
                       {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
                       <div className='border border-primary rounded' id={`msg_id${data?.msg_id}`}>
-                        {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px',cursor:'pointer' }} onClick={()=>document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
-                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted'/> : data?.pin?.msg}
+                        {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
+                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
                         <div className='p-2 messagetext1'>
                           {data?.is_media ?
@@ -311,8 +313,8 @@ function Chat() {
                   <div className='col-10 pl-2'>{/* receive */}
                     <div className='d-flex'>
                       <div className='border border-success rounded'>
-                      {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px',cursor:'pointer' }} onClick={()=>document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
-                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted'/> : data?.pin?.msg}
+                        {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
+                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
                         <div className=' p-2 messagetext2'>
                           {data?.is_media ?
