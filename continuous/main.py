@@ -9,7 +9,7 @@ def start():
         try:
             data= requests.get("https://chat-api-zu97.onrender.com")
             print(data.json())
-            time.sleep(300)
+            time.sleep(600)
         except:
             print("error")
-            time.sleep(300)
+            time.sleep(600)
