@@ -1,15 +1,20 @@
 from fastapi import FastAPI
-import requests,time
+import requests,time, datetime
 
 app= FastAPI()
 
-@app.on_event("startup")
+@app.get("/")
+def opne():
+    return {"status":200, "detail":"API is running"}
+@app.on_event("shutdown")
 def start():
     while True:
         try:
-            data= requests.get("https://chat-api-zu97.onrender.com")
-            print(data.json())
-            time.sleep(600)
+            for i in range(3):
+                data= requests.get("https://runnn.onrender.com")
+                print(data.json(), datetime.datetime.now().today().time())
+                time.sleep(30)
+            break
         except:
             print("error")
-            time.sleep(600)
+            time.sleep(30)
