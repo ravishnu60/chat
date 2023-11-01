@@ -261,14 +261,14 @@ function Chat() {
       {loadingFunc(loading)}
       <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
         <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#ade7ff' }}>
-          <div className='p-1 d-flex align-items-end'>
+          <div className='p-1 d-flex align-items-center'>
             <div>
               <img className='profile-small mr-2' id="profileimg"
                 src={userData?.profile ? userData?.profile : profile}
                 onError={() => document.getElementById("profileimg").src = profile} /></div>
             <div >
               <div className='h6 mb-0 font-weight-bold'>{userData?.name} </div>
-              <div className={'small font-weight-bold' +chat?.message?.[chat?.message?.length-1]?.alive ? 'text-success' : ''}>{chat?.message?.[chat?.message?.length-1]?.alive ? 'online' :chat?.message?.[chat?.message?.length-1]?.last_seen }</div>
+              <div className={`small font-weight-bold${chat?.message?.[chat?.message?.length-1]?.alive ? 'text-success' : ''}`}>{chat?.message?.[chat?.message?.length-1]?.alive ? 'online' :chat?.message?.[chat?.message?.length-1]?.last_seen }</div>
             </div>
             </div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
