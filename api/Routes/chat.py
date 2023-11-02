@@ -170,7 +170,6 @@ def getmsg(user_id,id,limit, db):
     
     return {"message":aligned_msg, **type_status}
 
-
 @app.websocket('/getchat/{user_id}')
 async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depends(get_DB)):
     await websocket.accept()
@@ -183,7 +182,7 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
             #save msg
             if receive.get('msg'):
                 data=receive['msg']
-                msg = Message(from_id=user_id, to_id=data['to_id'], message=data['message'], pin= data['pin'] if data.get('pin') else None)
+                msg = Message(from_id=user_id, to_id=data['to_id'],is_media=data['is_media'], message=data['message'], pin= data['pin'] if data.get('pin') else None)
                 db.add(msg)
                 db.commit()
             # send message
