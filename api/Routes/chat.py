@@ -59,7 +59,7 @@ def newchat(user_id, db):
         temp= temp.__dict__
         temp.pop('_sa_instance_state')
         if temp['last_seen']:
-            temp['last_seen']= temp['last_seen'].strftime('%I:%M %p, %d/%m/%Y')
+            temp['last_seen']= temp['last_seen'].astimezone(pytz.timezone('Asia/Kolkata')).strftime('%I:%M %p, %d/%m/%Y')
         if temp['profile']:
             # output= firecloud.getFile(temp['profile'])
             output= temp['profile'].split("##")[0]
@@ -125,7 +125,7 @@ def getmsg(user_id,id,limit, db):
         temp['alive']= receiver.alive
         temp['last_seen']= receiver.last_seen
         if receiver.last_seen:
-            temp['last_seen']= receiver.last_seen.strftime('%I:%M %p, %d/%m/%Y')
+            temp['last_seen']= receiver.last_seen.astimezone(pytz.timezone('Asia/Kolkata')).strftime('%I:%M %p, %d/%m/%Y')
         if msg.pin:
             pindata=json.loads(msg.pin)
         
