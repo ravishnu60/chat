@@ -13,6 +13,8 @@ import load from '../Assets/loading.gif';
 import img_static from '../Assets/img_static.png';
 import EmojiPicker from 'emoji-picker-react';
 import reply from '../Assets/reply.png'
+import computer from '../Assets/computer.png'
+import { emojis, url } from '../Utils/emojis';
 
 function Chat() {
   const location = useLocation();
@@ -30,6 +32,7 @@ function Chat() {
   const [imgFile, setImgFile] = useState();
   const [oneImg, setOneImg] = useState();
   const [emoji, setEmoji] = useState({ click: false, size: '65vh' });
+  const [em, setEm] = useState({ name: null, start: Number(0) })
   const [pin, setPin] = useState({ id: null, msg: null })
 
   //scroll element
@@ -47,6 +50,7 @@ function Chat() {
       chatref.current.message = {
         to_id: userData?.id,
         message: data.msg,
+        is_media: data?.is_media ? data.is_media : false,
         pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
       }
       let temp = chat
@@ -57,6 +61,7 @@ function Chat() {
       }, 200);
       reset();
       setEmoji({ click: false, size: '65vh' });
+      cancenAnimi();
       setPin({ id: null, msg: null })
     }
     setTimeout(() => {
@@ -169,7 +174,7 @@ function Chat() {
 
   //websocket event
   useEffect(() => {
-    if (user !== undefined) {
+    if (user !== undefined && chat?.message?.length == 0) {
       setLoading(true);
       const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${userData?.id}`);
 
@@ -187,6 +192,7 @@ function Chat() {
       ws.onerror = () => {
         clearInterval(interval);
         setLoading(false);
+        ws.close();
       }
 
       chatref.current = { ws: ws, interval: interval, ...chatref.current }
@@ -231,6 +237,7 @@ function Chat() {
       }
       setImgFile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]) });
       document.getElementById('sendbtn').focus();
+      cancenAnimi();
     } else {
       setImgFile();
     }
@@ -258,6 +265,11 @@ function Chat() {
     }
   }
 
+  const cancenAnimi = () => {
+    setEm({ name: null,start:0 });
+    setEmoji(pre => ({ ...pre, size: '65vh' }));
+  }
+
   return (
     <div className='container'>
       {loadingFunc(loading)}
@@ -270,7 +282,7 @@ function Chat() {
                 onError={() => document.getElementById("profileimg").src = profile} /></div>
             <div >
               <div className='h6 mb-0 font-weight-bold'>{userData?.name} </div>
-              <div className={`small font-weight-bold${chat?.message?.[chat?.message?.length - 1]?.alive ? ' text-success' : ''}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
+              <div className={`small font-weight-bold ${chat?.message?.[chat?.message?.length - 1]?.alive ? 'text-success' : 'text-secondary'}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
             </div>
           </div>
           <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
@@ -290,120 +302,160 @@ function Chat() {
                       <div className='border border-primary rounded' id={`msg_id${data?.msg_id}`}>
                         {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
                           {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
-                        </div>}
-                        <div className='p-2 messagetext1'>
-                          {data?.is_media ?
-                            <img src={data?.message}
-                              title='file'
-                              alt='No image'
-                              data-toggle="modal" data-target="#exampleModal"
-                              style={{ cursor: 'pointer' }}
-                              width={70} onClick={() => setOneImg(data?.message)} /> :
-                            data?.message
-                          }
-                        </div>
-                      </div>
-                      <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
+                        </div>} 
+                        {data?.is_media ?
+                          <img src={data?.message}
+                            title='file'
+                            alt='No image'
+                            data-toggle="modal" data-target="#exampleModal"
+                            style={{ cursor: 'pointer' }}
+                            width={70} onClick={() => setOneImg(data?.message)} /> :
+                          <div className='p-2 messagetext1'>{data?.message} </div>
+                        }
+                      {/* </div> */}
                     </div>
-                    <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
+                    <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                   </div>
-                </>
+                  <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
+                </div>
+            </>
                 :
-                <>{data?.from_id == false ?
-                  <div className='col-10 pl-2'>{/* receive */}
-                    <div className='d-flex'>
-                      <div className='border border-success rounded'>
-                        {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
-                          {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
-                        </div>}
-                        <div className=' p-2 messagetext2'>
-                          {data?.is_media ?
-                            <img src={data.message}
-                              title='file'
-                              alt='No image'
-                              data-toggle="modal" data-target="#exampleModal"
-                              style={{ cursor: 'pointer' }}
-                              width={70} onClick={() => setOneImg(data?.message)} /> :
-                            data?.message
-                          }
-                        </div>
-                      </div>
-
-                      <div>
-                        <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
-                      </div>
-                    </div>
-                    <div className='small msgtime2' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
-
-                  </div> : <div className='col-10 offset-1 text-center font-weight-bold' style={{ color: 'chocolate' }}>{data?.date}</div>}</>
-              }
-            </div>
-          )}
-          {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
-          {chat?.typing && <img src={typing_gif} width={30} alt='typing' />}
-          {pin.id &&
-            <div className='row'>
-              <div className='col-11 pr-2'>
-                <div className='d-flex flex-row-reverse align-items-center'>
-                  <div className='border border-primary rounded p-2 messagetext3'>
-                    {pin?.is_media ? <img src={pin?.msg} width={30} /> : pin?.msg}
-                    <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" onClick={() => setPin({ id: null, msg: null })}>
-                      <span aria-hidden="true">&times;</span>
-                    </button>
+          <>{data?.from_id == false ?
+            <div className='col-10 pl-2'>{/* receive */}
+              <div className='d-flex'>
+                <div className='border border-success rounded'>
+                  {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
+                    {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
+                  </div>}
+                  <div className=' p-2 messagetext2'>
+                    {data?.is_media ?
+                      <img src={data.message}
+                        title='file'
+                        alt='No image'
+                        data-toggle="modal" data-target="#exampleModal"
+                        style={{ cursor: 'pointer' }}
+                        width={70} onClick={() => setOneImg(data?.message)} /> :
+                      data?.message
+                    }
                   </div>
+                </div>
+
+                <div>
+                  <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
+                </div>
+              </div>
+              <div className='small msgtime2' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>
+
+            </div> : <div className='col-10 offset-1 text-center font-weight-bold' style={{ color: 'chocolate' }}>{data?.date}</div>}</>
+              }
+        </div>
+          )}
+        {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
+        {chat?.typing && <img src={typing_gif} width={30} alt='typing' />}
+        {pin.id &&
+          <div className='row'>
+            <div className='col-11 pr-2'>
+              <div className='d-flex flex-row-reverse align-items-center'>
+                <div className='border border-primary rounded p-2 messagetext3'>
+                  {pin?.is_media ? <img src={pin?.msg} width={30} /> : pin?.msg}
+                  <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" onClick={() => setPin({ id: null, msg: null })}>
+                    <span aria-hidden="true">&times;</span>
+                  </button>
                 </div>
               </div>
             </div>
-          }
+          </div>
+        }
+      </div>
+    </div>
+
+      {/* Input message */ }
+
+  <div className='mt-2' style={{ display: em?.name ? 'none' : '' }}>
+    <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
+      <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { setEm(pre => ({ ...pre, name: 'Smileys' })); setEmoji(pre => ({ ...pre, size: '37vh' })) }}>
+        <img src={img_static} width={28} alt='select image' />
+      </button>
+      <button type='button' className='btn btn-link' onClick={() => { setEmoji(pre => ({ click: !pre.click, size: pre.click ? '65vh' : '20vh' })); }}><i className='far fa-smile fa-lg'></i></button>
+      <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
+      <input id="msg_input" className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
+        placeholder='Message here'
+        {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
+
+      {imgFile?.url &&
+        // <div className='ml-2 d-flex imgDiv' >
+        //   <i className='fa fa-plus fa-sm plus text-danger font-weight-bold'></i>
+        <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />
+        // </div>
+      }
+      {imgFile?.load ? <img src={load} width={38} alt='load' /> :
+        <button className='btn btn-link p-1' type='submit' id='sendbtn' title='Send'>
+          {getValues('msg') ? <img src={sendIcon} width={28} alt='send' /> : <img src={sendIcon1} width={28} alt='send' />}
+        </button>}
+    </form>
+    {emoji.click && <div>
+      <EmojiPicker autoFocusSearch={false} onEmojiClick={(e) => { setValue("msg", getValues('msg') + e.emoji); document.getElementById('sendbtn').focus(); }} previewConfig={{ showPreview: false }} height="47vh" width={"100%"} />
+    </div>}
+  </div>
+
+  {/* Animate Emojiii */ }
+  {
+    em?.name &&
+    <>
+      <div className='align-items-center row col-lg-10 col-12 d-flex justify-content-between'>
+        <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => document.getElementById('fileSource').click()}>
+          <img src={computer} width={28} alt='select image' title='select from device' /><span>upload</span>
+        </button>
+        <button type="button" className="close px-2" onClick={cancenAnimi} style={{ color: 'red' }}>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div className="mt-1 row col-lg-10 col-12 ">
+        <div className='d-flex overflow-auto'>
+          {Object.keys(emojis).map((name, index) =>
+            <span key={index} className={`btn btn-sm text-nowrap ${name == em.name && "btn-primary"}`}
+              onClick={() => {
+                setEm({ start: 0, name: null }); setTimeout(() => {
+                  setEm({ start: 0, name: name })
+                }, 50);
+              }} >{name}</span>
+          )}
         </div>
       </div>
-
-      {/* Input message */}
-      <div className='mt-2'>
-        <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
-          <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => document.getElementById('fileSource').click()}>
-            <img src={img_static} width={28} alt='select image' />
-          </button>
-          <button type='button' className='btn btn-link' onClick={() => { setEmoji(pre => ({ click: !pre.click, size: pre.click ? '65vh' : '20vh' })); }}><i className='far fa-smile fa-lg'></i></button>
-          <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
-          <input id="msg_input" className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
-            placeholder='Message here'
-            {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
-
-          {imgFile?.url &&
-            // <div className='ml-2 d-flex imgDiv' >
-            //   <i className='fa fa-plus fa-sm plus text-danger font-weight-bold'></i>
-            <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />
-            // </div>
-          }
-          {imgFile?.load ? <img src={load} width={38} alt='load' /> :
-            <button className='btn btn-link p-1' type='submit' id='sendbtn' title='Send'>
-              {getValues('msg') ? <img src={sendIcon} width={28} alt='send' /> : <img src={sendIcon1} width={28} alt='send' />}
-            </button>}
-        </form>
-        {emoji.click && <div>
-          <EmojiPicker autoFocusSearch={false} onEmojiClick={(e) => { setValue("msg", getValues('msg') + e.emoji); document.getElementById('sendbtn').focus(); }} previewConfig={{ showPreview: false }} height="47vh" width={"100%"} />
-        </div>}
+      <div className='row col-lg-10 col-12 border border-primary my-1' />
+      <div className='row col-lg-10 col-12 d-flex justify-content-between'>
+        <i className='btn fa fa-arrow-left p-0' title='pre' onClick={() => em.start > 0 && setEm(pre => ({ ...pre, start: pre.start - 30 }))}></i>
+        <i className='btn fa fa-arrow-right p-0' title='next' onClick={() => emojis[em.name]?.length - em.start > 30 && setEm(pre => ({ ...pre, start: pre.start + 30 }))}></i>
       </div>
+      <div className='row col-lg-10 col-12 mt-1' style={{ maxHeight: '20vh', overflow: 'auto' }}>
+        {emojis[em.name]?.map((item, index) => {
+          return (index < em.start + 30 && index >= em.start) && <div key={index} className=' border border-warning rounded text-center ml-1'>
+            <img src={`${url}/${em.name}/${item}`} alt='no' width={isMobile ? 25 : 35} onClick={() => sendMsg({ msg: `${url}/${em.name}/${item}`, is_media: true })} />
+          </div>
+        }
+        )}
+      </div>
+    </>
+  }
 
-      {/* Modal */}
-      <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
-          <div className="modal-content bg-dark">
-            <div className='model-header'>
-              <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" style={{ color: 'white' }}>
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div className="modal-body" >
-              <div style={{ overflow: 'auto' }}>
-                <img src={oneImg} width={isMobile ? 350 : 760} />
-              </div>
-            </div>
+  {/* Modal */ }
+  <div className="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
+      <div className="modal-content bg-dark">
+        <div className='model-header'>
+          <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" style={{ color: 'white' }}>
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div className="modal-body" >
+          <div style={{ overflow: 'auto' }}>
+            <img src={oneImg} width={isMobile ? 350 : 760} />
           </div>
         </div>
       </div>
     </div>
+  </div>
+    </div >
   )
 }
 
