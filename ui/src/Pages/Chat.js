@@ -54,7 +54,7 @@ function Chat() {
         pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
       }
       let temp = chat
-      temp.message.push({ from_id: true, message: data.msg, load: true, msg_id: chat.message[chat.message.length - 1].msg_id + 1 });
+      temp.message.push({ from_id: true, message: data.msg, load: true, msg_id: chat.message[chat.message.length - 1].msg_id + 1 , is_media: data?.is_media ? data.is_media : false});
       setChat(temp);
       setTimeout(() => {
         setScroll(!scroll)
@@ -370,9 +370,9 @@ function Chat() {
             <img src={img_static} width={28} alt='select image' />
           </button>
           <button type='button' className='btn btn-link p-1' onClick={() => { setEmoji(pre => ({ click: !pre.click, size: pre.click ? '65vh' : '20vh' })); }}><i className='far fa-smile fa-lg'></i></button>
-          <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { setAnime(pre => ({ ...pre, name: pre.name ? null : 'Smileys' })); setEmoji(pre => ({ ...pre, size: '37vh' })) }}>
+         {!isMobile && <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { setAnime(pre => ({ ...pre, name: pre.name ? null : 'Smileys' })); setEmoji(pre => ({ ...pre, size: '37vh' })) }}>
             <img src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Smileys/Relieved Face.webp' width={28} alt='select image' />
-          </button>
+          </button>}
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
           <input id="msg_input" className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
             placeholder='Message here' onFocus={() => typing(true, getValues('msg'), true)}
