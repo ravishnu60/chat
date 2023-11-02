@@ -70,7 +70,7 @@ function Chat() {
   }
 
   const typing = (status, value) => {
-    if (value?.length < 2) {
+    if (value?.length < 2 || status == false) {
       if (!value || value?.length == 0) {
         status = false;
       }
