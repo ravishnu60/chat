@@ -108,7 +108,7 @@ def getmsg(user_id,id,limit, db):
         .options(load_only(Message.message, Message.is_read, Message.from_id,Message.is_media, Message.createdAt))\
         .filter(or_(and_(Message.from_id == user_id, Message.to_id == id),
                     and_(Message.to_id == user_id, Message.from_id == id)))\
-        .order_by(Message.createdAt.desc()).limit(limit).all()
+        .order_by(Message.msg_id.desc()).limit(limit).all()
     receiver= db.query(User).filter(User.user_id == id).first()
     aligned_msg = []
     temp_date = None
@@ -129,10 +129,14 @@ def getmsg(user_id,id,limit, db):
         if msg.pin:
             pindata=json.loads(msg.pin)
         
-            getmsg= db.query(Message.message).filter(Message.msg_id == pindata['id']).first()
+            getmsg=None
+            for msg in my_msg: # db.query(Message.message).filter(Message.msg_id == pindata['id']).first()
+                if msg.msg_id== pindata['id']:
+                    getmsg=msg.message
+                    break
             pinmsg="Message deleted"
             try:
-                pinmsg = getmsg[0]
+                pinmsg = getmsg
             except:
                 pass
             temp['pin']={"media":pindata['media'],"msg":pinmsg,"id":pindata['id']}

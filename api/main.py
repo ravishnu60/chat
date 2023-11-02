@@ -34,10 +34,10 @@ def close():
         try:
             for i in range(3):
                 data= requests.get("https://chat-api-zu97.onrender.com")
-                time.sleep(30)
+                time.sleep(10)
             break
         except:
-            time.sleep(30)
+            time.sleep(10)
 
 # api_detail = get_openapi(
 #     title="Chat API",
