@@ -29,6 +29,7 @@ function Login() {
       }, 300);
 
     }).catch(() => {
+      alert("Something went wrong")
       setError(true);
       setLoading(false);
     })
@@ -46,6 +47,7 @@ function Login() {
       reset();
       setLoading(false);
     }).catch((err) => {
+      alert("Something went wrong")
       setLoading(false);
     });
   }

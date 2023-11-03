@@ -123,7 +123,6 @@ function Chat(props) {
       setChat(temp);
     }
     setLoading(false);
-    console.log(chatref.current?.data);
     chatref.current?.message?.length==0 && setTimeout(() => {
       setScroll(true)
     }, 200);
