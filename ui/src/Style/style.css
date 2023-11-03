@@ -68,21 +68,22 @@ input,
     border-radius: 11px !important;
 }
 
-.profile{
+.profile {
     width: 50px;
     height: 50px;
     border-radius: 55%;
     background-size: cover;
 }
 
-.profile-small{
+.profile-small {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     background-size: cover;
 }
 
-.profile img, .profile-small img{
+.profile img,
+.profile-small img {
     height: inherit;
     width: inherit;
 }
@@ -101,7 +102,7 @@ input,
         font-size: 94%;
     }
 
-    .profile{
+    .profile {
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -109,18 +110,46 @@ input,
     }
 }
 
-.selImg{
+.selImg {
     cursor: pointer;
-    border: 1px solid ;
+    border: 1px solid;
     border-radius: 10px;
     /* margin-left: -15px; */
 }
 
-.plus{
+.plus {
     visibility: hidden;
     rotate: 40deg;
 }
-.imgDiv:hover .plus{
+
+.imgDiv:hover .plus {
     z-index: 999;
     visibility: visible;
+}
+
+.loadd {
+    width: 100px;
+    height: 100px;
+    color: red;
+    animation-name: example;
+    animation-duration: 4s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes example {
+    0% {
+        color: red;
+    }
+
+    25% {
+        color: #ff5100;
+    }
+
+    50% {
+        color: #19d612;
+    }
+
+    100% {
+        color: green;
+    }
 }

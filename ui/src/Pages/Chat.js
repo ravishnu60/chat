@@ -123,7 +123,10 @@ function Chat(props) {
       setChat(temp);
     }
     setLoading(false);
-    chatref.current?.data == undefined && setScroll(true)
+    console.log(chatref.current?.data);
+    chatref.current?.message?.length==0 && setTimeout(() => {
+      setScroll(true)
+    }, 200);
   }
 
   //push notification
