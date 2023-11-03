@@ -117,7 +117,7 @@ def getmsg(user_id,id,limit, db):
     for msg in my_msg:
         temp={}
         temp['is_read']= msg.is_read
-        temp['from_id']= msg.from_id
+        temp['from_id']=msg.from_id == user_id
         temp['createdAt']= msg.createdAt
         temp['message']= msg.message
         temp['is_media']= msg.is_media
@@ -140,9 +140,12 @@ def getmsg(user_id,id,limit, db):
             except:
                 pass
             temp['pin']={"media":pindata['media'],"msg":pinmsg,"id":pindata['id']}
+            
         if temp['is_media']:
             temp['message']= temp['message'].split("##")[0]
+        
         temp['createdAt'] = msg.createdAt.astimezone(pytz.timezone('Asia/Kolkata'))
+        
         if temp_date == None:
             temp_date = temp['createdAt'].strftime('%d/%m/%Y')
 
@@ -150,7 +153,6 @@ def getmsg(user_id,id,limit, db):
             aligned_msg.append({"date": temp_date})
             temp_date =temp['createdAt'].strftime('%d/%m/%Y')
 
-        temp['from_id'] = msg.from_id == user_id
         temp['createdAt'] = temp['createdAt'].strftime('%I:%M %p')
         aligned_msg.append(temp)
 
