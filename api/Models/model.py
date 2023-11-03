@@ -7,7 +7,7 @@ key=secret.key
 #TypeDecorator - Create a type which can add additional functionality of an existing type
 class PGPString(TypeDecorator):
     impl = LargeBinary # Assign the type LargerBinary to large values
-
+    cache_ok=True 
     def __init__(self):
         super(PGPString, self).__init__()  # Initialize with superclass
 

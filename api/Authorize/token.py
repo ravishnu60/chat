@@ -3,7 +3,7 @@ import datetime
 from fastapi.security.oauth2 import OAuth2PasswordBearer
 from fastapi import status, HTTPException, Depends
 
-Oauth_token= OAuth2PasswordBearer('chat/login')
+Oauth_token= OAuth2PasswordBearer('user/login')
 
 secret_key= "gcdygfrt89y87r8y dih uicdfkugcd7fesgcuiofe"
 algorithm= 'HS256'

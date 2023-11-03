@@ -129,16 +129,11 @@ def getmsg(user_id,id,limit, db):
         if msg.pin:
             pindata=json.loads(msg.pin)
         
-            getmsg=None
-            for msg in my_msg: # db.query(Message.message).filter(Message.msg_id == pindata['id']).first()
-                if msg.msg_id== pindata['id']:
-                    getmsg=msg.message
-                    break
+            getmsg= db.query(Message.message).filter(Message.msg_id == pindata['id']).first()
             pinmsg="Message deleted"
-            try:
-                pinmsg = getmsg
-            except:
-                pass
+            if getmsg:
+                pinmsg = getmsg[0]
+
             temp['pin']={"media":pindata['media'],"msg":pinmsg,"id":pindata['id']}
             
         if temp['is_media']:
