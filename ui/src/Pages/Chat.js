@@ -16,7 +16,7 @@ import reply from '../Assets/reply.png'
 import computer from '../Assets/computer.png'
 import { emojis, url } from '../Utils/emojis';
 
-function Chat() {
+function Chat(props) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -31,7 +31,7 @@ function Chat() {
   const chatref = useRef({ limit: 10, message: null });
   const [imgFile, setImgFile] = useState();
   const [oneImg, setOneImg] = useState();
-  const [emoji, setEmoji] = useState({ click: false, size: '65vh' });
+  const [emoji, setEmoji] = useState({ click: false, size: '70vh' });
   const [anime, setAnime] = useState({ name: null, start: Number(0) })
   const [pin, setPin] = useState({ id: null, msg: null })
 
@@ -60,7 +60,7 @@ function Chat() {
         setScroll(!scroll)
       }, 200);
       reset();
-      setEmoji({ click: false, size: '65vh' });
+      setEmoji({ click: false, size: '70vh' });
       cancenAnimi();
       setPin({ id: null, msg: null })
     }
@@ -107,6 +107,7 @@ function Chat() {
 
   //initialize the call
   useEffect(() => {
+    props?.onClick(pre=>({...pre,hide:true}))
     !userData?.id && navigate('/home')
     getUser()
     // markasread();
@@ -139,9 +140,7 @@ function Chat() {
       } else if (permission === "default") {
         requestPermission();
       }
-      setTimeout(() => {
-        setScroll(!scroll)
-      }, 200);
+      setScroll(!scroll);
     }
 
     if (chat?.message[chat?.message?.length - 1]?.is_media && chat?.message[chat?.message?.length - 1]?.is_read === false) {
@@ -156,8 +155,6 @@ function Chat() {
         divEle?.scrollTo(0, tempEle.scrollHeight * 5 + 25)
       }, 50);
     }
-
-
     chatref.current = { ...chatref.current, data: chat }
   }, [chat])
 
@@ -256,7 +253,7 @@ function Chat() {
 
   const cancenAnimi = () => {
     setAnime({ name: null, start: 0 });
-    setEmoji(pre => ({ ...pre, size: '65vh' }));
+    setEmoji(pre => ({ ...pre, size: '70vh' }));
   }
 
   return (
@@ -369,8 +366,8 @@ function Chat() {
           <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => {document.getElementById('fileSource').click()}}>
             <img src={img_static} width={28} alt='select image' />
           </button>
-          <button type='button' className='btn btn-link p-1' onClick={() => { setEmoji(pre => ({ click: !pre.click, size: pre.click ? '65vh' : '20vh' })); }}><i className='far fa-smile fa-lg'></i></button>
-         {!isMobile && <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { setAnime(pre => ({ ...pre, name: pre.name ? null : 'Smileys' })); setEmoji(pre => ({ ...pre, size: '37vh' })) }}>
+          <button type='button' className='btn btn-link p-1' onClick={() => {setAnime({ name: null, start: Number(0) }); setEmoji(pre => ({ click: !pre.click, size: pre.click ? '70vh' : '30vh' })); }}><i className='far fa-smile fa-lg'></i></button>
+         {!isMobile && <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { setEmoji({ click:false, size:anime.name ? '70vh' : '42vh' }); setAnime(pre => ({ ...pre, name: pre.name ? null : 'Smileys' }));  }}>
             <img src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Smileys/Relieved Face.webp' width={28} alt='select image' />
           </button>}
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
@@ -417,8 +414,8 @@ function Chat() {
           </div>
           <div className='row col-lg-10 col-12 mt-1' style={{ maxHeight: '20vh', overflow: 'auto' }}>
             {emojis[anime.name]?.map((item, index) => {
-              return (index < anime.start + (isMobile ? 15 : 30) && index >= anime.start) && <div key={index} className=' border border-warning rounded text-center ml-1'>
-                <img style={{cursor:'pointer'}} src={`${url}/${anime.name}/${item}`} alt='no' width={isMobile ? 25 : 35} onClick={() => sendMsg({ msg: `${url}/${anime.name}/${item}`, is_media: true })} />
+              return (index < anime.start + (isMobile ? 15 : 30) && index >= anime.start) && <div key={index} className=' border border-warning rounded text-center ml-1 mb-1'>
+                <img style={{cursor:'pointer'}} src={`${url}/${anime.name}/${item}`} alt='no' width={isMobile ? 25 : 50} onClick={() => sendMsg({ msg: `${url}/${anime.name}/${item}`, is_media: true })} />
               </div>
             }
             )}

@@ -35,7 +35,7 @@ function Header(props) {
           <button className='btn btn-danger btn-sm' title='sign out' hidden={location.pathname === '/login' ? true : false} onClick={signout}><i className='fas fa-sign-out-alt'></i></button>
         </div>
       </div>
-      {user?.name && <div className='text-center bg-white h6 p-1'>Welcome <Link onClick={()=>location.pathname !== '/chat' && props.onClick(pre=>({...pre,click:true}))} className='text-success'><u>{user?.name}</u> </Link></div>}
+      {(user?.name && !props?.click?.hide) && <div className='text-center bg-white h6 p-1'>Welcome <Link onClick={()=>location.pathname !== '/chat' && props.onClick(pre=>({...pre,click:true}))} className='text-success'><u>{user?.name}</u> </Link></div>}
     </div>
   )
 }

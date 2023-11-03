@@ -68,6 +68,7 @@ function Home(props) {
   }
 
   useEffect(() => {
+    props?.onClick(pre => ({ ...pre, hide:false }))
     permission !== "granted" && Notification?.requestPermission();
     getUser();
     setLoading(true);
