@@ -11,12 +11,8 @@
 
 - Typing and viewing updates
   
----
-
-🧑‍💻️ *_The upcoming Features are_*,
-
-- Set background for specific chat
 - Can share media files (images)
+  
 - Notify the user if someone is online
 
 ---
@@ -29,3 +25,8 @@
 - *PostgreSQL*
 - *ReactJS*
 - *Bootstrap*
+
+---
+# ☁️ Service :
+ - *Firebase*
+ - *Render*
