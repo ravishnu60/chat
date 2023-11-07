@@ -34,7 +34,7 @@ function Chat(props) {
   const [emoji, setEmoji] = useState({ click: false, size: '70vh' });
   const [anime, setAnime] = useState({ name: null, start: Number(0) })
   const [pin, setPin] = useState({ id: null, msg: null })
-
+  const [restartScoket, setRestartSocket] = useState(false)
   //scroll element
   const divEle = document.getElementById('chatDiv');
 
@@ -123,9 +123,6 @@ function Chat(props) {
       setChat(temp);
     }
     setLoading(false);
-    chatref.current?.message?.length==0 && setTimeout(() => {
-      setScroll(true)
-    }, 200);
   }
 
   //push notification
@@ -148,7 +145,7 @@ function Chat(props) {
     if (chat?.message[chat?.message?.length - 1]?.is_media && chat?.message[chat?.message?.length - 1]?.is_read === false) {
       setTimeout(() => {
         setScroll(!scroll);
-      }, 400);
+      }, 1500);
     }
 
     //align div for prev chat view
@@ -160,9 +157,17 @@ function Chat(props) {
     chatref.current = { ...chatref.current, data: chat }
   }, [chat])
 
+  const wsErrorHandler=()=>{
+    chatref.current?.ws.close();
+    clearInterval(chatref.current?.interval);
+    setTimeout(() => {
+      setRestartSocket(!restartScoket)
+    }, 15000);
+  }
+
   //websocket event
   useEffect(() => {
-    if (user !== undefined && chat?.message?.length == 0) {
+    if (user !== undefined) {
       setLoading(true);
       const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${userData?.id}`);
 
@@ -171,6 +176,8 @@ function Chat(props) {
       }
 
       ws.onmessage = onmessage
+      ws.onerror = wsErrorHandler
+      ws.onclose = wsErrorHandler
 
       let interval = setInterval(() => {
         ws.send(JSON.stringify({ limit: chatref.current.limit, msg: chatref.current.message }))
@@ -190,7 +197,7 @@ function Chat(props) {
       chatref.current?.ws?.close()
       clearInterval(chatref.current?.interval);
     }
-  }, [user])
+  }, [user, restartScoket])
 
   useEffect(() => {
     if (limit !== chatref.current.limit) {
@@ -426,7 +433,7 @@ function Chat(props) {
       }
 
       {/* Modal */}
-      <div className="modal fade" id="pic_view" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div className="modal fade" id="pic_view" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
           <div className="modal-content bg-dark">
             <div className='model-header'>

@@ -20,6 +20,7 @@ function Home(props) {
   const listRef = useRef();
   const [step, setStep] = useState(0);
   const [profilePic, setProfile] = useState();
+  const [restartScoket, setRestartSocket] = useState(false)
 
   const newChat = (data) => {
     const search = data.search;
@@ -68,7 +69,7 @@ function Home(props) {
   }
 
   useEffect(() => {
-    props?.onClick(pre => ({ ...pre, hide:false }))
+    props?.onClick(pre => ({ ...pre, hide: false }))
     permission !== "granted" && Notification?.requestPermission();
     getUser();
     setLoading(true);
@@ -79,6 +80,14 @@ function Home(props) {
     setLoading(false);
     setList(JSON.parse(event.data));
 
+  }
+
+  const webSocketErrorHandler = () => {
+    listRef.current?.ws?.close()
+    clearInterval(listRef.current?.interval);
+    setTimeout(() => {
+      setRestartSocket(!restartScoket);
+    }, 15000);
   }
 
   //Notify for new messages
@@ -116,10 +125,10 @@ function Home(props) {
       let interval = setInterval(() => {
         ws.send("getList")
       }, 2500);
-      ws.onerror = () => {
-        clearInterval(interval);
-        setLoading(false);
-      }
+
+      ws.onerror = webSocketErrorHandler
+
+      ws.onclose = webSocketErrorHandler
 
       listRef.current = { ws: ws, interval: interval }
     }
@@ -128,7 +137,7 @@ function Home(props) {
       listRef.current?.ws?.close()
       clearInterval(listRef.current?.interval)
     }
-  }, [user])
+  }, [user, restartScoket])
 
   useEffect(() => {
     ProfileReset(user)
@@ -252,17 +261,17 @@ function Home(props) {
                   alt='profile'
                   className='profile mx-2'
                   src={item?.profile ? item?.profile : profile}
-                  onError={() =>  document.getElementById(`imgpr_${index}`).src = profile}
+                  onError={() => document.getElementById(`imgpr_${index}`).src = profile}
                   onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} />
               </div>
 
               <div className='col-lg-10 col-7 ' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null } }) }}>
                 <div className='row'>{item?.name}
-                <span className='ml-2'>
-                  {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
-                </span>
+                  <span className='ml-2'>
+                    {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
+                  </span>
                 </div>
-                <div className='row'> {!item?.alive && <span className='small'>{item?.last_seen} </span> }</div>
+                <div className='row'> {!item?.alive && <span className='small'>{item?.last_seen} </span>}</div>
               </div>
               <div className='col-lg-1 col-2 text-right'>
                 <button className='btn btn-link messagedel' title='delete all text you sent' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
