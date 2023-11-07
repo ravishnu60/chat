@@ -148,6 +148,10 @@ function Chat(props) {
       }, 1500);
     }
 
+    !chatref.current?.data?.length && setTimeout(() => {
+      setScroll(!scroll);
+    }, 500);
+
     //align div for prev chat view
     if (temp?.message?.length !== undefined && temp?.message?.length !== chat?.message?.length) {
       limit != 10 && setTimeout(() => {
@@ -265,6 +269,14 @@ function Chat(props) {
     setEmoji(pre => ({ ...pre, size: '70vh' }));
   }
 
+
+  const urlRegex = /https?:\/\/[^\s/$.?#].[^\s]*/;
+
+  const constructText = (text) => {
+    let temp= text.split(' ')
+   return temp?.map((value, index)=><span key={index}>{urlRegex.test(value) ? <a target='_blank' href={value}>{value}</a> : <>&nbsp;{value}</> }</span>);
+  }
+
   return (
     <div className='container'>
       {loadingFunc(loading)}
@@ -309,9 +321,8 @@ function Chat(props) {
                             data-toggle="modal" data-target="#pic_view"
                             style={{ cursor: 'pointer' }}
                             width={70} onClick={() => setOneImg(data?.message)} /> :
-                          <div className='p-2 messagetext1'>{data?.message} </div>
+                          <div className='p-2 messagetext1'>{constructText(data?.message)} </div>
                         }
-                        {/* </div> */}
                       </div>
                       <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                     </div>
@@ -326,7 +337,6 @@ function Chat(props) {
                         {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
                           {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
-                        <div className=' p-2 messagetext2'>
                           {data?.is_media ?
                             <img src={data.message}
                               title='file'
@@ -334,11 +344,9 @@ function Chat(props) {
                               data-toggle="modal" data-target="#pic_view"
                               style={{ cursor: 'pointer' }}
                               width={70} onClick={() => setOneImg(data?.message)} /> :
-                            data?.message
+                              <div className=' p-2 messagetext2'> {constructText(data?.message)} </div>
                           }
-                        </div>
                       </div>
-
                       <div>
                         <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                       </div>
@@ -380,7 +388,7 @@ function Chat(props) {
             <img src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Smileys/Relieved Face.webp' width={28} alt='select image' />
           </button>}
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
-          <input id="msg_input" className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
+          <input id="msg_input" type='text' style={{borderRadius:'20px'}} className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
             placeholder='Message here' onFocus={() => typing(true, getValues('msg'), true)}
             {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
 
