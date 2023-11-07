@@ -8,12 +8,17 @@ from Models.model import User, Message, Typing
 from sqlalchemy import or_, and_
 import json,pytz,os, random
 import shutil
-from datetime import datetime
+import datetime
 
 app = APIRouter(
     prefix='/chat',
     tags=['Chat']
 )
+
+def setlastSeen(id, db):
+    query= db.query(User).filter(User.user_id== id)
+    query.update({"alive":False,"last_seen":datetime.datetime.utcnow()}, synchronize_session=False)
+    db.commit()
 
 #set typing off when end chat
 def typingOff(db, id):
@@ -86,11 +91,8 @@ async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
                 await websocket.send_json(newData)
         except Exception as Err:
             print("Connection closed",Err)
-            query= db.query(User).filter(User.user_id== id)
-            query.update({"alive":False,"last_seen":datetime.today()}, synchronize_session=False)
-            db.commit()
+            setlastSeen(id, db)
             break
-
     
 #updated viewwd status
 def updateView(user_id,id,db):
@@ -193,9 +195,7 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
             updateView(user_id,id,db)
         except Exception as Err:
             print("Connection closed",Err)
-            query= db.query(User).filter(User.user_id== user_id)
-            query.update({"alive":False,"last_seen":datetime.today()}, synchronize_session=False)
-            db.commit()
+            setlastSeen(user_id, db)
             typingOff(db, user_id)
             break
 

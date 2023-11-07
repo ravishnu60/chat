@@ -29,7 +29,6 @@ function Login() {
       }, 300);
 
     }).catch(() => {
-      alert("Something went wrong")
       setError(true);
       setLoading(false);
     })
