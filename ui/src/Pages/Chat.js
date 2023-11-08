@@ -13,8 +13,8 @@ import load from '../Assets/loading.gif';
 import img_static from '../Assets/img_static.png';
 import EmojiPicker from 'emoji-picker-react';
 import reply from '../Assets/reply.png'
-import computer from '../Assets/computer.png'
 import { emojis, url } from '../Utils/emojis';
+import uEmojiParser from 'universal-emoji-parser'
 
 function Chat(props) {
   const location = useLocation();
@@ -278,6 +278,10 @@ function Chat(props) {
     return temp?.map((value, index) => <span key={index}>{urlRegex.test(value) ? <a target='_blank' href={value}>{value}</a> : <>&nbsp;{value}</>}</span>);
   }
 
+  const getEmoji =(name) =>{
+    return uEmojiParser.parse(`:${name.toLowerCase().split(' ').join('_')}:`, { parseToHtml: false, parseToUnicode: true });
+  }
+
   return (
     <div className='container'>
       {loadingFunc(loading)}
@@ -318,7 +322,7 @@ function Chat(props) {
                         {data?.is_media ?
                           <>
                             {(data.message.includes(url) && isMobile) ?
-                              <div children className='p-1 small'>Emoji {data.message.split('/')[data.message.split('/')?.length - 1].split('.')[0]}</div >
+                              <div children className='p-1 small'>{getEmoji(data.message.split('/')[data.message.split('/')?.length - 1].split('.')[0])}</div >
                               :
                               <img src={data?.message}
                                 title='file'
@@ -345,13 +349,15 @@ function Chat(props) {
                           {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
                         {data?.is_media ?
-                          <>
+                          <> {(data.message.includes(url) && isMobile) ?
+                            <div children className='p-1 small'>{getEmoji(data.message.split('/')[data.message.split('/')?.length - 1].split('.')[0])}</div > 
+                            :
                             <img src={data.message}
                               title='file'
                               alt='No image'
                               data-toggle="modal" data-target="#pic_view"
                               style={{ cursor: 'pointer' }}
-                              width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
+                              width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />}
                           </> :
                           <div className=' p-2 messagetext2'> {constructText(data?.message)} </div>
                         }
@@ -413,7 +419,7 @@ function Chat(props) {
             </button>}
         </form>
         {emoji.click && <div>
-          <EmojiPicker autoFocusSearch={false} onEmojiClick={(e) => { setValue("msg", getValues('msg') + e.emoji); document.getElementById('sendbtn').focus(); }} previewConfig={{ showPreview: false }} height="47vh" width={"100%"} />
+          <EmojiPicker autoFocusSearch={false} onEmojiClick={(e) => {setValue("msg", getValues('msg') + e.emoji); document.getElementById('sendbtn').focus(); }} previewConfig={{ showPreview: false }} height="47vh" width={"100%"} />
         </div>}
       </div>
 
