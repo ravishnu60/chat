@@ -332,7 +332,7 @@ function Chat(props) {
                                 width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
                             }
                           </> :
-                          <div className='p-2 messagetext1'>{constructText(data?.message)} </div>
+                          <div className='p-2 messagetext1 text-break'>{constructText(data?.message)} </div>
                         }
                       </div>
                       <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
@@ -359,7 +359,7 @@ function Chat(props) {
                               style={{ cursor: 'pointer' }}
                               width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />}
                           </> :
-                          <div className=' p-2 messagetext2'> {constructText(data?.message)} </div>
+                          <div className=' p-2 messagetext2 text-break'> {constructText(data?.message)} </div>
                         }
                       </div>
                       <div>
