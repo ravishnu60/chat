@@ -8,7 +8,7 @@ import '../Style/style.css'
 function Header(props) {
   const location = useLocation();
   const navigate = useNavigate();
-  const header = { "Authorization": "bearer " + localStorage.getItem('token') };
+  const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
   const [user, setUser] = useState();
 
   const signout = () => {

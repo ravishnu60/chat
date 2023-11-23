@@ -22,7 +22,7 @@ function Login() {
     formdata.append('password', data.password);
 
     axios.post(`${base_url}user/login`, formdata).then((res) => {
-      localStorage.setItem('token', res.data.access_token);
+      sessionStorage.setItem('token', res.data.access_token);
       setTimeout(() => {
         navigate('/home');
         setLoading(false);
@@ -63,7 +63,7 @@ function Login() {
   }
 
   useEffect(() => {
-    localStorage.clear();
+    sessionStorage.clear();
   }, [])
   
   

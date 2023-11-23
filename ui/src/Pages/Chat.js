@@ -38,7 +38,7 @@ function Chat(props) {
   //scroll element
   const divEle = document.getElementById('chatDiv');
 
-  const header = { "Authorization": "bearer " + localStorage.getItem('token') };
+  const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
 
   const getUser = async () => {
     const data = await userstatus(navigate, header);

@@ -14,7 +14,7 @@ function Home(props) {
   const navigate = useNavigate();
   const [user, setUser] = useState();
   const [loading, setLoading] = useState(true);
-  const header = { "Authorization": "bearer " + localStorage.getItem('token') }
+  const header = { "Authorization": "bearer " + sessionStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
   const { register: profileReg, formState: { errors: profileErr }, reset: ProfileReset, handleSubmit: ProfileSubmit, getValues } = useForm();
   const listRef = useRef();
