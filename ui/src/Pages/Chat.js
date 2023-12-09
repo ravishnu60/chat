@@ -42,7 +42,7 @@ function Chat({props}) {
   const sendMsg = (data) => {
     if (data.msg !== '') {
       chatref.current.message = {
-        to_id: to?.id,
+        to_id: to?.user_id,
         message: data.msg,
         is_media: data?.is_media ? data.is_media : false,
         pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
@@ -71,7 +71,7 @@ function Chat({props}) {
       axios({
         method: 'put',
         url: `${base_url}chat/typing`,
-        data: { to_id: to?.id, typing: status },
+        data: { to_id: to?.user_id, typing: status },
         headers: header
       }).then(res => {
       }).catch(err => { });
@@ -100,6 +100,7 @@ function Chat({props}) {
   }
 
   const onmessage = (event) => {
+    ;console.log("oko");
     let temp = JSON.parse(event.data);
     let msg_id = chatref.current?.data?.message?.filter((item) => item?.load == true)[0]?.msg_id;
     if (temp?.message?.filter((item) => item?.msg_id == msg_id)) {
@@ -144,6 +145,7 @@ function Chat({props}) {
   }, [chat])
 
   const wsErrorHandler = () => {
+    console.log("err");
     chatref.current?.ws.close();
     clearInterval(chatref.current?.interval);
     setTimeout(() => {
@@ -155,10 +157,10 @@ function Chat({props}) {
   useEffect(() => {
     if (user !== undefined) {
       setLoading(true);
-      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${to?.id}`);
+      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${to?.user_id}`);
 
       ws.onopen = () => {
-        ws?.send(JSON.stringify({ limit: chatref.current.limit, msg: chatref.current.message }))
+        ws?.send(JSON.stringify({ limit: chatref.current.limit, msg: null }))
       }
 
       ws.onmessage = onmessage
@@ -233,7 +235,7 @@ function Chat({props}) {
     if (imgFile?.file) {
       setImgFile(pre => ({ ...pre, load: true }))
       const fm = new FormData();
-      fm.append('data', JSON.stringify({ to_id: to?.id }));
+      fm.append('data', JSON.stringify({ to_id: to?.user_id }));
       fm.append('source', imgFile?.file);
 
       axios({
@@ -377,7 +379,7 @@ function Chat({props}) {
 
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
-          <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { document.getElementById('fileSource').click() }}>
+          <button type='button' className='btn btn-link p-1 bg-info mr-1' title='choose media' onClick={() => { document.getElementById('fileSource').click() }}>
             <img src={img_static} width={28} alt='select image' />
           </button>
           <button type='button' className='btn btn-link p-1' onClick={() => { setAnime({ name: null, start: Number(0) }); setEmoji(pre => ({ click: !pre.click, size: pre.click ? '70vh' : '30vh' })); }}><i className='far fa-smile fa-lg'></i></button>
@@ -396,7 +398,7 @@ function Chat({props}) {
             // </div>
           }
           {imgFile?.load ? <img src={load} width={38} alt='load' /> :
-            <button className='btn btn-link p-1' type='submit' id='sendbtn' title='Send'>
+            <button className='btn btn-link p-1 bg-success ml-2' type='submit' id='sendbtn' title='Send'>
               {getValues('msg') ? <img src={sendIcon} width={28} alt='send' /> : <img src={sendIcon1} width={28} alt='send' />}
             </button>}
         </form>

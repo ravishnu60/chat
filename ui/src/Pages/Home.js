@@ -27,7 +27,9 @@ function Home({props}) {
         headers: header
       }).then((res) => {
         reset();
+        setTo(res.data?.data)
       }).catch(() => {
+        alert("No User","warning")
       })
     }
   }
@@ -55,11 +57,13 @@ function Home({props}) {
     })
   }
   const onmessage = (event) => {
+    console.log(event);
     setLoading(false);
     setList(JSON.parse(event.data));
   }
   const webSocketErrorHandler = () => {
     listRef.current?.ws?.close()
+    clearInterval(listRef.current?.interval)
     setLoading(false);
     setTimeout(() => {
       setRestartSocket(!restartScoket);
@@ -102,15 +106,25 @@ function Home({props}) {
       ws.onopen = () => {
         ws.send("Connect");
       }
+
+      let interval = setInterval(() => {
+        try {
+          ws?.send("list")
+        } catch {
+          webSocketErrorHandler();
+        }
+      }, 1000);
+
       ws.onmessage = onmessage
       ws.onerror = webSocketErrorHandler
       ws.onclose = webSocketErrorHandler
 
-      listRef.current = { ws: ws}
+      listRef.current = { ws: ws, interval : interval}
     }
 
     return () => {
       listRef.current?.ws?.close()
+      clearInterval(listRef.current?.interval)
     }
 
   }, [user, restartScoket])
@@ -151,7 +165,7 @@ function Home({props}) {
                   // onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} 
                 />
               </div>
-              <div className='col' onClick={() => { setTo({ id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
+              <div className='col' onClick={() => { setTo({ user_id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
                 <div className='row'>{item?.name}
                   <span className='ml-2'>
                     {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
