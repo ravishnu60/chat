@@ -43,8 +43,11 @@ def login(res: Response, data: OAuth2PasswordRequestForm = Depends(), db: Sessio
 
 
 @app.get('/userinfo')
-def userData(db: Session = Depends(get_DB),  get_curr_user=Depends(token.get_current_user)):
+def userData(res: Response, db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
     query= db.query(User).filter(User.user_id== get_curr_user['id'])
+    if not query.first():
+        res.status_code = status.HTTP_404_NOT_FOUND
+        return {"status_code": 404, "status": "failed", "detail": "User not found"}
     if not query.first().alive:
         query.update({"alive":True}, synchronize_session=False)
         db.commit()
@@ -127,12 +130,3 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
         res.status_code=status.HTTP_409_CONFLICT
         return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}   
     return {"status_code": 200, "status": "success", "detail": "profile updated"}
-
-#No use manage in firebase
-@app.get('/profile/{id}')
-def getMedia(id:int,db: Session = Depends(get_DB)):
-    source= db.query(User).filter(User.user_id == id).first()
-    check_file= os.path.exists(source.profile)
-    if not source or check_file:
-        return {"status_code": 404, "status": "failed", "detail": "file not found"}
-    return FileResponse(source.profile)

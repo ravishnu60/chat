@@ -6,8 +6,9 @@ const Login = React.lazy(() => import('./Pages/Login.js'));
 const Main = React.lazy(() => import('./Pages/Main.js'));
 
 function App() {
+  //vh-100
   return (
-    <div className="min vh-100">
+    <div className="min "> 
       <BrowserRouter >
         <Routes>
           <Route path='/login' name="login" element={<Login />} />

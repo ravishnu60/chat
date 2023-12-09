@@ -4,15 +4,17 @@ import Home from './Home'
 import Chat from './Chat'
 import { loadingFunc, userstatus, isMobile } from '../Utils/Utility';
 import gif1 from '../Assets/hi_cat.gif'
+import { useNavigate } from 'react-router-dom';
 
 function Main() {
     const [user, setUser] = useState();
     const [to, setTo] = useState();
     const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
     const [loading, setLoading] = useState(true);
+    const navigate= useNavigate();
 
     const getUser = async () => {
-        const data = await userstatus("navigate", header);
+        const data = await userstatus(navigate, header);
         setLoading(false);
         setUser(data?.data);
     };
