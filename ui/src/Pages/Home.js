@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { alert, base_url, isMobile, loadingFunc, permission, showNotification, userstatus, webSocketUrl } from '../Utils/Utility';
+import { alert, base_url, permission, showNotification, webSocketUrl } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
 import findperson from '../Assets/find-person.png'
@@ -9,17 +9,13 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 import { Notifications } from 'react-push-notification';
 
-function Home(props) {
+function Home({props}) {
+  const {user, loading, setLoading}= props;
   const [list, setList] = useState([]);
   const navigate = useNavigate();
-  const [user, setUser] = useState();
-  const [loading, setLoading] = useState(true);
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
-  const { register: profileReg, formState: { errors: profileErr }, reset: ProfileReset, handleSubmit: ProfileSubmit, getValues } = useForm();
   const listRef = useRef();
-  const [step, setStep] = useState(0);
-  const [profilePic, setProfile] = useState();
   const [restartScoket, setRestartSocket] = useState(false)
 
   const newChat = (data) => {
@@ -31,19 +27,10 @@ function Home(props) {
         headers: header
       }).then((res) => {
         reset();
-        navigate('/chat', { state: { id: res?.data?.data?.user_id, name: res?.data?.data?.name } })
-      }).catch((err) => {
-        userstatus(navigate, header);
-        alert('User not found', false)
+      }).catch(() => {
       })
     }
   }
-
-  const getUser = async () => {
-    props?.onClick(pre => ({ ...pre, refresh: !pre.refresh }))
-    const data = await userstatus(navigate, header);
-    setUser(data?.data);
-  };
 
   const deleteChat = (id) => {
     Swal.fire({
@@ -59,36 +46,31 @@ function Home(props) {
           method: 'delete',
           url: `${base_url}chat/deletechat/${id}`,
           headers: header
-        }).then((response) => {
+        }).then(() => {
           alert('deleted successfully', 'success')
-        }).catch((error) => {
+        }).catch(() => {
           alert('Error while deleting')
         })
       }
     })
   }
-
-  useEffect(() => {
-    props?.onClick(pre => ({ ...pre, hide: false }))
-    permission !== "granted" && Notification?.requestPermission();
-    getUser();
-    setLoading(true);
-  }, []);
-
-
   const onmessage = (event) => {
     setLoading(false);
     setList(JSON.parse(event.data));
-
   }
-
   const webSocketErrorHandler = () => {
     listRef.current?.ws?.close()
-    clearInterval(listRef.current?.interval);
+    setLoading(false);
     setTimeout(() => {
       setRestartSocket(!restartScoket);
+      setLoading(true);
     }, 15000);
   }
+
+  useEffect(() => {
+    permission !== "granted" && Notification?.requestPermission();
+    setLoading(true);
+  }, []);
 
   //Notify for new messages
   useEffect(() => {
@@ -121,116 +103,20 @@ function Home(props) {
         ws.send("Connect");
       }
       ws.onmessage = onmessage
-
-      let interval = setInterval(() => {
-        ws.send("getList")
-      }, 2500);
-
       ws.onerror = webSocketErrorHandler
-
       ws.onclose = webSocketErrorHandler
 
-      listRef.current = { ws: ws, interval: interval }
+      listRef.current = { ws: ws}
     }
 
     return () => {
       listRef.current?.ws?.close()
-      clearInterval(listRef.current?.interval)
     }
+
   }, [user, restartScoket])
 
-  useEffect(() => {
-    ProfileReset(user)
-    setStep(0);
-    props?.click?.click && document.getElementById('modalBtn').click();
-  }, [props?.click?.click])
-
-  const updateProfile = (data) => {
-    const url = `${base_url}user/${step == 0 ? 'update' : 'password'}`;
-    setLoading(true);
-    axios({
-      method: 'put',
-      url: url,
-      data: data,
-      headers: header
-    }).then((res) => {
-      setLoading(false)
-      if (step == 0) {
-        alert('updated successfully', 'success');
-        setTimeout(() => {
-          getUser();
-        }, 300);
-      } else {
-        alert('Password changed', 'success');
-        setStep(0);
-      }
-    }).catch((err) => {
-      setLoading(false)
-      if (step == 0) {
-        alert('Error while update, try later');
-      } else {
-        alert(err?.response?.data?.detail);
-      }
-    })
-  }
-
-  const addPic = (e) => {
-    if (e.target.files?.length) {
-      var allowedExtensions = /(\.jpg|\.jpeg|\.png|)$/i;
-
-      if (!allowedExtensions.exec(e.target.value)) {
-        alert("Image files only");
-        return;
-      }
-      if (e.target.files[0].size > 100e5) {
-        alert("Large image files");
-        return;
-      }
-      setProfile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]) });
-    } else {
-      setProfile();
-    }
-  }
-
-  const updatePic = () => {
-    const fm = new FormData();
-    fm.append('source', profilePic?.file);
-    setLoading(true);
-    axios({
-      method: 'put',
-      url: base_url + 'user/profilepic',
-      data: fm,
-      headers: header
-    }).then((res) => {
-      alert("profile updated", 'success');
-      getUser();
-      setTimeout(() => {
-        setProfile();
-      }, 200);
-      setLoading(false);
-    }).catch(err => {
-      alert("Error, try later");
-      setLoading(false);
-
-    })
-  }
-
-  const backProfile = () => {
-    setStep(0);
-    setTimeout(() => {
-      ProfileReset(user)
-    }, 100);
-  }
-
-  const clickProfile = () => {
-    if (profilePic?.url || user?.profile) {
-      setProfile(pre => ({ ...pre, urls: profilePic?.url ? profilePic?.url : user?.profile }));
-      setStep(2);
-    }
-  }
   return (
     <>
-      {loadingFunc(loading)}
       <Notifications />
       <form onSubmit={handleSubmit(newChat)}>
         <div className="input-group">
@@ -262,9 +148,9 @@ function Home(props) {
                   className='profile mx-2'
                   src={item?.profile ? item?.profile : profile}
                   onError={() => document.getElementById(`imgpr_${index}`).src = profile}
-                  onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} />
+                  // onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} 
+                />
               </div>
-
               <div className='col-lg-10 col-7 ' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null } }) }}>
                 <div className='row'>{item?.name}
                   <span className='ml-2'>
@@ -285,12 +171,12 @@ function Home(props) {
       {/* modal */}
       <button data-toggle="modal" data-target="#profile" id="modalBtn" style={{ display: 'none' }}></button>
 
-      <div className="modal" tabIndex="-1" role="dialog" id="profile" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+      {/* <div className="modal" tabIndex="-1" role="dialog" id="profile" aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div className="modal-dialog" role="document">
           <div className="modal-content">
             <div className="modal-header">
               <h5 className="modal-title">User Profile</h5>
-              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => (props?.onClick(pre => ({ ...pre, click: false })), setProfile())}>
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={() => (setProfile())}>
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
@@ -378,12 +264,12 @@ function Home(props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <button data-toggle="modal" data-target="#profileModel" id="profileview" style={{ display: 'none' }}></button>
 
       {/* Model to view profile */}
-      <div className="modal" tabIndex="-1" role="dialog" id="profileModel" data-backdrop="static" data-keyboard="false">
+      {/* <div className="modal" tabIndex="-1" role="dialog" id="profileModel" data-backdrop="static" data-keyboard="false">
         <div className="modal-dialog modal-dialog-scrollable" role="document">
           <div className="modal-content">
             <div className="modal-header">
@@ -399,7 +285,7 @@ function Home(props) {
             </div>
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   )
 }

@@ -5,11 +5,11 @@ import loading_gif from '../Assets/load.webp';
 import key from '../Assets/Key.webp';
 import addNotification from "react-push-notification";
 
-// export const base_url = "http://127.0.0.1:8000/";
-export const base_url = "https://chat-api-zu97.onrender.com/";
+export const base_url = "http://127.0.0.1:8000/";
+// export const base_url = "https://chat-api-zu97.onrender.com/";
 
-// export const webSocketUrl = "ws://localhost:8000/chat";
-export const webSocketUrl= "wss://chat-api-zu97.onrender.com/chat";
+export const webSocketUrl = "ws://localhost:8000/chat";
+// export const webSocketUrl= "wss://chat-api-zu97.onrender.com/chat";
 
 export const alert = (text, status) => {
     Swal.fire({
@@ -29,7 +29,7 @@ export const userstatus = async (navigate, header) => {
     }).then((res) => {
         return res.data;
     }).catch(() => {
-        navigate('/login');
+        // navigate('/login');
     });
 }
 

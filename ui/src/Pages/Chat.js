@@ -26,9 +26,9 @@ function Chat(props) {
   const [loading, setLoading] = useState(true);
   const [loadingdel, setLoadingdel] = useState({});
   const { register, reset, handleSubmit, getValues, setValue } = useForm();
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(20);
   const [user, setUser] = useState();
-  const chatref = useRef({ limit: 10, message: null });
+  const chatref = useRef({ limit: 20, message: null });
   const [imgFile, setImgFile] = useState();
   const [oneImg, setOneImg] = useState();
   const [emoji, setEmoji] = useState({ click: false, size: '70vh' });
@@ -151,7 +151,7 @@ function Chat(props) {
 
     //align div for prev chat view
     if (temp?.message?.length !== undefined && temp?.message?.length !== chat?.message?.length) {
-      limit != 10 && setTimeout(() => {
+      limit != 20 && setTimeout(() => {
         divEle?.scrollTo(0, tempEle.scrollHeight * 5 + 25)
       }, 50);
     }
@@ -218,10 +218,10 @@ function Chat(props) {
 
   divEle?.addEventListener('scroll', () => {
     if (divEle?.scrollTop == 0) {
-      setLimit(limit + 5);
+      setLimit(limit + 10);
       setLoading(true);
     }
-    divEle.scrollTop + divEle.offsetHeight == divEle?.scrollHeight && setLimit(10)
+    divEle.scrollTop + divEle.offsetHeight == divEle?.scrollHeight && setLimit(20)
   });
 
   const selectFile = (e) => {
