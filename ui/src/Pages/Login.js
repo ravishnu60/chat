@@ -79,8 +79,8 @@ function Login() {
       <div className='mt-5 p-5'>
         {loadingFunc(loading, step==0)}
         <div className="row justify-content-center align-items-center">
-          <div className="col-lg-4 col-11">
-            <form style={{ background: 'linear-gradient(138deg,#73ebff6b,#94ff764f)' }} className={error ? 'border border-danger rounded p-3' : 'border border-success rounded p-3'} onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
+          <div className="col-lg-4 col-11 text-light">
+            <form className={error ? 'border border-danger rounded p-3' : 'border border-success rounded p-3'} onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
               {error && <div className="text-danger text-center h5">Invalid credentials</div>}
               <h5 className='bg-info p-2 text-light text-center'>{step ? "Create Account" : "Login to your Account"}</h5>
               {step === 0 ?

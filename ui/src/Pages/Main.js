@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react'
 import Header from '../Menus/Header'
 import Home from './Home'
 import Chat from './Chat'
-import { loadingFunc, userstatus } from '../Utils/Utility';
+import { loadingFunc, userstatus, isMobile } from '../Utils/Utility';
+import gif1 from '../Assets/hi_cat.gif'
 
 function Main() {
     const [user, setUser] = useState();
-    const [to, setTo]= useState();
+    const [to, setTo] = useState();
     const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
     const [loading, setLoading] = useState(true);
 
@@ -25,19 +26,41 @@ function Main() {
             {loadingFunc(loading)}
             <Header user={user} />
             <div className='p-3'>
-                <div className='row'>
-                    <div className='col-4'>
-                        <Home props={{user, loading, setLoading}} />
+                {isMobile ?
+                    <div className='row' style={{ height: '80vh' }}>
+                        {
+                            !to ?
+                                <div className='col border-right'>
+                                    <Home props={{ user, loading, setLoading, setTo }} />
+                                </div>
+                                :
+                                <div className='col'>
+                                    {
+                                        to ? <Chat props={{ user, to, loading, setLoading, setTo }} /> :
+                                            <div className='text-center h4 mt-5'>
+                                                <img src={gif1} width='80vh' className='mb-4' /><br />
+                                                <span className='font-weight-bold text-info'>Welcome {user?.name} </span>
+                                            </div>
+                                    }
+                                </div>
+                        }
                     </div>
-                    <div className='col'>
-                       { 
-                            to ? <Chat props={{user, to, loading, setLoading}} /> :
-                            <div className='text-center h3 mt-5'>
-                                Welcome {user?.name}
-                            </div>
-                       }
+                    :
+                    <div className='row' style={{ height: '80vh' }}>
+                        <div className='col-4 border-right'>
+                            <Home props={{ user, loading, setLoading, setTo }} />
+                        </div>
+                        <div className='col'>
+                            {
+                                to ? <Chat props={{ user, to, loading, setLoading, setTo }} /> :
+                                    <div className='text-center h4 mt-5'>
+                                        <img src={gif1} width='80vh' className='mb-4' /><br />
+                                        <span className='font-weight-bold text-info'>Welcome {user?.name} </span>
+                                    </div>
+                            }
+                        </div>
                     </div>
-                </div>
+                }
             </div>
         </div>
     )

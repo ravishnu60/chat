@@ -16,18 +16,16 @@ import reply from '../Assets/reply.png'
 import { emojis, url } from '../Utils/emojis';
 import uEmojiParser from 'universal-emoji-parser'
 
-function Chat(props) {
+function Chat({props}) {
+  const {user, to, loading, setLoading, setTo}= props;
   const location = useLocation();
   const navigate = useNavigate();
 
-  const userData = location.state;
   const [chat, setChat] = useState({ typing: false, message: [] });
   const [scroll, setScroll] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [loadingdel, setLoadingdel] = useState({});
   const { register, reset, handleSubmit, getValues, setValue } = useForm();
   const [limit, setLimit] = useState(20);
-  const [user, setUser] = useState();
   const chatref = useRef({ limit: 20, message: null });
   const [imgFile, setImgFile] = useState();
   const [oneImg, setOneImg] = useState();
@@ -35,20 +33,16 @@ function Chat(props) {
   const [anime, setAnime] = useState({ name: null, start: Number(0) })
   const [pin, setPin] = useState({ id: null, msg: null })
   const [restartScoket, setRestartSocket] = useState(false)
+
   //scroll element
   const divEle = document.getElementById('chatDiv');
 
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
 
-  const getUser = async () => {
-    const data = await userstatus(navigate, header);
-    setUser(data?.data)
-  };
-
   const sendMsg = (data) => {
     if (data.msg !== '') {
       chatref.current.message = {
-        to_id: userData?.id,
+        to_id: to?.id,
         message: data.msg,
         is_media: data?.is_media ? data.is_media : false,
         pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
@@ -77,7 +71,7 @@ function Chat(props) {
       axios({
         method: 'put',
         url: `${base_url}chat/typing`,
-        data: { to_id: userData?.id, typing: status },
+        data: { to_id: to?.id, typing: status },
         headers: header
       }).then(res => {
       }).catch(err => { });
@@ -105,15 +99,6 @@ function Chat(props) {
     })
   }
 
-  //initialize the call
-  useEffect(() => {
-    props?.onClick(pre => ({ ...pre, hide: true }))
-    !userData?.id && navigate('/home')
-    getUser()
-    // markasread();
-  }, []);
-
-
   const onmessage = (event) => {
     let temp = JSON.parse(event.data);
     let msg_id = chatref.current?.data?.message?.filter((item) => item?.load == true)[0]?.msg_id;
@@ -134,7 +119,7 @@ function Chat(props) {
     if (temp?.message?.[temp?.message?.length - 1]?.message != chat?.message?.[chat?.message?.length - 1]?.message) {
       if (temp?.message?.length !== 0 && permission === "granted" && document.visibilityState == 'hidden') {
         if (chat?.message?.[chat?.message?.length - 1]?.from_id == false && chat?.message[chat?.message?.length - 1]?.is_read === false) {
-          showNotification(`Message from ${userData?.name}`, chat?.message[chat?.message?.length - 1]?.is_media ? "Send an image" : chat?.message[chat?.message?.length - 1]?.message);
+          showNotification(`Message from ${to?.name}`, chat?.message[chat?.message?.length - 1]?.is_media ? "Send an image" : chat?.message[chat?.message?.length - 1]?.message);
         }
       } else if (permission === "default") {
         requestPermission();
@@ -163,7 +148,6 @@ function Chat(props) {
     clearInterval(chatref.current?.interval);
     setTimeout(() => {
       setRestartSocket(!restartScoket);
-      getUser();
     }, 15000);
   }
 
@@ -171,7 +155,7 @@ function Chat(props) {
   useEffect(() => {
     if (user !== undefined) {
       setLoading(true);
-      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${userData?.id}`);
+      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${to?.id}`);
 
       ws.onopen = () => {
         ws?.send(JSON.stringify({ limit: chatref.current.limit, msg: chatref.current.message }))
@@ -249,7 +233,7 @@ function Chat(props) {
     if (imgFile?.file) {
       setImgFile(pre => ({ ...pre, load: true }))
       const fm = new FormData();
-      fm.append('data', JSON.stringify({ to_id: userData?.id }));
+      fm.append('data', JSON.stringify({ to_id: to?.id }));
       fm.append('source', imgFile?.file);
 
       axios({
@@ -275,7 +259,7 @@ function Chat(props) {
 
   const constructText = (text) => {
     let temp = text.split(' ')
-    return temp?.map((value, index) => <span key={index}>{urlRegex.test(value) ? <a target='_blank' href={value}>{value}</a> : <>&nbsp;{value}</>}</span>);
+    return temp?.map((value, index) => <span key={index}>{urlRegex.test(value) ? <a target='_blank' href={value}>{value}</a> : <>{value+' '}</>}</span>);
   }
 
   const getEmoji =(name) =>{
@@ -284,29 +268,27 @@ function Chat(props) {
 
   return (
     <div className='container'>
-      {loadingFunc(loading)}
-      <div className='border border-info rounded' style={{ backgroundColor: '#ffc77747' }}>
-        <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#ade7ff' }}>
+      <div className='border border-info rounded'>
+        <div className='d-flex justify-content-between align-items-center' style={{ backgroundColor: '#90ffcc' }}>
           <div className='p-1 d-flex align-items-center'>
             <div>
               <img
                 className='profile-small mr-2' id="profileimg"
                 data-toggle="modal" data-target="#pic_view"
                 style={{ cursor: 'pointer' }}
-                src={userData?.profile ? userData?.profile : profile}
-                onError={() => document.getElementById("profileimg").src = profile}
-                onClick={() => { setOneImg(userData?.profile); }} /></div>
+                src={to?.profile ? to?.profile : profile}
+                onError={() => document.getElementById("profileimg").src = profile} />
+              </div>
             <div >
-              <div className='h6 mb-0 font-weight-bold'>{userData?.name} </div>
+              <div className='h6 mb-0 font-weight-bold'>{to?.name} </div>
               <div className={`small font-weight-bold ${chat?.message?.[chat?.message?.length - 1]?.alive ? 'text-success' : 'text-secondary'}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
             </div>
           </div>
-          <button className='btn btn-link p-0' title='Back' onClick={() => { navigate('/home') }}>
+          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo() }}>
             <img src={back} width={35} alt='back' />
           </button>
-
         </div>
-        <div id="chatDiv" className='p-2' style={{ minHeight: emoji.size, maxHeight: emoji.size, overflowX: 'hidden', overflowY: 'auto' }}>
+        <div id="chatDiv" className='p-2 text-light' style={{ minHeight: emoji.size, maxHeight: emoji.size, overflowX: 'hidden', overflowY: 'auto' }}>
           {chat?.message?.length !== 1 && chat?.message?.map((data, index) =>
             <div className='row p-2' key={index} id={`first${index}`}>
               {data?.from_id ?
@@ -316,7 +298,7 @@ function Chat(props) {
                     <div className='d-flex flex-row-reverse align-items-center' >
                       {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
                       <div className='border border-primary rounded' id={`msg_id${data?.msg_id}`}>
-                        {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)}>
+                        {data?.pin?.msg && <div className='border border-warning senderPin px-1' style={{ fontSize: '13px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)}>
                           {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
                         {data?.is_media ?
@@ -332,7 +314,7 @@ function Chat(props) {
                                 width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
                             }
                           </> :
-                          <div className='p-2 messagetext1 text-break'>{constructText(data?.message)} </div>
+                          <div className='p-2 sender text-break small'>{constructText(data?.message)} </div>
                         }
                       </div>
                       <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
@@ -359,7 +341,7 @@ function Chat(props) {
                               style={{ cursor: 'pointer' }}
                               width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />}
                           </> :
-                          <div className=' p-2 messagetext2 text-break'> {constructText(data?.message)} </div>
+                          <div className=' p-2 receiver text-break small'> {constructText(data?.message)} </div>
                         }
                       </div>
                       <div>
@@ -372,7 +354,7 @@ function Chat(props) {
               }
             </div>
           )}
-          {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-dark text-center">Say Hi to <span className='text-capitalize'>{userData?.name}</span></div>}
+          {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-light text-center">Say Hi to <span className='text-capitalize'>{to?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={30} alt='typing' />}
           {pin.id &&
             <div className='row'>

@@ -6,14 +6,19 @@
 .input-group-text {
     background-color: #ffffff00 !important;
     border-left: none;
-    border-color: #000000 !important;
+    /* border-color: #000000 !important; */
     border-radius: 0px 4px 4px 0px;
 }
 
-input,
+.searchInput::placeholder{
+    color: #f5deb39d;
+}
+
 .form-control {
     background-color: #ffffff00 !important;
-    border-color: #000000 !important;
+    caret-color:#f87204;
+    color : orange !important;
+    /* border-color: #000000 !important; */
 }
 
 .input-send {
@@ -47,21 +52,23 @@ input,
 
 }
 
-.messagetext1 {
-    background-color: #b0e0e6ab;
+.sender {
+    background-color: #075b75;
 }
 
-.messagetext2 {
-    background-color: #90ee9059;
+.receiver {
+    background-color: #90ee90b7;
+    color: black !important;
 }
 
-.messagetext3 {
-    background-color: #efff6459;
+.senderPin {
+    background-color: #129c91e1;
+    color: black;
 }
 
 .msgtime1,
 .msgtime2 {
-    color: #0014ff;
+    color: #3fff00;
 }
 
 .newmsgcount {

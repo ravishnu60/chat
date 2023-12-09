@@ -10,7 +10,7 @@ import Swal from 'sweetalert2';
 import { Notifications } from 'react-push-notification';
 
 function Home({props}) {
-  const {user, loading, setLoading}= props;
+  const {user, loading, setLoading, setTo}= props;
   const [list, setList] = useState([]);
   const navigate = useNavigate();
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') }
@@ -120,9 +120,10 @@ function Home({props}) {
       <Notifications />
       <form onSubmit={handleSubmit(newChat)}>
         <div className="input-group">
-          <input type="number" className="form-control"
+          <input type="number" className="form-control searchInput"
             autoComplete='off'
             placeholder="Enter mobile no."
+            onKeyDown={e => e.key==='e' && e.preventDefault()}
             {...register('search', { required: true, minLength: 10 })}
             aria-invalid={errors?.password ? "true" : "false"}
           />
@@ -132,15 +133,14 @@ function Home({props}) {
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
-      <div className='list-group mt-2 border border-success rounded' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
+      <div className='mt-2 border-bottom border-success rounded' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
         {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow list-group-item text-dark font-weight-bold text-capitalize d-flex align-items-center px-1 py-1 border-bottom-0"
+              className="hoverRow text-light font-weight-bold text-capitalize p-1 border-bottom-0 d-flex align-items-center"
             >
               <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
-
               <div >
                 <img
                   id={`imgpr_${index}`}
@@ -151,7 +151,7 @@ function Home({props}) {
                   // onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} 
                 />
               </div>
-              <div className='col-lg-10 col-7 ' onClick={() => { navigate('/chat', { state: { id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null } }) }}>
+              <div className='col' onClick={() => { setTo({ id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
                 <div className='row'>{item?.name}
                   <span className='ml-2'>
                     {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
@@ -159,7 +159,7 @@ function Home({props}) {
                 </div>
                 <div className='row'> {!item?.alive && <span className='small'>{item?.last_seen} </span>}</div>
               </div>
-              <div className='col-lg-1 col-2 text-right'>
+              <div className='col text-right'>
                 <button className='btn btn-link messagedel' title='delete all text you sent' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
               </div>
             </div>
