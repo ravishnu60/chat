@@ -7,7 +7,7 @@ import findperson from '../Assets/find-person.png'
 import profile from '../Assets/profile.png';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-import { Notifications } from 'react-push-notification';
+// import { Notifications } from 'react-push-notification';
 
 function Home({props}) {
   const {user, loading, setLoading, setTo}= props;
@@ -117,7 +117,7 @@ function Home({props}) {
 
   return (
     <>
-      <Notifications />
+      {/* <Notifications /> */}
       <form onSubmit={handleSubmit(newChat)}>
         <div className="input-group">
           <input type="number" className="form-control searchInput"

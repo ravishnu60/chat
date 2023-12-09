@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import logo from '../Assets/logo.png'
 import loading_gif from '../Assets/load.webp';
 import key from '../Assets/Key.webp';
-import addNotification from "react-push-notification";
+// import addNotification from "react-push-notification";
 
 // export const base_url = "http://127.0.0.1:8000/";
 export const base_url = "https://chat-api-zu97.onrender.com/";
@@ -48,27 +48,27 @@ navigator.serviceWorker.register("sw.js");
 export const isMobile = window.innerWidth <= 768;
 
 export function showNotification(title, body) {
-        if (permission === "granted") {
-            const isMobile = window.innerWidth <= 768;
-            if (isMobile) {
-                navigator?.serviceWorker?.ready?.then((registration) => {
-                    // Show a notification that includes an action titled Archive.
-                    registration?.showNotification(title, { body: body, icon: logo })
-                });
-            } else {
-                addNotification({
-                    title: title,
-                    message: body,
-                    theme: 'darkblue',
-                    native: true,
-                    icon: logo,
-                    backgroundBottom: 'green',
-                    onClick: () => { window.parent.focus() }
-                });
-            }
-        }else{
-            requestPermission();
-        }
+        // if (permission === "granted") {
+        //     const isMobile = window.innerWidth <= 768;
+        //     if (isMobile) {
+        //         navigator?.serviceWorker?.ready?.then((registration) => {
+        //             // Show a notification that includes an action titled Archive.
+        //             registration?.showNotification(title, { body: body, icon: logo })
+        //         });
+        //     } else {
+        //         addNotification({
+        //             title: title,
+        //             message: body,
+        //             theme: 'darkblue',
+        //             native: true,
+        //             icon: logo,
+        //             backgroundBottom: 'green',
+        //             onClick: () => { window.parent.focus() }
+        //         });
+        //     }
+        // }else{
+        //     requestPermission();
+        // }
 }
 
 
