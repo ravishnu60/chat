@@ -18,8 +18,6 @@ import uEmojiParser from 'universal-emoji-parser'
 
 function Chat({props}) {
   const {user, to, loading, setLoading, setTo}= props;
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [chat, setChat] = useState({ typing: false, message: [] });
   const [scroll, setScroll] = useState(false);
@@ -90,17 +88,16 @@ function Chat({props}) {
       method: 'delete',
       url: `${base_url}chat/deletemsg/${id}`,
       headers: header
-    }).then((response) => {
+    }).then(() => {
       //removed
       delay(setLoadingdel);
-    }).catch((error) => {
+    }).catch(() => {
       alert('Error while deleting');
       delay(setLoadingdel);
     })
   }
 
   const onmessage = (event) => {
-    ;console.log("oko");
     let temp = JSON.parse(event.data);
     let msg_id = chatref.current?.data?.message?.filter((item) => item?.load == true)[0]?.msg_id;
     if (temp?.message?.filter((item) => item?.msg_id == msg_id)) {
@@ -145,7 +142,6 @@ function Chat({props}) {
   }, [chat])
 
   const wsErrorHandler = () => {
-    console.log("err");
     chatref.current?.ws.close();
     clearInterval(chatref.current?.interval);
     setTimeout(() => {
@@ -155,8 +151,8 @@ function Chat({props}) {
 
   //websocket event
   useEffect(() => {
+    setLoading(true)
     if (user !== undefined) {
-      setLoading(true);
       const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${to?.user_id}`);
 
       ws.onopen = () => {
@@ -286,7 +282,7 @@ function Chat({props}) {
               <div className={`small font-weight-bold ${chat?.message?.[chat?.message?.length - 1]?.alive ? 'text-success' : 'text-secondary'}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
             </div>
           </div>
-          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo() }}>
+          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo();setLoading(true) }}>
             <img src={back} width={35} alt='back' />
           </button>
         </div>
@@ -316,7 +312,7 @@ function Chat({props}) {
                                 width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
                             }
                           </> :
-                          <div className='p-2 sender text-break small'>{constructText(data?.message)} </div>
+                          <div className={'p-2 sender text-break '+(isMobile ? 'small':'')}>{constructText(data?.message)} </div>
                         }
                       </div>
                       <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
@@ -343,7 +339,7 @@ function Chat({props}) {
                               style={{ cursor: 'pointer' }}
                               width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />}
                           </> :
-                          <div className=' p-2 receiver text-break small'> {constructText(data?.message)} </div>
+                          <div className={'p-2 receiver text-break '+(isMobile ? 'small':'')}> {constructText(data?.message)} </div>
                         }
                       </div>
                       <div>

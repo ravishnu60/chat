@@ -9,7 +9,7 @@ import key from '../Assets/Key.webp';
 export const base_url = "https://chat-api-zu97.onrender.com/";
 
 // export const webSocketUrl = "ws://localhost:8000/chat";
-export const webSocketUrl= "wss://chat-api-zu97.onrender.com/chat";
+export const webSocketUrl = "wss://chat-api-zu97.onrender.com/chat";
 
 export const alert = (text, status) => {
     Swal.fire({
@@ -48,27 +48,22 @@ navigator.serviceWorker.register("sw.js");
 export const isMobile = window.innerWidth <= 768;
 
 export function showNotification(title, body) {
-        // if (permission === "granted") {
-        //     const isMobile = window.innerWidth <= 768;
-        //     if (isMobile) {
-        //         navigator?.serviceWorker?.ready?.then((registration) => {
-        //             // Show a notification that includes an action titled Archive.
-        //             registration?.showNotification(title, { body: body, icon: logo })
-        //         });
-        //     } else {
-        //         addNotification({
-        //             title: title,
-        //             message: body,
-        //             theme: 'darkblue',
-        //             native: true,
-        //             icon: logo,
-        //             backgroundBottom: 'green',
-        //             onClick: () => { window.parent.focus() }
-        //         });
-        //     }
-        // }else{
-        //     requestPermission();
-        // }
+    if (permission === "granted") {
+        const isMobile = window.innerWidth <= 768;
+        if (isMobile) {
+            navigator?.serviceWorker?.ready?.then((registration) => {
+                // Show a notification that includes an action titled Archive.
+                registration?.showNotification(title, { body: body, icon: logo })
+            });
+        } else {
+            var notification = new Notification(title, { body, logo });
+            notification.onclick = ()=>{
+                window.parent.focus()
+            }
+        }
+    } else {
+        requestPermission();
+    }
 }
 
 
@@ -76,7 +71,7 @@ export const loadingFunc = (status, login) => {
     if (status) {
         return (<div style={{ zIndex: 9999, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
             <img src={login ? key : loading_gif} width={100} alt="Loading..." />
-        <div className="loadd ml-3">Loading</div>
+            <div className="loadd ml-3">Loading</div>
         </div>)
     }
 

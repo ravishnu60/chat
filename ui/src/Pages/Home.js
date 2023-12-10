@@ -7,12 +7,10 @@ import findperson from '../Assets/find-person.png'
 import profile from '../Assets/profile.png';
 import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
-// import { Notifications } from 'react-push-notification';
 
-function Home({props}) {
-  const {user, loading, setLoading, setTo}= props;
+function Home({ props }) {
+  const { user, loading, setLoading, setTo } = props;
   const [list, setList] = useState([]);
-  const navigate = useNavigate();
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
   const listRef = useRef();
@@ -29,12 +27,12 @@ function Home({props}) {
         reset();
         setTo(res.data?.data)
       }).catch(() => {
-        alert("No User","warning")
+        alert("No User")
       })
     }
   }
-
   const deleteChat = (id) => {
+    setLoading(true)
     Swal.fire({
       text: 'Are you sure you want to delete ?',
       icon: 'question',
@@ -50,16 +48,17 @@ function Home({props}) {
           headers: header
         }).then(() => {
           alert('deleted successfully', 'success')
+          setLoading(false)
         }).catch(() => {
           alert('Error while deleting')
+          setLoading(false)
         })
       }
     })
   }
   const onmessage = (event) => {
-    console.log(event);
-    setLoading(false);
     setList(JSON.parse(event.data));
+    setLoading(false);
   }
   const webSocketErrorHandler = () => {
     listRef.current?.ws?.close()
@@ -73,7 +72,6 @@ function Home({props}) {
 
   useEffect(() => {
     permission !== "granted" && Notification?.requestPermission();
-    setLoading(true);
   }, []);
 
   //Notify for new messages
@@ -117,9 +115,12 @@ function Home({props}) {
 
       ws.onmessage = onmessage
       ws.onerror = webSocketErrorHandler
-      ws.onclose = webSocketErrorHandler
+      ws.onclose = () => {
+        listRef.current?.ws?.close()
+        clearInterval(listRef.current?.interval)
+      }
 
-      listRef.current = { ws: ws, interval : interval}
+      listRef.current = { ws: ws, interval: interval }
     }
 
     return () => {
@@ -137,7 +138,7 @@ function Home({props}) {
           <input type="number" className="form-control searchInput"
             autoComplete='off'
             placeholder="Enter mobile no."
-            onKeyDown={e => e.key==='e' && e.preventDefault()}
+            onKeyDown={e => e.key === 'e' && e.preventDefault()}
             {...register('search', { required: true, minLength: 10 })}
             aria-invalid={errors?.password ? "true" : "false"}
           />
@@ -147,12 +148,12 @@ function Home({props}) {
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
-      <div className='mt-2 border-bottom border-success rounded' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
+      <div className='mt-2' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
         {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow text-light font-weight-bold text-capitalize p-1 border-bottom-0 d-flex align-items-center"
+              className="hoverRow border-bottom border-success rounded text-light font-weight-bold text-capitalize p-1 d-flex align-items-center"
             >
               <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
               <div >
@@ -162,10 +163,10 @@ function Home({props}) {
                   className='profile mx-2'
                   src={item?.profile ? item?.profile : profile}
                   onError={() => document.getElementById(`imgpr_${index}`).src = profile}
-                  // onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} 
+                // onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} 
                 />
               </div>
-              <div className='col' onClick={() => { setTo({ user_id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
+              <div className='col-8' onClick={() => { setTo({ user_id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
                 <div className='row'>{item?.name}
                   <span className='ml-2'>
                     {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
@@ -179,7 +180,7 @@ function Home({props}) {
             </div>
           ))
         }
-        {(list?.length == 0 && !loading) && <div className='text-center text-secondary h4'>No chats</div>}
+        {(list?.length == 0 && !loading) && <div className='text-center text-secondary h4 mt-4 p-2'>No chats</div>}
       </div>
 
       {/* modal */}

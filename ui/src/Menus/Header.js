@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router'
 import logo from '../Assets/logo.png'
 import { Link } from 'react-router-dom';
 import '../Style/style.css'
+import { isMobile } from '../Utils/Utility';
 
 function Header({user}) {
   const location = useLocation();
@@ -20,7 +21,7 @@ function Header({user}) {
           <button className='btn btn-danger btn-sm' title='sign out' hidden={location.pathname === '/login' ? true : false} onClick={signout}><i className='fas fa-sign-out-alt'></i></button>
         </div>
       </div>
-      {/* <div className='text-center bg-white h5 p-1'>Welcome <Link className='text-success'><u>{user?.name}</u> </Link></div> */}
+      {isMobile && <div className='text-center bg-white h5 p-1'>Welcome <span className='text-success'>{user?.name} </span></div>}
     </div>
   )
 }
