@@ -1,6 +1,6 @@
 # Real-time chat application
 
-*_[🔗 Open chat APP](https://connect-nwdp.onrender.com/#/login)_*
+*_[🔗 Open chat APP](https://connect-friends.onrender.com/#/login)_*
 ---
 
 *It contains the following features*,

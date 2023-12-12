@@ -76,9 +76,9 @@ function Login() {
           <div> </div>
         </div>
       </div>
-      <div className='mt-5 p-5'>
+      <div className='p-5'>
         {loadingFunc(loading, step==0)}
-        <div className="row justify-content-center align-items-center">
+        <div className="row justify-content-center align-items-center mt-5">
           <div className="col-lg-4 col-11 text-light">
             <form className={error ? 'border border-danger rounded p-3' : 'border border-success rounded p-3'} onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
               {error && <div className="text-danger text-center h5">Invalid credentials</div>}

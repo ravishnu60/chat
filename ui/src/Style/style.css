@@ -14,6 +14,12 @@
     color: #f5deb39d;
 }
 
+.profileHome{
+    border:4px solid orange;
+    border-radius: 20px;
+    background-size: cover;
+}
+
 .form-control {
     background-color: #ffffff00 !important;
     caret-color:#f87204;
@@ -104,8 +110,8 @@
         font-size: 12px;
     }
 
-    .messagetext1,
-    .messagetext2 {
+    .sender,
+    .receiver {
         font-size: 94%;
     }
 

@@ -18,8 +18,6 @@ import uEmojiParser from 'universal-emoji-parser'
 
 function Chat({props}) {
   const {user, to, loading, setLoading, setTo, viewProfile}= props;
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [chat, setChat] = useState({ typing: false, message: [] });
   const [scroll, setScroll] = useState(false);
@@ -42,7 +40,7 @@ function Chat({props}) {
   const sendMsg = (data) => {
     if (data.msg !== '') {
       chatref.current.message = {
-        to_id: to?.id,
+        to_id: to?.user_id,
         message: data.msg,
         is_media: data?.is_media ? data.is_media : false,
         pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
@@ -71,7 +69,7 @@ function Chat({props}) {
       axios({
         method: 'put',
         url: `${base_url}chat/typing`,
-        data: { to_id: to?.id, typing: status },
+        data: { to_id: to?.user_id, typing: status },
         headers: header
       }).then(res => {
       }).catch(err => { });
@@ -90,10 +88,10 @@ function Chat({props}) {
       method: 'delete',
       url: `${base_url}chat/deletemsg/${id}`,
       headers: header
-    }).then((response) => {
+    }).then(() => {
       //removed
       delay(setLoadingdel);
-    }).catch((error) => {
+    }).catch(() => {
       alert('Error while deleting');
       delay(setLoadingdel);
     })
@@ -153,12 +151,12 @@ function Chat({props}) {
 
   //websocket event
   useEffect(() => {
+    setLoading(true)
     if (user !== undefined) {
-      setLoading(true);
-      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${to?.id}`);
+      const ws = new WebSocket(`${webSocketUrl}/getchat/${user?.id}?id=${to?.user_id}`);
 
       ws.onopen = () => {
-        ws?.send(JSON.stringify({ limit: chatref.current.limit, msg: chatref.current.message }))
+        ws?.send(JSON.stringify({ limit: chatref.current.limit, msg: null }))
       }
 
       ws.onmessage = onmessage
@@ -233,7 +231,7 @@ function Chat({props}) {
     if (imgFile?.file) {
       setImgFile(pre => ({ ...pre, load: true }))
       const fm = new FormData();
-      fm.append('data', JSON.stringify({ to_id: to?.id }));
+      fm.append('data', JSON.stringify({ to_id: to?.user_id }));
       fm.append('source', imgFile?.file);
 
       axios({
@@ -284,7 +282,7 @@ function Chat({props}) {
               <div className={`small font-weight-bold ${chat?.message?.[chat?.message?.length - 1]?.alive ? 'text-success' : 'text-secondary'}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
             </div>
           </div>
-          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo() }}>
+          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo();setLoading(true) }}>
             <img src={back} width={35} alt='back' />
           </button>
         </div>
@@ -314,7 +312,7 @@ function Chat({props}) {
                                 width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
                             }
                           </> :
-                          <div className='p-2 sender text-break small'>{constructText(data?.message)} </div>
+                          <div className={'p-2 sender text-break '+(isMobile ? 'small':'')}>{constructText(data?.message)} </div>
                         }
                       </div>
                       <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
@@ -341,7 +339,7 @@ function Chat({props}) {
                               style={{ cursor: 'pointer' }}
                               width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />}
                           </> :
-                          <div className=' p-2 receiver text-break small'> {constructText(data?.message)} </div>
+                          <div className={'p-2 receiver text-break '+(isMobile ? 'small':'')}> {constructText(data?.message)} </div>
                         }
                       </div>
                       <div>
@@ -377,7 +375,7 @@ function Chat({props}) {
 
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
-          <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { document.getElementById('fileSource').click() }}>
+          <button type='button' className='btn btn-link p-1 bg-info mr-1' title='choose media' onClick={() => { document.getElementById('fileSource').click() }}>
             <img src={img_static} width={28} alt='select image' />
           </button>
           <button type='button' className='btn btn-link p-1' onClick={() => { setAnime({ name: null, start: Number(0) }); setEmoji(pre => ({ click: !pre.click, size: pre.click ? '70vh' : '30vh' })); }}><i className='far fa-smile fa-lg'></i></button>
@@ -396,7 +394,7 @@ function Chat({props}) {
             // </div>
           }
           {imgFile?.load ? <img src={load} width={38} alt='load' /> :
-            <button className='btn btn-link p-1' type='submit' id='sendbtn' title='Send'>
+            <button className='btn btn-link p-1 bg-success ml-2' type='submit' id='sendbtn' title='Send'>
               {getValues('msg') ? <img src={sendIcon} width={28} alt='send' /> : <img src={sendIcon1} width={28} alt='send' />}
             </button>}
         </form>
