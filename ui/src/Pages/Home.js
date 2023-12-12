@@ -10,9 +10,8 @@ import Swal from 'sweetalert2';
 // import { Notifications } from 'react-push-notification';
 
 function Home({props}) {
-  const {user, loading, setLoading, setTo}= props;
+  const {user, loading, setLoading, setTo, viewProfile}= props;
   const [list, setList] = useState([]);
-  const navigate = useNavigate();
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
   const listRef = useRef();
@@ -148,7 +147,7 @@ function Home({props}) {
                   className='profile mx-2'
                   src={item?.profile ? item?.profile : profile}
                   onError={() => document.getElementById(`imgpr_${index}`).src = profile}
-                  // onClick={() => { if (item?.profile) { setProfile({ urls: item?.profile }); document.getElementById('profileview').click() } }} 
+                  onClick={() => item?.profile && viewProfile(item?.profile) }
                 />
               </div>
               <div className='col' onClick={() => { setTo({ id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
@@ -265,8 +264,6 @@ function Home({props}) {
           </div>
         </div>
       </div> */}
-
-      <button data-toggle="modal" data-target="#profileModel" id="profileview" style={{ display: 'none' }}></button>
 
       {/* Model to view profile */}
       {/* <div className="modal" tabIndex="-1" role="dialog" id="profileModel" data-backdrop="static" data-keyboard="false">

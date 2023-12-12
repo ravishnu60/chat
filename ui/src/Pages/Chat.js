@@ -17,7 +17,7 @@ import { emojis, url } from '../Utils/emojis';
 import uEmojiParser from 'universal-emoji-parser'
 
 function Chat({props}) {
-  const {user, to, loading, setLoading, setTo}= props;
+  const {user, to, loading, setLoading, setTo, viewProfile}= props;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -274,10 +274,10 @@ function Chat({props}) {
             <div>
               <img
                 className='profile-small mr-2' id="profileimg"
-                data-toggle="modal" data-target="#pic_view"
                 style={{ cursor: 'pointer' }}
                 src={to?.profile ? to?.profile : profile}
-                onError={() => document.getElementById("profileimg").src = profile} />
+                onError={() => document.getElementById("profileimg").src = profile}
+                onClick={() => to?.profile && viewProfile(to?.profile) } />
               </div>
             <div >
               <div className='h6 mb-0 font-weight-bold'>{to?.name} </div>
