@@ -32,7 +32,6 @@ function Home({ props }) {
     }
   }
   const deleteChat = (id) => {
-    setLoading(true)
     Swal.fire({
       text: 'Are you sure you want to delete ?',
       icon: 'question',
@@ -41,6 +40,7 @@ function Home({ props }) {
       confirmButtonColor: '#ff3d3d',
       toast: true
     }).then((result) => {
+      setLoading(true)
       if (result.isConfirmed) {
         axios({
           method: 'delete',
