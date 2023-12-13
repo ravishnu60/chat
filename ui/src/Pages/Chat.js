@@ -283,7 +283,7 @@ function Chat({props}) {
               <div className={`small font-weight-bold ${chat?.message?.[chat?.message?.length - 1]?.alive ? 'text-success' : 'text-secondary'}`}>{chat?.message?.[chat?.message?.length - 1]?.alive ? 'online' : chat?.message?.[chat?.message?.length - 1]?.last_seen}</div>
             </div>
           </div>
-          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo();setLoading(true) }}>
+          <button className='btn btn-link p-0' title='Back' onClick={() => { setTo()}}>
             <img src={back} width={35} alt='back' />
           </button>
         </div>

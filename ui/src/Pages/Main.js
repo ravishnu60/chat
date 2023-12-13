@@ -107,11 +107,13 @@ function Main() {
                                     <div className='text-center h4 mt-5'>
                                         {user && <img id='profile'  
                                             className={'mb-4 '+ (user?.profile ?'profileHome':'')} 
-                                            src={user?.profile} 
+                                            style={{cursor:'pointer'}}
+                                            src={user?.profile ? user?.profile : gif1} 
                                             width='120vh'
+                                            alt='profile'
                                             title='change profile' 
                                             onClick={() => document.getElementById('profileUpload').click()}
-                                            onError={() => document.getElementById(`profile`).src = gif1} />}
+                                            onError={() => {document.getElementById(`profile`).src = gif1; console.log("yes");} } />}
                                         <br />
                                         <input name='file' type='file' id='profileUpload' style={{ display: 'none' }} onChange={profileChange} />
                                         {

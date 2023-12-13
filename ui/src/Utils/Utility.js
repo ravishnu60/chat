@@ -53,10 +53,10 @@ export function showNotification(title, body) {
         if (isMobile) {
             navigator?.serviceWorker?.ready?.then((registration) => {
                 // Show a notification that includes an action titled Archive.
-                registration?.showNotification(title, { body: body, icon: logo })
+                let i= registration?.showNotification(title, { body: body, icon: logo })
             });
         } else {
-            var notification = new Notification(title, { body, logo });
+            var notification = new Notification(title, { body: body, icon: logo });
             notification.onclick = ()=>{
                 window.parent.focus()
             }
