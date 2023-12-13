@@ -195,7 +195,6 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
             updateView(user_id,id,db)
         except Exception as Err:
             print("Connection closed",Err)
-            setlastSeen(user_id, db)
             typingOff(db, user_id)
             break
 
