@@ -58,8 +58,9 @@ function Home({ props }) {
   }
   const onmessage = (event) => {
     setList(JSON.parse(event.data));
-    setLoading(false);
+    !listRef.current?.data && setLoading(false);
   }
+
   const webSocketErrorHandler = () => {
     listRef.current?.ws?.close()
     clearInterval(listRef.current?.interval)

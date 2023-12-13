@@ -105,7 +105,6 @@ function Chat({props}) {
     } else if (!msg_id) {
       setChat(temp);
     }
-    setLoading(false);
   }
 
   //push notification
@@ -139,6 +138,7 @@ function Chat({props}) {
       }, 50);
     }
     chatref.current = { ...chatref.current, data: chat }
+    setLoading(false);
   }, [chat])
 
   const wsErrorHandler = () => {
@@ -161,7 +161,6 @@ function Chat({props}) {
 
       ws.onmessage = onmessage
       ws.onerror = wsErrorHandler
-      ws.onclose = wsErrorHandler
 
       let interval = setInterval(() => {
         try {
@@ -182,8 +181,10 @@ function Chat({props}) {
     }
 
     return () => {
+      setChat({ typing: false, message: [] })
       chatref.current?.ws?.close()
       clearInterval(chatref.current?.interval);
+      chatref.current={ limit: 20, message: null };
     }
   }, [to, restartScoket])
 
