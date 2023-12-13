@@ -185,7 +185,7 @@ function Chat({props}) {
       chatref.current?.ws?.close()
       clearInterval(chatref.current?.interval);
     }
-  }, [user, restartScoket])
+  }, [to, restartScoket])
 
   useEffect(() => {
     if (limit !== chatref.current.limit) {
