@@ -5,7 +5,6 @@ import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import typing_gif from '../Assets/typing.gif';
 import '../Style/style.css';
-import sendIcon from '../Assets/send.gif';
 import sendIcon1 from '../Assets/send.png';
 import profile from '../Assets/profile.png';
 import back from '../Assets/back.png';
@@ -354,7 +353,7 @@ function Chat({props}) {
             </div>
           )}
           {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-light text-center">Say Hi to <span className='text-capitalize'>{to?.name}</span></div>}
-          {chat?.typing && <img src={typing_gif} width={30} alt='typing' />}
+          {chat?.typing && <img src={typing_gif} width={40} alt='typing' />}
           {pin.id &&
             <div className='row'>
               <div className='col-11 pr-2'>
@@ -376,7 +375,7 @@ function Chat({props}) {
 
       <div className='mt-2'>
         <form className='d-flex align-items-center' onSubmit={handleSubmit(imgFile ? postImg : sendMsg)}>
-          <button type='button' className='btn btn-link p-1 bg-info mr-1' title='choose media' onClick={() => { document.getElementById('fileSource').click() }}>
+          <button type='button' className='btn btn-link p-1 mr-1' title='choose media' onClick={() => { document.getElementById('fileSource').click() }}>
             <img src={img_static} width={28} alt='select image' />
           </button>
           <button type='button' className='btn btn-link p-1' onClick={() => { setAnime({ name: null, start: Number(0) }); setEmoji(pre => ({ click: !pre.click, size: pre.click ? '70vh' : '30vh' })); }}><i className='far fa-smile fa-lg'></i></button>
@@ -395,8 +394,8 @@ function Chat({props}) {
             // </div>
           }
           {imgFile?.load ? <img src={load} width={38} alt='load' /> :
-            <button className='btn btn-link p-1 bg-success ml-2' type='submit' id='sendbtn' title='Send'>
-              {getValues('msg') ? <img src={sendIcon} width={28} alt='send' /> : <img src={sendIcon1} width={28} alt='send' />}
+            <button className='btn btn-link p-1 ml-2' type='submit' id='sendbtn' title='Send'>
+              <img src={sendIcon1} width={28} alt='send' />
             </button>}
         </form>
         {emoji.click && <div>

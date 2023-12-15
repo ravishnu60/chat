@@ -89,9 +89,9 @@ function Home({ props }) {
           alive = true;
       });
     }
-    if (popup)
+    if (popup && document.visibilityState == 'hidden')
       showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
-    if (alive)
+    if (alive && document.visibilityState == 'hidden')
       showNotification(`Excuse me ${user?.name}`, 'Your friends are online now');
 
     listRef.current = { ...listRef.current, data: list }
