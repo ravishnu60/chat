@@ -36,6 +36,9 @@ function Chat({props}) {
 
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
 
+  const imgExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+  const vidExtensions = /(\.mp4)$/i;
+
   const sendMsg = (data) => {
     if (data.msg !== '') {
       chatref.current.message = {
@@ -200,7 +203,7 @@ function Chat({props}) {
 
   divEle?.addEventListener('scroll', () => {
     if (divEle?.scrollTop == 0) {
-      setLimit(limit + 10);
+      setLimit(limit + 20);
       setLoading(true);
     }
     divEle.scrollTop + divEle.offsetHeight == divEle?.scrollHeight && setLimit(20)
@@ -208,17 +211,16 @@ function Chat({props}) {
 
   const selectFile = (e) => {
     if (e.target.files?.length) {
-      var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
 
-      if (!allowedExtensions.exec(e.target.value)) {
-        alert("Image files only");
+      if (!imgExtensions.exec(e.target.value) && !vidExtensions.exec(e.target.value)) {
+        alert("Image & video files only");
         return;
       }
-      if (e.target.files[0].size > 100e5) {
+      if (e.target.files[0].size > 30e5) {
         alert("Large image files");
         return;
       }
-      setImgFile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]) });
+      setImgFile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]), type: imgExtensions.exec(e.target.value) ? 'image' : 'video'});
       document.getElementById('sendbtn').focus();
       cancenAnimi();
     } else {
@@ -304,6 +306,15 @@ function Chat({props}) {
                             {(data.message.includes(url) && isMobile) ?
                               <div children className='p-1 small'>{getEmoji(data.message.split('/')[data.message.split('/')?.length - 1].split('.')[0])}</div >
                               :
+                              data?.message?.includes('.mp4') ?
+                              <video src={data?.message}
+                                title='file'
+                                alt='No Video'
+                                // autoPlay muted loop
+                                data-toggle="modal" data-target={!data.message.includes(url) && "#pic_view"}
+                                style={{ cursor: 'pointer' }}
+                                width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
+                            :
                               <img src={data?.message}
                                 title='file'
                                 alt='No image'
@@ -332,6 +343,14 @@ function Chat({props}) {
                           <> {(data.message.includes(url) && isMobile) ?
                             <div children className='p-1 small'>{getEmoji(data.message.split('/')[data.message.split('/')?.length - 1].split('.')[0])}</div > 
                             :
+                            data?.message?.includes('.mp4') ?
+                            <video src={data.message}
+                              title='file'
+                              alt='No image'
+                              data-toggle="modal" data-target="#pic_view"
+                              style={{ cursor: 'pointer' }}
+                              width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
+                          :
                             <img src={data.message}
                               title='file'
                               alt='No image'
@@ -382,7 +401,7 @@ function Chat({props}) {
           {!isMobile && <button type='button' className='btn btn-link p-1' title='choose media' onClick={() => { setEmoji({ click: false, size: anime.name ? '70vh' : '42vh' }); setAnime(pre => ({ ...pre, name: pre.name ? null : 'Smileys' })); }}>
             <img src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Smileys/Relieved Face.webp' width={28} alt='select image' />
           </button>}
-          <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png' />
+          <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png,.mp4' />
           <input id="msg_input" type='text' style={{ borderRadius: '20px' }} className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
             placeholder='Message here' onFocus={() => typing(true, getValues('msg'), true)}
             {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
@@ -390,7 +409,9 @@ function Chat({props}) {
           {imgFile?.url &&
             // <div className='ml-2 d-flex imgDiv' >
             //   <i className='fa fa-plus fa-sm plus text-danger font-weight-bold'></i>
-            <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />
+            imgFile?.type === 'image' ?
+            <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />:
+            <video className='ml-2 selImg' alt='selected' autoPlay muted src={imgFile?.url} width={45} title='remove' onClick={() => setImgFile()} />
             // </div>
           }
           {imgFile?.load ? <img src={load} width={38} alt='load' /> :
@@ -437,16 +458,16 @@ function Chat({props}) {
 
       {/* Modal */}
       <div className="modal fade" id="pic_view" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered model-lg ">
+        <div className="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
           <div className="modal-content bg-dark">
             <div className='model-header'>
               <button type="button" className="close px-2" data-dismiss='modal' aria-label="Close" style={{ color: 'white' }}>
                 <span aria-hidden="true">&times;</span>
               </button>
             </div>
-            <div className="modal-body" >
+            <div className="modal-body text-center" >
               <div style={{ overflow: 'auto' }}>
-                <img src={oneImg} width={isMobile ? 350 : 760} />
+              {oneImg?.includes('.mp4') ? <video controls autoPlay src={oneImg}  width={isMobile ? 250 : 300} /> : <img src={oneImg} width={isMobile ? 350 : 760} />}
               </div>
             </div>
           </div>
