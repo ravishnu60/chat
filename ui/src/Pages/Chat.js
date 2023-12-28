@@ -407,12 +407,12 @@ function Chat({props}) {
             {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
 
           {imgFile?.url &&
-            // <div className='ml-2 d-flex imgDiv' >
-            //   <i className='fa fa-plus fa-sm plus text-danger font-weight-bold'></i>
-            imgFile?.type === 'image' ?
-            <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />:
-            <video className='ml-2 selImg' alt='selected' autoPlay muted src={imgFile?.url} width={45} title='remove' onClick={() => setImgFile()} />
-            // </div>
+            <div>
+              {imgFile?.type === 'image' ?
+              <img className='ml-2 selImg' alt='selected' src={imgFile?.url} width={35} title='remove' onClick={() => setImgFile()} />:
+              <video className='ml-2 selImg' alt='selected' autoPlay muted src={imgFile?.url} width={45} title='remove' onClick={() => setImgFile()} />
+              }
+            </div>
           }
           {imgFile?.load ? <img src={load} width={38} alt='load' /> :
             <button className='btn btn-link p-1 ml-2' type='submit' id='sendbtn' title='Send'>
