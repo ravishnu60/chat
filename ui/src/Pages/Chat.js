@@ -216,8 +216,8 @@ function Chat({props}) {
         alert("Image & video files only");
         return;
       }
-      if (e.target.files[0].size > 30e5) {
-        alert("Large image files");
+      if (e.target.files[0].size > 30e6) {
+        alert("large file size");
         return;
       }
       setImgFile({ file: e.target.files[0], url: URL.createObjectURL(e.target.files[0]), type: imgExtensions.exec(e.target.value) ? 'image' : 'video'});
