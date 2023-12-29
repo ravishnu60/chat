@@ -310,6 +310,7 @@ function Chat({props}) {
                               <video src={data?.message}
                                 title='file'
                                 alt='No Video'
+                                controls
                                 // autoPlay muted loop
                                 data-toggle="modal" data-target={!data.message.includes(url) && "#pic_view"}
                                 style={{ cursor: 'pointer' }}
@@ -346,7 +347,8 @@ function Chat({props}) {
                             data?.message?.includes('.mp4') ?
                             <video src={data.message}
                               title='file'
-                              alt='No image'
+                              alt='No video'
+                              controls
                               data-toggle="modal" data-target="#pic_view"
                               style={{ cursor: 'pointer' }}
                               width={data.message.includes(url) ? 50 : 120} onClick={() => setOneImg(data?.message)} />
