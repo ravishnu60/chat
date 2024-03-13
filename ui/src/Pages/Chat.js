@@ -48,7 +48,7 @@ function Chat({props}) {
         pin: pin.id ? JSON.stringify({ id: pin.id, media: pin?.is_media }) : null
       }
       let temp = chat
-      temp.message.push({ from_id: true, message: data.msg, load: true, msg_id: chat.message[chat.message.length - 1].msg_id + 1, is_media: data?.is_media ? data.is_media : false });
+      temp.message.push({ from_id: true, message: data.msg, load: true, msg_id: chat.message[chat.message.length - 1]?.msg_id ? chat.message[chat.message.length - 1]?.msg_id + 1 : 1, is_media: data?.is_media ? data.is_media : false });
       setChat(temp);
       setTimeout(() => {
         setScroll(!scroll)

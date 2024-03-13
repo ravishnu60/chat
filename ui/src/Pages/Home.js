@@ -108,7 +108,8 @@ function Home({ props }) {
 
       let interval = setInterval(() => {
         try {
-          ws?.send("list")
+          ws?.send("list");
+          setLoading(false);
         } catch {
           webSocketErrorHandler();
         }
