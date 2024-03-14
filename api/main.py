@@ -30,12 +30,13 @@ app.include_router(user.app)
 
 @app.on_event("shutdown")
 def close():
-    print("executed for restart")
     while True:
         try:
             for i in range(3):
-                data= requests.get("https://chat-api-zu97.onrender.com")
-                time.sleep(10)
+                print("executed for restart",i)
+                data= requests.get("https://chat-api-zu97.onrender.com/")
+                data= requests.get("https://chat-api-zu97.onrender.com/user/userinfo")
+                time.sleep(15)
             break
         except:
             time.sleep(10)
