@@ -30,6 +30,7 @@ app.include_router(user.app)
 
 @app.on_event("shutdown")
 def close():
+    print("executed for restart")
     while True:
         try:
             for i in range(3):
