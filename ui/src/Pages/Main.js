@@ -49,7 +49,13 @@ function Main() {
             url: base_url + 'user/profilepic',
             data: fm,
             headers: header
-        }).then(() => {
+        }).then((res) => {
+            if (res.data?.status == "failed"){
+                alert("Error, try later");
+                setLoading(false);
+                getUser();
+                return;
+            }
             alert("profile updated", 'success');
             getUser();
             setTimeout(() => {

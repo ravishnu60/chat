@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from Routes import chat, user
 from fastapi.middleware.cors import CORSMiddleware
-import time, requests
+import time, requests, threading
 
 app=FastAPI(
     title="Connect API",
@@ -28,22 +28,28 @@ def root():
 app.include_router(chat.app)
 app.include_router(user.app)
 
-@app.on_event("shutdown")
-def close():
+
+def continueCall(event):
+    # ip="https://chat-api-zu97.onrender.com"
+    ip="http://localhost:8080"
     while True:
         try:
-            for i in range(3):
-                print("executed for restart",i)
-                data= requests.get("https://chat-api-zu97.onrender.com/")
-                data= requests.get("https://chat-api-zu97.onrender.com/user/userinfo")
-                time.sleep(15)
-            break
+            data= requests.get(f"{ip}/user/userinfo")
+            data= requests.get(f"{ip}/")
+            time.sleep(15)
+            if event.is_set():
+                break
         except:
-            time.sleep(10)
+            time.sleep(15)
+            
+event= threading.Event()
+loop= threading.Thread(target=continueCall, args=(event,))
+# loop.start()
 
-# api_detail = get_openapi(
-#     title="Chat API",
-#     version="1.0",
-#     routes=app.routes,
-# )
-# app.openapi_schema= api_detail
+@app.on_event("shutdown")
+def close():
+    try:
+        event.set()
+        loop.join()
+    except:
+        pass

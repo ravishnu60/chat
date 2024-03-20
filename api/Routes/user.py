@@ -55,7 +55,7 @@ def userData(res: Response, db: Session = Depends(get_DB), get_curr_user=Depends
     data:dict={}
     data['name'],data['phone_no'],data['id']= temp.name, temp.phone_no, temp.user_id
     if temp.profile:
-        output= firecloud.getFile(temp.profile.split("##")[1])
+        output= firecloud.getFile(temp.profile)
         if output:
             data['profile']= output
     else:
@@ -104,12 +104,11 @@ def delPath(path):
 
 @app.put('/profilepic')
 def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_DB), get_curr_user=Depends(token.get_current_user)):
-
     path = os.path.join("Assets",f"profile/{get_curr_user['id']}")
     file_loc= f"{path}/{source.filename}"
     query= db.query(User).filter(User.user_id == get_curr_user['id'])
     data= query.first()
-    old_loc= data.profile.split("##")[1] if data.profile else None
+    old_loc= data.profile if data.profile else None
     try:
         if not os.path.exists(path):
             os.makedirs(path)
@@ -123,10 +122,11 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
             delPath(path)
             return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}
         
-        query.update({"profile":f"{link}##{file_loc}"}, synchronize_session=False)
+        query.update({"profile":file_loc}, synchronize_session=False)
         db.commit()
         delPath(path)
     except Exception as err:
+        print(err)
         res.status_code=status.HTTP_409_CONFLICT
         return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}   
     return {"status_code": 200, "status": "success", "detail": "profile updated"}

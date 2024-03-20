@@ -3,7 +3,7 @@ from pydantic.v1 import BaseSettings
 class Secret(BaseSettings):
     db_url:str
     key:str
-    uid:str
+    bucket_id:str
     
     class Config:
         env_file=".env"

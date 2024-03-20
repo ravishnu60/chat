@@ -118,7 +118,6 @@ def getmsg(user_id,id,limit, db):
     # Add Date in list
     for msg in my_msg:
         temp={}
-        temp['is_read']= msg.is_read
         temp['from_id']=msg.from_id == user_id
         temp['createdAt']= msg.createdAt
         temp['message']= msg.message
@@ -151,6 +150,7 @@ def getmsg(user_id,id,limit, db):
             temp_date =temp['createdAt'].strftime('%d/%m/%Y')
 
         temp['createdAt'] = temp['createdAt'].strftime('%I:%M %p')
+        temp['is_read']= msg.is_read
         aligned_msg.append(temp)
 
     # insert latest date into list
@@ -190,9 +190,9 @@ async def getchat(websocket:WebSocket,user_id:int, id: int, db: Session = Depend
                 db.commit()
             # send message
             newData=getmsg(user_id,id,int(receive['limit']),db)
+            updateView(user_id,id,db)
             if newData:
                 await websocket.send_json(newData)
-            updateView(user_id,id,db)
         except Exception as Err:
             print("Connection closed",Err)
             typingOff(db, user_id)

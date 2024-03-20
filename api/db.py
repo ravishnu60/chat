@@ -8,7 +8,7 @@ try:
     base= declarative_base()
     print("Connected to DB")
 except Exception as err:
-    print(err)
+    print("Error: ",err,"\n\n")
     
 def get_DB():
     session= session_local()
