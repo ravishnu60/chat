@@ -30,13 +30,14 @@ app.include_router(user.app)
 
 
 def continueCall(event):
-    ip="https://chat-6yfc.onrender.com/"
+    ip="https://chat-6yfc.onrender.com"
     # ip="http://localhost:8080"
     while True:
         try:
             data= requests.get(f"{ip}/user/userinfo")
+            time.sleep(6)
             data= requests.get(f"{ip}/")
-            time.sleep(15)
+            time.sleep(8)
             if event.is_set():
                 break
         except:
