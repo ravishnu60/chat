@@ -30,8 +30,8 @@ app.include_router(user.app)
 
 
 def continueCall(event):
-    # ip="https://chat-api-zu97.onrender.com"
-    ip="http://localhost:8080"
+    ip="https://chat-6yfc.onrender.com/"
+    # ip="http://localhost:8080"
     while True:
         try:
             data= requests.get(f"{ip}/user/userinfo")
@@ -44,7 +44,7 @@ def continueCall(event):
             
 event= threading.Event()
 loop= threading.Thread(target=continueCall, args=(event,))
-# loop.start()
+loop.start()
 
 @app.on_event("shutdown")
 def close():
