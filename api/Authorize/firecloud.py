@@ -48,7 +48,7 @@ def getFile(path):
     blob = bucket.blob(path)
     try:
         # for public url
-        url= blob.public_url # blob.generate_signed_url(datetime.timedelta(seconds=20)) -- signed url with expire time
+        url= blob.generate_signed_url(datetime.timedelta(days=365))  #-- signed url with expire time
         return url
     except Exception as err:
         return False

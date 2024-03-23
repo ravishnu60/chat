@@ -55,9 +55,9 @@ def userData(res: Response, db: Session = Depends(get_DB), get_curr_user=Depends
     data:dict={}
     data['name'],data['phone_no'],data['id']= temp.name, temp.phone_no, temp.user_id
     if temp.profile:
-        output= firecloud.getFile(temp.profile)
-        if output:
-            data['profile']= output
+        # output= firecloud.getFile(temp.profile.split('##')[0])
+        # if output:
+        data['profile']= temp.profile.split('##')[0]
     else:
         data['profile']=None
         
@@ -108,7 +108,7 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
     file_loc= f"{path}/{source.filename}"
     query= db.query(User).filter(User.user_id == get_curr_user['id'])
     data= query.first()
-    old_loc= data.profile if data.profile else None
+    old_loc= data.profile if data.profile.split('##')[1] else None
     try:
         if not os.path.exists(path):
             os.makedirs(path)
@@ -122,7 +122,7 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
             delPath(path)
             return {"status_code": 409, "status": "failed", "detail": "Can't upload file"}
         
-        query.update({"profile":file_loc}, synchronize_session=False)
+        query.update({"profile":f'{link}##{file_loc}'}, synchronize_session=False)
         db.commit()
         delPath(path)
     except Exception as err:
