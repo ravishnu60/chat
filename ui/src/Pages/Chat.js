@@ -404,7 +404,7 @@ function Chat({props}) {
             <img src='https://raw.githubusercontent.com/Tarikul-Islam-Anik/Telegram-Animated-Emojis/main/Smileys/Relieved Face.webp' width={28} alt='select image' />
           </button>}
           <input id="fileSource" type='file' onChange={(e) => { selectFile(e) }} style={{ display: 'none' }} accept='.jpg,.jpeg,.png,.mp4' />
-          <input id="msg_input" type='text' style={{ borderRadius: '20px' }} className={`form-control border-secondary p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
+          <input id="msg_input" type='text' style={{ borderRadius: '20px', border:'2px solid white' }} className={`form-control p-1 ${isMobile ? "h-50" : ''}`} autoComplete='off'
             placeholder='Message here' onFocus={() => typing(true, getValues('msg'), true)}
             {...register('msg', { onChange: (e) => typing(true, e.target.value), onBlur: () => typing(false) })} />
 

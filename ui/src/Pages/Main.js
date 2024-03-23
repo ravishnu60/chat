@@ -3,7 +3,8 @@ import Header from '../Menus/Header'
 import Home from './Home'
 import Chat from './Chat'
 import { loadingFunc, userstatus, isMobile, base_url, alert } from '../Utils/Utility';
-import gif1 from '../Assets/hi_cat.gif'
+import gif1 from '../Assets/user.png';
+import editing from '../Assets/image-editing.png';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -12,7 +13,7 @@ function Main() {
     const [to, setTo] = useState();
     const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };
     const [loading, setLoading] = useState(true);
-    const navigate  = useNavigate();
+    const navigate = useNavigate();
     const [profile, setProfile] = useState()
     const [profileView, setProfileView] = useState();
 
@@ -33,7 +34,7 @@ function Main() {
                 alert("Large image files");
                 return;
             }
-            setProfile({ file: e.target.files[0]});
+            setProfile({ file: e.target.files[0] });
             document.getElementById('profile').src = URL.createObjectURL(e.target.files[0]);
         } else {
             setProfile();
@@ -50,7 +51,7 @@ function Main() {
             data: fm,
             headers: header
         }).then((res) => {
-            if (res.data?.status == "failed"){
+            if (res.data?.status == "failed") {
                 alert("Error, try later");
                 setLoading(false);
                 getUser();
@@ -60,7 +61,7 @@ function Main() {
             getUser();
             setTimeout(() => {
                 setProfile();
-            setLoading(false);
+                setLoading(false);
             }, 200);
         }).catch(() => {
             alert("Error, try later");
@@ -73,13 +74,13 @@ function Main() {
         getUser();
     }, [])
 
-    const viewProfile= (link)=>{
+    const viewProfile = (link) => {
         setProfileView(link);
         document.getElementById('profileview').click();
     }
 
     return (
-        <div>
+        <div className='home_bgd'>
             {loadingFunc(loading)}
             <Header user={user} />
             <div className='p-3'>
@@ -96,7 +97,7 @@ function Main() {
                                         to ? <Chat props={{ user, to, loading, setLoading, setTo, viewProfile }} /> :
                                             <div className='text-center h4 mt-5'>
                                                 <img src={gif1} width='80vh' className='mb-4' /><br />
-                                                <span className='font-weight-bold text-info'>Welcome {user?.name} </span>
+                                                <span className='font-weight-bold text-light'>Welcome {user?.name} </span>
                                             </div>
                                     }
                                 </div>
@@ -111,15 +112,21 @@ function Main() {
                             {
                                 to ? <Chat props={{ user, to, loading, setLoading, setTo, viewProfile }} /> :
                                     <div className='text-center h4 mt-5'>
-                                        {user && <img id='profile'  
-                                            className={'mb-4 '+ (user?.profile ?'profileHome':'')} 
-                                            style={{cursor:'pointer'}}
-                                            src={user?.profile ? user?.profile : gif1} 
-                                            width='120vh'
-                                            alt='profile'
-                                            title='change profile' 
-                                            onClick={() => document.getElementById('profileUpload').click()}
-                                            onError={() => {document.getElementById(`profile`).src = gif1; console.log("yes");} } />}
+                                        <div className=''>
+                                            {user && <img id='profile'
+                                                className={(user?.profile ? 'profileHome' : '')}
+                                                style={{ cursor: 'pointer' }}
+                                                src={user?.profile ? user?.profile : gif1}
+                                                width='120vh'
+                                                alt='profile'
+                                                title='change profile'
+                                                onClick={() => document.getElementById('profileUpload').click()}
+                                                onError={() => { document.getElementById(`profile`).src = gif1; console.log("yes"); }} />}
+
+                                            {/* <div>
+                                                <img className='mx-5' src={editing} width={25} />
+                                            </div> */}
+                                        </div>
                                         <br />
                                         <input name='file' type='file' id='profileUpload' style={{ display: 'none' }} onChange={profileChange} />
                                         {
@@ -130,7 +137,7 @@ function Main() {
 
                                             </div>
                                         }
-                                        {user?.name && <span className='font-weight-bold text-info'>Welcome {user?.name} </span>}
+                                        {user?.name && <span className='font-weight-bold text-light'>Welcome {user?.name} </span>}
 
                                     </div>
                             }

@@ -43,7 +43,7 @@ export function requestPermission() {
     });
 }
 
-navigator.serviceWorker.register("sw.js");
+navigator.serviceWorker?.register("sw.js");
 
 export const isMobile = window.innerWidth <= 768;
 
@@ -53,7 +53,7 @@ export function showNotification(title, body) {
         if (isMobile) {
             navigator?.serviceWorker?.ready?.then((registration) => {
                 // Show a notification that includes an action titled Archive.
-                let i= registration?.showNotification(title, { body: body, icon: logo })
+                registration?.showNotification(title, { body: body, icon: logo })
             });
         } else {
             var notification = new Notification(title, { body: body, icon: logo });

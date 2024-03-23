@@ -1,12 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { alert, base_url, isMobile, loadingFunc } from '../Utils/Utility';
+import { alert, base_url, loadingFunc } from '../Utils/Utility';
 import { Link, useNavigate } from 'react-router-dom';
-import '../Style/style.css';
-import logo from '../Assets/logo.png'
-import bg from '../Assets/bg.png'
-import login from '../Assets/login_side.jpg'
+import '../Style/login.css';
+import logo from '../Assets/logo.png';
+import login from '../Assets/login_side.jpg';
 
 function Login() {
   const [error, setError] = useState(false);
@@ -15,9 +14,10 @@ function Login() {
   const { register: reg, handleSubmit: regSubmit, formState: { errors: regError }, reset: regReset } = useForm();
   const navigate = useNavigate();
   const [view, setView] = useState(false);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const submit = (data) => {
+    console.log(data);
     setLoading(true);
     const formdata = new FormData();
     formdata.append('username', data.username);
@@ -25,6 +25,7 @@ function Login() {
 
     axios.post(`${base_url}user/login`, formdata).then((res) => {
       sessionStorage.setItem('token', res.data.access_token);
+      data.remember ? localStorage.setItem('connect',JSON.stringify(data)) : localStorage.setItem('connect',null)
       setTimeout(() => {
         navigate('/home');
         setLoading(false);
@@ -53,10 +54,14 @@ function Login() {
     });
   }
 
-  const handlePage = (page) => {
+  const handlePage = () => {
+    setError(false);
     if (step === 0) {
       setStep(1);
       regReset();
+      setTimeout(() => {
+        document.getElementById('register_name').value = '';
+      }, 50);
     } else {
       setStep(0);
       reset();
@@ -66,12 +71,13 @@ function Login() {
 
   useEffect(() => {
     sessionStorage.clear();
+    let data= localStorage.getItem('connect');
+    data && reset(JSON.parse(data))
   }, [])
 
 
   return (
     <div>
-      <img src={bg} className='login_bg' alt='Background' />
       <div className='fixed-top'>
         <div className='p-2 text-center header'>
           <div className='h4' style={{ fontWeight: 'bolder' }}>Connect <img src={logo} width={25} alt='Logo' /></div>
@@ -80,21 +86,23 @@ function Login() {
 
       {loadingFunc(loading, step === 0)}
 
-      <div className={isMobile ? 'down-form':"center"}>
-        <div className="login_form" style={{ borderColor: error ? 'red' : 'white' }}>
+      {/* <div className={isMobile ? 'down-form':"center"}> */}
+      <div className='d-flex align-items-center justify-content-center vh-100'>
+        <div className="login_form" style={{ overflow: 'hidden', borderColor: error ? 'red' : 'white' }} >
           <form className='row' onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
-            <div className='col-lg-6 col-0'>
-              <img src={login} style={{width:'inherit'}} alt='side' />
+            <div className='d-none d-lg-block col-md-5 col-lg-5 col-xl-5 side-img' style={{ background: `url(${login})` }}>
+              {/* side bg */}
             </div>
-            <div className='col-lg-6 col-12'>
+            <div className='col-lg-7 col-12 p-5'>
               <div className='row'>
                 {error && <div className="text-danger text-center h5 col-12 font-weight-bold">Invalid credentials</div>}
-                <h5 className='text-light text-center col-12 login_title'>{step ? "Create Account" : "Login"}</h5>
+                <h5 className='text-light text-center col-12 login_title'>{step ? "Create Account" : "Sign In"}</h5>
                 {step === 0 ?
                   <>
-                    <div className="col-12 mb-4 login__inputs">
+                    {/* Login Form */}
+                    <div className="col-12 mb-4">
                       <input type="text"
-                        className="form-control login__box"
+                        className="form-control"
                         placeholder='Mobile No.'
                         {...register('username', { required: true })}
                         onFocus={() => { setError(false) }}
@@ -104,9 +112,9 @@ function Login() {
 
                     <div className="col-12 mb-3">
                       <div className='input-group'>
-                        <input 
-                          type={view ? "text" : "password"} 
-                          autoComplete='off' 
+                        <input
+                          type={view ? "text" : "password"}
+                          autoComplete='off'
                           className="form-control border-right-0"
                           placeholder='Password'
                           {...register('password', { required: true })} onFocus={() => { setError(false) }} />
@@ -114,29 +122,45 @@ function Login() {
                       </div>
                       {errors?.password && <div className="text-danger font-weight-bold">Password is required</div>}
                     </div>
+                    <div className='col-12 mb-4'>
+                      <div className="col d-flex justify-content-between">
+                        <div className="form-check">
+                          <input className="form-check-input" type="checkbox" id="remember" {...register('remember')} />
+                          <label className="form-check-label" htmlFor="remember"> Remember me </label>
+                        </div>
+                        <div>
+                          {/* <Link className='text-light font-weight-bold'>Forgot Password?</Link> */}
+                        </div>
+                      </div>
+                    </div>
                   </>
                   :
                   <>
-                    <div className="form mb-4">
-                      <label className="form-label" >Name</label>
+                    {/* Register */}
+                    <div className="col-12 mb-4">
                       <input type="text"
+                        id="register_name"
                         className="form-control"
+                        placeholder='Name'
                         {...reg('name', { required: true })} onFocus={() => { setError(false) }} />
                       {regError?.name && <div className="text-danger">Name is required</div>}
                     </div>
 
-                    <div className="form mb-4">
-                      <label className="form-label" >Mobile No.</label>
+                    <div className="col-12  mb-4">
                       <input type="number"
                         className="form-control"
+                        placeholder='Mobile No.'
                         {...reg('phone_no', { required: true })} onFocus={() => { setError(false) }} />
                       {regError?.phone_no && <div className="text-danger">Mobile number is required</div>}
                     </div>
 
-                    <div className="form-outline mb-4">
-                      <label className="form-label" >Password</label>
+                    <div className="col-12 mb-4">
                       <div className='input-group'>
-                        <input type={view ? "text" : "password"} autoComplete='off' className="form-control border-right-0"
+                        <input
+                          type={view ? "text" : "password"}
+                          autoComplete='off'
+                          className="form-control border-right-0"
+                          placeholder='Password'
                           {...reg('password', { required: true })} onFocus={() => { setError(false) }} />
                         <div className='input-group-text' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye text-light'></i> : <i className='fa fa-eye-slash text-light'></i>}</div>
                       </div>
@@ -145,13 +169,12 @@ function Login() {
                   </>
                 }
               </div>
-              <div className="d-flex justify-content-around align-items-center">
-                {/* <a href="#!">Forgot password?</a> */}
-              </div>
 
               <button type="submit" className="btn btn-light btn-block login-button">{step ? "Sign up" : "Login"}</button>
-              <h6 className='text-light text-center mt-3'>Don't have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign up!</Link></h6>
-              { step ? <button type="button" onClick={handlePage} className='btn btn-dark btn-block login-button'>Back</button> : null}
+              <h6 className='text-light text-center mt-3'>{
+                step === 0 ? <>Don't have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign up!</Link></>
+                  : <>Already have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign in!</Link></>}
+              </h6>
             </div>
           </form>
         </div>
