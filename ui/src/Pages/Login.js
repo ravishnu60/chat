@@ -65,6 +65,9 @@ function Login() {
     } else {
       setStep(0);
       reset();
+      setTimeout(() => {
+        document.getElementById('username').value = '';
+      }, 50);
     }
     setView(false);
   }
@@ -102,8 +105,10 @@ function Login() {
                     {/* Login Form */}
                     <div className="col-12 mb-4">
                       <input type="text"
+                        id='username'
                         className="form-control"
                         placeholder='Mobile No.'
+                        autoComplete='off'
                         {...register('username', { required: true })}
                         onFocus={() => { setError(false) }}
                       />
@@ -142,6 +147,7 @@ function Login() {
                         id="register_name"
                         className="form-control"
                         placeholder='Name'
+                        autoComplete='off'
                         {...reg('name', { required: true })} onFocus={() => { setError(false) }} />
                       {regError?.name && <div className="text-danger">Name is required</div>}
                     </div>
@@ -149,6 +155,7 @@ function Login() {
                     <div className="col-12  mb-4">
                       <input type="number"
                         className="form-control"
+                        autoComplete='off'
                         placeholder='Mobile No.'
                         {...reg('phone_no', { required: true })} onFocus={() => { setError(false) }} />
                       {regError?.phone_no && <div className="text-danger">Mobile number is required</div>}
