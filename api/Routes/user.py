@@ -108,7 +108,7 @@ def addMedia(res: Response,source:UploadFile=File(), db: Session = Depends(get_D
     file_loc= f"{path}/{source.filename}"
     query= db.query(User).filter(User.user_id == get_curr_user['id'])
     data= query.first()
-    old_loc= data.profile if data.profile.split('##')[1] else None
+    old_loc= data.profile.split('##')[1] if data.profile else None
     try:
         if not os.path.exists(path):
             os.makedirs(path)
