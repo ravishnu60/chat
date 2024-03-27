@@ -28,6 +28,13 @@
     backdrop-filter: blur(16px);
 }
 
+.form-control:focus,
+.form-control:active {
+    outline: none !important;
+    box-shadow: none;
+    border-color: #ffffff;
+}
+
 .center{
     margin: 0;
     position: absolute;

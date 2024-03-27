@@ -11,7 +11,8 @@ import back from '../Assets/back.png';
 import load from '../Assets/loading.gif';
 import img_static from '../Assets/img_static.png';
 import EmojiPicker from 'emoji-picker-react';
-import reply from '../Assets/reply.png'
+import reply1 from '../Assets/reply1.png'
+import reply2 from '../Assets/reply2.png'
 import { emojis, url } from '../Utils/emojis';
 import uEmojiParser from 'universal-emoji-parser'
 
@@ -297,7 +298,7 @@ function Chat({props}) {
                   <div className='col-10 pr-2'>
                     <div className='d-flex flex-row-reverse align-items-center' >
                       {(loadingdel?.[data?.msg_id] || data?.load) ? <img src={load} width={30} /> : <i className='fa fa-trash fa-sm messagedel' onClick={() => deleteMsg(data?.msg_id)}></i>}
-                      <div className='border border-primary rounded' id={`msg_id${data?.msg_id}`}>
+                      <div className={`${data?.is_media ? '' : 'border border-primary rounded'}`} id={`msg_id${data?.msg_id}`}>
                         {data?.pin?.msg && <div className='border border-warning senderPin px-1' style={{ fontSize: '13px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)}>
                           {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
@@ -327,7 +328,7 @@ function Chat({props}) {
                           <div className={'p-2 sender text-break '+(isMobile ? 'small':'')}>{constructText(data?.message)} </div>
                         }
                       </div>
-                      <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
+                      <img src={reply1} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                     </div>
                     <div className='text-right small msgtime1'> <span dangerouslySetInnerHTML={{ __html: data?.createdAt }} /> {data?.is_read && <i className='fas fa-sm fa-thumbs-up'></i>}</div>
                   </div>
@@ -336,7 +337,7 @@ function Chat({props}) {
                 <>{data?.from_id == false ?
                   <div className='col-10 pl-2'>{/* receive */}
                     <div className='d-flex'>
-                      <div className='border border-success rounded'>
+                      <div className={`${data?.is_media ? '' : 'border border-primary rounded'}`}>
                         {data?.pin?.msg && <div className='border border-warning messagetext3 text-secondary px-1' style={{ fontSize: '14px', cursor: 'pointer' }} onClick={() => document.getElementById(`msg_id${data?.pin?.id}`)?.focus()}>
                           {data?.pin?.media ? <img src={data?.pin?.msg} width={30} alt='deleted' /> : data?.pin?.msg}
                         </div>}
@@ -364,7 +365,7 @@ function Chat({props}) {
                         }
                       </div>
                       <div>
-                        <img src={reply} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
+                        <img src={reply2} width={20} style={{ opacity: '0.5', cursor: 'pointer' }} onClick={() => (document.getElementById('msg_input').focus(), setPin({ id: data?.msg_id, msg: data.message, is_media: data?.is_media }))} />
                       </div>
                     </div>
                     <div className='small msgtime2' dangerouslySetInnerHTML={{ __html: data?.createdAt }}></div>

@@ -4,7 +4,19 @@
 }
 
 .searchInput::placeholder {
-    color: #f5deb39d;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+.search_icon{
+    background-color: #ffffff00;
+    border: 2px solid white;
+    border-left: 0px;
+}
+
+.searchInput {
+    border: 2px solid white;
+    border-right: 0px;
 }
 
 .profileHome {
@@ -18,8 +30,15 @@
 .form-control {
     background-color: #ffffff00 !important;
     caret-color: #f87204;
-    color: orange !important;
+    color: #ffffff !important;
     /* border-color: #000000 !important; */
+}
+
+.form-control:focus,
+.form-control:active {
+    outline: none !important;
+    box-shadow: none;
+    border-color: #ffffff;
 }
 
 .input-send {
@@ -38,8 +57,8 @@
 }
 
 .hoverRow:hover {
-    color: #f87204 !important;
-    background-color: #32e0ff5d !important;
+    color: #fbff10 !important;
+    background-color: #32e0ff3d !important;
 
 }
 
@@ -153,7 +172,7 @@
     }
 }
 
-.home_bgd{
+.home_bgd {
     background-color: #0721756e;
     height: 100vh;
 }

@@ -73,9 +73,11 @@ function Login() {
   }
 
   useEffect(() => {
+    
     sessionStorage.clear();
     let data= localStorage.getItem('connect');
     data && reset(JSON.parse(data))
+    // eslint-disable-next-line 
   }, [])
 
 

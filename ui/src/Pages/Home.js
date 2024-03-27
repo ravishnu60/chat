@@ -145,7 +145,7 @@ function Home({ props }) {
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div className="input-group-append">
-            <button className="input-group-text py-0" type='submit' title='search' ><img src={findperson} width={30} alt='search' /></button>
+            <button className="input-group-text search_icon py-0" type='submit' title='search' ><img src={findperson} width={30} alt='search' /></button>
           </div>
         </div>
         {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
@@ -155,7 +155,7 @@ function Home({ props }) {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow border-bottom border-success rounded text-light font-weight-bold text-capitalize p-1 d-flex align-items-center"
+              className="hoverRow border-bottom border-danger rounded text-light font-weight-bold text-capitalize p-1 d-flex align-items-center"
             >
               <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
               <div >
