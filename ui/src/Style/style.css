@@ -17,6 +17,7 @@
 .searchInput {
     border: 2px solid white;
     border-right: 0px;
+    border-radius: 16px;
 }
 
 .profileHome {
