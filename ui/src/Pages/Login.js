@@ -17,7 +17,6 @@ function Login() {
   const [loading, setLoading] = useState(false);
 
   const submit = (data) => {
-    console.log(data);
     setLoading(true);
     const formdata = new FormData();
     formdata.append('username', data.username);
@@ -25,7 +24,8 @@ function Login() {
 
     axios.post(`${base_url}user/login`, formdata).then((res) => {
       sessionStorage.setItem('token', res.data.access_token);
-      data.remember ? localStorage.setItem('connect',JSON.stringify(data)) : localStorage.setItem('connect',null)
+      [data.username, data.password] = [btoa(data.username), btoa(data.password)];
+      data.remember ? localStorage.setItem('connect', JSON.stringify(data)) : localStorage.setItem('connect', null)
       setTimeout(() => {
         navigate('/home');
         setLoading(false);
@@ -73,10 +73,17 @@ function Login() {
   }
 
   useEffect(() => {
-    
     sessionStorage.clear();
-    let data= localStorage.getItem('connect');
-    data && reset(JSON.parse(data))
+    let data = localStorage.getItem('connect');
+    if (data) {
+      data= JSON.parse(data)
+      try{
+        [data.username, data.password] = [atob(data.username), atob(data.password)]
+      }catch(err){
+        console.log(err);
+      }
+      reset(data);
+    }
     // eslint-disable-next-line 
   }, [])
 

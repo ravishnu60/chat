@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { alert, base_url, permission, showNotification, webSocketUrl } from '../Utils/Utility';
 import axios from 'axios';
 import '../Style/style.css';
