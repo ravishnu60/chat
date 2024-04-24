@@ -8,7 +8,7 @@
     border-left: none;
     /* border-color: #000000 !important; */
     border-radius: 0px 15px 15px 0px;
-    border: 2px solid white;
+    border: 1px solid white;
     border-left: 0px;
 }
 
@@ -45,18 +45,20 @@
 }
 
 .login_title{
+    color: #4e1061 !important;
+    margin-top: 10px;
     font-weight: bolder;
-    font-size: xx-large;
+    font-size: larger;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
 .login_form input{
     color: white  !important;
-    font-weight: bold  !important;
+    font-weight: 100 !important;
     border-radius: 15px;
-    border: 2px solid white;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    border: 1px solid white;
+    padding-top: 6px;
+    padding-bottom: 6px;
     background-color: #ffffff00 !important;
 }
 

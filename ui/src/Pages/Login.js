@@ -76,10 +76,10 @@ function Login() {
     sessionStorage.clear();
     let data = localStorage.getItem('connect');
     if (data) {
-      data= JSON.parse(data)
-      try{
+      data = JSON.parse(data)
+      try {
         [data.username, data.password] = [atob(data.username), atob(data.password)]
-      }catch(err){
+      } catch (err) {
         console.log(err);
       }
       reset(data);
@@ -99,101 +99,107 @@ function Login() {
       {loadingFunc(loading, step === 0)}
 
       {/* <div className={isMobile ? 'down-form':"center"}> */}
-      <div className='d-flex align-items-center justify-content-center vh-100'>
-        <div className="login_form" style={{ overflow: 'hidden', borderColor: error ? 'red' : 'white' }} >
-          <form className='row' onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
-            <div className='d-none d-lg-block col-md-5 col-lg-5 col-xl-5 side-img' style={{ background: `url(${login})` }}>
-              {/* side bg */}
-            </div>
-            <div className='col-lg-7 col-12 p-5'>
-              <div className='row'>
-                {error && <div className="text-danger text-center h5 col-12 font-weight-bold">Invalid credentials</div>}
-                <h5 className='text-light text-center col-12 login_title'>{step ? "Create Account" : "Sign In"}</h5>
-                {step === 0 ?
-                  <>
-                    {/* Login Form */}
-                    <div className="col-12 mb-4">
-                      <input type="text"
-                        id='username'
-                        className="form-control"
-                        placeholder='Mobile No.'
-                        autoComplete='off'
-                        {...register('username', { required: true })}
-                        onFocus={() => { setError(false) }}
-                      />
-                      {errors?.username && <div className="text-danger font-weight-bold">Mobile number is required</div>}
-                    </div>
+      <div className='vh-100 d-flex align-items-center'>
+        <form className='row col' onSubmit={step ? regSubmit(registerNew) : handleSubmit(submit)}>
+          <div className='col-lg-3 col-md-3 col'></div>
+          <div className='col-lg-7 col-md-7 col-12 p-0'>
+            <div className="login_form row" style={{ overflow: 'hidden', borderColor: error ? 'red' : 'white' }} >
 
-                    <div className="col-12 mb-3">
-                      <div className='input-group'>
-                        <input
-                          type={view ? "text" : "password"}
+              <div className='d-none d-lg-block col-md-6 col-lg-6 col-xl-6 side-img' style={{ background: `url(${login})` }}>
+                {/* side bg */}
+              </div>
+              <div className='col-lg-6   col-12 px-3'>
+                <div className='row'>
+                  {error && <div className="text-danger text-center h5 col-12 font-weight-bold">Invalid credentials</div>}
+                  <h5 className='text-light text-center col-12 login_title'>{step ? "Create Account" : "Sign In"}</h5>
+                  {step === 0 ?
+                    <>
+                      {/* Login Form */}
+                      <div className="col-12 mb-4">
+                        <input type="text"
+                          id='username'
+                          className="form-control"
+                          placeholder='Mobile No.'
                           autoComplete='off'
-                          className="form-control border-right-0"
-                          placeholder='Password'
-                          {...register('password', { required: true })} onFocus={() => { setError(false) }} />
-                        <div className='input-group-text' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye text-light'></i> : <i className='fa fa-eye-slash text-light  '></i>}</div>
+                          {...register('username', { required: true })}
+                          onFocus={() => { setError(false) }}
+                        />
+                        {errors?.username && <div className="text-danger font-weight-bold">Mobile number is required</div>}
                       </div>
-                      {errors?.password && <div className="text-danger font-weight-bold">Password is required</div>}
-                    </div>
-                    <div className='col-12 mb-4'>
-                      <div className="col d-flex justify-content-between">
-                        <div className="form-check">
-                          <input className="form-check-input" type="checkbox" id="remember" {...register('remember')} />
-                          <label className="form-check-label" htmlFor="remember"> Remember me </label>
+
+                      <div className="col-12 mb-3">
+                        <div className='input-group'>
+                          <input
+                            type={view ? "text" : "password"}
+                            autoComplete='off'
+                            className="form-control border-right-0"
+                            placeholder='Password'
+                            {...register('password', { required: true })} onFocus={() => { setError(false) }} />
+                          <div className='input-group-text' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye text-light'></i> : <i className='fa fa-eye-slash text-light  '></i>}</div>
                         </div>
-                        <div>
-                          {/* <Link className='text-light font-weight-bold'>Forgot Password?</Link> */}
+                        {errors?.password && <div className="text-danger font-weight-bold">Password is required</div>}
+                      </div>
+                      <div className='col-12 mb-4'>
+                        <div className="col d-flex justify-content-between">
+                          <div className="form-check">
+                            <input className="form-check-input" type="checkbox" id="remember" {...register('remember')} />
+                            <label className="form-check-label" htmlFor="remember"> Remember me </label>
+                          </div>
+                          <div>
+                            {/* <Link className='text-light font-weight-bold'>Forgot Password?</Link> */}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </>
-                  :
-                  <>
-                    {/* Register */}
-                    <div className="col-12 mb-4">
-                      <input type="text"
-                        id="register_name"
-                        className="form-control"
-                        placeholder='Name'
-                        autoComplete='off'
-                        {...reg('name', { required: true })} onFocus={() => { setError(false) }} />
-                      {regError?.name && <div className="text-danger">Name is required</div>}
-                    </div>
-
-                    <div className="col-12  mb-4">
-                      <input type="number"
-                        className="form-control"
-                        autoComplete='off'
-                        placeholder='Mobile No.'
-                        {...reg('phone_no', { required: true })} onFocus={() => { setError(false) }} />
-                      {regError?.phone_no && <div className="text-danger">Mobile number is required</div>}
-                    </div>
-
-                    <div className="col-12 mb-4">
-                      <div className='input-group'>
-                        <input
-                          type={view ? "text" : "password"}
+                    </>
+                    :
+                    <>
+                      {/* Register */}
+                      <div className="col-12 mb-4">
+                        <input type="text"
+                          id="register_name"
+                          className="form-control"
+                          placeholder='Name'
                           autoComplete='off'
-                          className="form-control border-right-0"
-                          placeholder='Password'
-                          {...reg('password', { required: true })} onFocus={() => { setError(false) }} />
-                        <div className='input-group-text' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye text-light'></i> : <i className='fa fa-eye-slash text-light'></i>}</div>
+                          {...reg('name', { required: true })} onFocus={() => { setError(false) }} />
+                        {regError?.name && <div className="text-danger">Name is required</div>}
                       </div>
-                      {regError?.password && <div className="text-danger">Password is required</div>}
-                    </div>
-                  </>
-                }
+
+                      <div className="col-12  mb-4">
+                        <input type="number"
+                          className="form-control"
+                          autoComplete='off'
+                          placeholder='Mobile No.'
+                          {...reg('phone_no', { required: true })} onFocus={() => { setError(false) }} />
+                        {regError?.phone_no && <div className="text-danger">Mobile number is required</div>}
+                      </div>
+
+                      <div className="col-12 mb-4">
+                        <div className='input-group'>
+                          <input
+                            type={view ? "text" : "password"}
+                            autoComplete='off'
+                            className="form-control border-right-0"
+                            placeholder='Password'
+                            {...reg('password', { required: true })} onFocus={() => { setError(false) }} />
+                          <div className='input-group-text' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye text-light'></i> : <i className='fa fa-eye-slash text-light'></i>}</div>
+                        </div>
+                        {regError?.password && <div className="text-danger">Password is required</div>}
+                      </div>
+                    </>
+                  }
+                </div>
+
+                <button type="submit" className="btn btn-light btn-block login-button">{step ? "Sign up" : "Login"}</button>
+                <h6 className='text-light text-center mt-3'>{
+                  step === 0 ? <>Don't have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign up!</Link></>
+                    : <>Already have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign in!</Link></>}
+                </h6>
               </div>
 
-              <button type="submit" className="btn btn-light btn-block login-button">{step ? "Sign up" : "Login"}</button>
-              <h6 className='text-light text-center mt-3'>{
-                step === 0 ? <>Don't have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign up!</Link></>
-                  : <>Already have an account? <Link className='font-weight-bold text-light text-nowrap' onClick={handlePage}>Sign in!</Link></>}
-              </h6>
             </div>
-          </form>
-        </div>
+          </div>
+
+        </form>
       </div>
     </div>
 
