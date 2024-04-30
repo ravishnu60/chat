@@ -92,7 +92,7 @@ function Login() {
 
       {loadingFunc(loading, step === 0)}
 
-      <div className='login-form mt-2'>
+      <div className={`${error ? 'mt-2':''} login-form`}>
         <div className={`form p-2 px-4 ${error ? 'form-error':'form-normal'}`}>
           {step === 0 ? <form className='' onSubmit={handleSubmit(submit)}>
             {error && <div className="text-danger text-center font-weight-bold">Invalid credentials</div>}
