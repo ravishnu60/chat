@@ -1,7 +1,7 @@
 import axios from "axios";
 import Swal from "sweetalert2";
 import logo from '../Assets/logo.png'
-import loading_gif from '../Assets/load.webp';
+import loading_gif from '../Assets/loading-all.gif';
 import key from '../Assets/Key.webp';
 // import addNotification from "react-push-notification";
 
@@ -68,10 +68,11 @@ export function showNotification(title, body) {
 
 
 export const loadingFunc = (status, login) => {
+    
     if (status) {
         return (<div style={{ zIndex: 9999, position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)" }}>
-            <img src={login ? key : loading_gif} width={100} alt="Loading..." />
-            <div className="loadd ml-3">Loading</div>
+            <img src={loading_gif}width={260} alt="Loading..." />
+            {/* <div className="loadd ml-3">Loading</div> */}
         </div>)
     }
 

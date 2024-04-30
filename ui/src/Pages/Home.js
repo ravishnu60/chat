@@ -81,19 +81,20 @@ function Home({ props }) {
     let temp = listRef.current?.data
     if (list?.length !== 0 && listRef.current?.data) {
       temp?.forEach((element, index) => {
-        if (element?.newmsg != list[index].newmsg) {
+        if (element?.newmsg !== list[index].newmsg) {
           popup = true;
         }
-        if (element?.alive == false && list[index]?.alive)
+        if (element?.alive === false && list[index]?.alive)
           alive = true;
       });
     }
-    if (popup && document.visibilityState == 'hidden')
+    if (popup && document.visibilityState === 'hidden')
       showNotification(`Excuse me ${user?.name}`, 'Some one texting you');
-    if (alive && document.visibilityState == 'hidden')
+    if (alive && document.visibilityState === 'hidden')
       showNotification(`Excuse me ${user?.name}`, 'Your friends are online now');
 
     listRef.current = { ...listRef.current, data: list }
+    // eslint-disable-next-line
   }, [list])
 
   //websocket event
@@ -128,7 +129,7 @@ function Home({ props }) {
       listRef.current?.ws?.close()
       clearInterval(listRef.current?.interval)
     }
-
+    // eslint-disable-next-line
   }, [user, restartScoket])
 
   return (
@@ -144,10 +145,10 @@ function Home({ props }) {
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div className="input-group-append">
-            <button className="input-group-text search_icon py-0" type='submit' title='search' ><img src={findperson} width={30} alt='search' /></button>
+            <button className="input-group-text search_icon py-0 border-left-0" type='submit' title='search' ><img src={findperson} width={30} alt='search' /></button>
           </div>
         </div>
-        {errors?.search?.type == 'minLength' && <div className='text-danger'>Enter valid number</div>}
+        {errors?.search?.type === 'minLength' && <div className='text-danger'>Enter valid number</div>}
       </form>
       <div className='mt-2' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
         {
@@ -181,7 +182,7 @@ function Home({ props }) {
             </div>
           ))
         }
-        {(list?.length == 0 && !loading) && <div className='text-center text-secondary h4 mt-4 p-2'>No chats</div>}
+        {(list?.length === 0 && !loading) && <div className='text-center text-secondary h4 mt-4 p-2'>No chats</div>}
       </div>
 
       {/* modal */}
