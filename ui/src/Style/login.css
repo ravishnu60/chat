@@ -53,7 +53,7 @@
 }
 
 .login-form input::placeholder{
-    color: #00ffc6;
+    color: #00ffc8a1;
     font-weight: 400 !important;
 }
 /* password lock */

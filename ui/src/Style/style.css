@@ -4,20 +4,14 @@
 }
 
 .searchInput::placeholder {
-    color: #00ffc6;
-    font-weight: bold;
+    color: #00ffc896;
+    /* font-weight: bold; */
 }
 
 .search_icon{
     background-color: #ffffff00;
     border: 1px solid white;
     border-radius: 10px;
-}
-
-.searchInput{
-    border: 1px solid white;
-    border-radius: 10px;
-    color: #00ffc6 !important;
 }
 
 .profileHome {
@@ -32,6 +26,12 @@
     background-color: #ffffff00 !important;
     color: #ffffff !important;
     /* border-color: #000000 !important; */
+}
+
+.searchInput{
+    border: 1px solid white;
+    border-radius: 10px;
+    color: #00ffc6 !important;
 }
 
 .form-control:focus,
