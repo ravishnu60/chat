@@ -11,12 +11,12 @@
 .search_icon{
     background-color: #ffffff00;
     border: 1px solid white;
-    border-radius: 0px 10px 15px 0px;
+    border-radius: 10px;
 }
 
-.input-group .form-control{
+.searchInput{
     border: 1px solid white;
-    border-radius: 15px 0px 0px 10px;
+    border-radius: 10px;
     color: #00ffc6 !important;
 }
 
@@ -30,7 +30,6 @@
 
 .form-control {
     background-color: #ffffff00 !important;
-    caret-color: #f87204;
     color: #ffffff !important;
     /* border-color: #000000 !important; */
 }

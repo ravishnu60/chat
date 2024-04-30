@@ -2,7 +2,6 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import logo from '../Assets/logo.png'
 import loading_gif from '../Assets/loading-all.gif';
-import key from '../Assets/Key.webp';
 // import addNotification from "react-push-notification";
 
 // export const base_url = "http://127.0.0.1:8080/";

@@ -8,7 +8,7 @@ import '../Style/style.css';
 import sendIcon1 from '../Assets/send.png';
 import profile from '../Assets/profile.png';
 import back from '../Assets/back.png';
-import load from '../Assets/loading.gif';
+import load from '../Assets/loading-.gif';
 import img_static from '../Assets/img_static.png';
 import EmojiPicker from 'emoji-picker-react';
 import reply1 from '../Assets/reply1.png'
