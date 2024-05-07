@@ -17,4 +17,4 @@ class Profile(BaseModel):
 
 class Password(BaseModel):
     password:str
-    new_password:str   
+    new_password:str

@@ -40,7 +40,7 @@ function Login() {
     setLoading(true);
     axios({
       method: 'POST',
-      url: `${base_url}user/new`,
+      url: `${base_url}user/register`,
       data: data
     }).then((res) => {
       alert('Registered successfully', true);

@@ -35,9 +35,9 @@ def continueCall(event):
     while True:
         try:
             data= requests.get(f"{ip}/user/userinfo")
-            time.sleep(6)
+            time.sleep(15)
             data= requests.get(f"{ip}/")
-            time.sleep(8)
+            time.sleep(15)
             if event.is_set():
                 break
         except:
@@ -52,5 +52,6 @@ def close():
     try:
         event.set()
         loop.join()
+        pass
     except:
         pass

@@ -8,7 +8,7 @@ import { useForm } from 'react-hook-form';
 import Swal from 'sweetalert2';
 
 function Home({ props }) {
-  const { user, loading, setLoading, setTo, viewProfile } = props;
+  const { user, loading,to, setLoading, setTo, viewProfile } = props;
   const [list, setList] = useState([]);
   const header = { "Authorization": "bearer " + sessionStorage.getItem('token') }
   const { register, formState: { errors }, reset, handleSubmit, } = useForm();
@@ -47,6 +47,9 @@ function Home({ props }) {
           headers: header
         }).then(() => {
           alert('deleted successfully', 'success')
+          if (to?.user_id === id) {
+            setTo(null);
+          }
           setLoading(false)
         }).catch(() => {
           alert('Error while deleting')

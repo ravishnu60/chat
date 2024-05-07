@@ -1,23 +1,21 @@
 from fastapi import APIRouter, Depends, Response, status, WebSocket, Form, UploadFile, File
-from fastapi.responses import FileResponse
 from db import get_DB
 from sqlalchemy.orm import Session, load_only
 from schema import  TypingSchema
 from Authorize import  token, firecloud
 from Models.model import User, Message, Typing
 from sqlalchemy import or_, and_
-import json,pytz,os, random
-import shutil
-import datetime
+import json,pytz,os, random, shutil, datetime
 
 app = APIRouter(
     prefix='/chat',
     tags=['Chat']
 )
 
+# Set last seen for user
 def setlastSeen(id, db):
     query= db.query(User).filter(User.user_id== id)
-    query.update({"alive":False,"last_seen":datetime.datetime.utcnow()}, synchronize_session=False)
+    query.update({"alive":False,"last_seen":datetime.datetime.now(datetime.timezone.utc)}, synchronize_session=False)
     db.commit()
 
 #set typing off when end chat
@@ -29,14 +27,11 @@ def typingOff(db, id):
         db.commit()
 
 # get chat list by websocket
-def newchat(user_id, db):
+def getChatList(user_id, db):
     get_chat = db.query(Message.from_id, Message.to_id, Message.is_read)\
     .order_by(Message.msg_id.desc())\
     .filter(or_(Message.from_id == user_id, Message.to_id == user_id)).all()
     
-    if not get_chat:
-        return False
-
     ids = []
     newtext = {}
     # get ids and new messgae count
@@ -57,7 +52,7 @@ def newchat(user_id, db):
         if str(id) not in newtext:
             newtext[str(id)] = 0
 
-    get_name = []
+    chat_list = []
     for id in ids:
         temp = db.query(User).options(load_only(User.name, User.alive, User.profile, User.last_seen)).filter(User.user_id == id).first()
         temp.newmsg = newtext[str(id)]
@@ -72,23 +67,20 @@ def newchat(user_id, db):
                 temp['profile']= output
         else:
             temp['profile']=None
-        get_name.append(temp)
-    
-    return get_name
-       
+        chat_list.append(temp)
+    return chat_list
+
 @app.websocket("/chatlist/{id}")
 async def chatlist(websocket: WebSocket, id: int, db: Session= Depends(get_DB)):
     await websocket.accept()
-    
     while True:
         try:
             #receive
             await websocket.receive_text()
 
             # send message
-            newData= newchat(id,db)
-            if newData:
-                await websocket.send_json(newData)
+            newData= getChatList(id,db)
+            await websocket.send_json(newData)
         except Exception as Err:
             print("Connection closed",Err)
             setlastSeen(id, db)
@@ -278,8 +270,10 @@ def deleteChat(to_id: int, res: Response, db: Session = Depends(get_DB), get_cur
                                         get_curr_user['id'], Message.to_id == to_id)
 
     if get_chat.first():
-        path = os.path.join("Assets",f"{get_curr_user['id']}_{to_id}")
-        firecloud.removeFile(path)
+        for i in get_chat.all():
+            if i.is_media:
+                path = os.path.join(i.message.split("##")[1])
+                firecloud.removeFile(path)
         get_chat.delete(synchronize_session=False)
         db.commit()
 

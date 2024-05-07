@@ -106,7 +106,7 @@ function Main() {
                     :
                     <div className='row' style={{ height: '80vh' }}>
                         <div className='col-4 border-right'>
-                            <Home props={{ user, loading, setLoading, setTo, getUser, viewProfile }} />
+                            <Home props={{ user, loading,to, setLoading, setTo, getUser, viewProfile }} />
                         </div>
                         <div className='col'>
                             {

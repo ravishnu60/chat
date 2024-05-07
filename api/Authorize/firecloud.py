@@ -16,7 +16,7 @@ base_token= json.loads(decrypted.decode())
 cred = credentials.Certificate(base_token)
 app = firebase_admin.initialize_app(cred)
 
-bucket = storage.bucket( secret.bucket_id)
+bucket = storage.bucket(secret.bucket_id)
 
 def removeFile(path):
     try:
