@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
 import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl, alert, isMobile } from '../Utils/Utility';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
@@ -124,15 +123,17 @@ function Chat({props}) {
       } else if (permission === "default") {
         requestPermission();
       }
-      setScroll(!scroll);
+      // setScroll(!scroll);
     }
-
-    !chatref.current?.data?.message?.length && setTimeout(() => {
-      setScroll(!scroll);
+    
+    if(!chatref.current?.data?.message?.length){
       setTimeout(() => {
         setScroll(!scroll);
-      }, 950);
-    }, 500);
+        setTimeout(() => {
+          setScroll(!scroll);
+        }, 950);
+      }, 500);
+    }
 
     //align div for prev chat view
     if (temp?.message?.length !== undefined && temp?.message?.length !== chat?.message?.length) {
@@ -200,7 +201,7 @@ function Chat({props}) {
   //UseEffect to scroll end
   useEffect(() => {
     chat?.message?.length !== 0 && divEle?.scrollTo(0, divEle?.scrollHeight);
-  }, [scroll, chat?.typing == true, emoji, pin])
+  }, [scroll, emoji, pin])
 
   divEle?.addEventListener('scroll', () => {
     if (divEle?.scrollTop == 0) {
@@ -266,6 +267,8 @@ function Chat({props}) {
   const getEmoji =(name) =>{
     return uEmojiParser.parse(`:${name.toLowerCase().split(' ').join('_')}:`, { parseToHtml: false, parseToUnicode: true });
   }
+
+  const new_position= isMobile ? {position:'fixed', bottom:'25px'} : {position:'fixed', bottom:'85px'}
 
   return (
     <div className='container'>
@@ -376,6 +379,7 @@ function Chat({props}) {
           )}
           {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-light text-center">Say Hi to <span className='text-capitalize'>{to?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={40} alt='typing' />}
+          {(chat?.message?.some(msg_data=> msg_data.is_read === false) && !chat?.typing) && <div className='small p-1 rounded-circle text-success bg-dark font-weight-bold' style={new_position}>new</div>}
           {pin.id &&
             <div className='row'>
               <div className='col-11 pr-2'>
