@@ -4,7 +4,6 @@ import Home from './Home'
 import Chat from './Chat'
 import { loadingFunc, userstatus, isMobile, base_url, alert } from '../Utils/Utility';
 import gif1 from '../Assets/user.png';
-import editing from '../Assets/image-editing.png';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
@@ -51,7 +50,7 @@ function Main() {
             data: fm,
             headers: header
         }).then((res) => {
-            if (res.data?.status == "failed") {
+            if (res.data?.status === "failed") {
                 alert("Error, try later");
                 setLoading(false);
                 getUser();
@@ -72,6 +71,7 @@ function Main() {
 
     useEffect(() => {
         getUser();
+        // eslint-disable-next-line
     }, [])
 
     const viewProfile = (link) => {
@@ -96,7 +96,7 @@ function Main() {
                                     {
                                         to ? <Chat props={{ user, to, loading, setLoading, setTo, viewProfile }} /> :
                                             <div className='text-center h4 mt-5'>
-                                                <img src={gif1} width='80vh' className='mb-4' /><br />
+                                                <img alt='profile' src={gif1} width='80vh' className='mb-4' /><br />
                                                 <span className='font-weight-bold text-light'>Welcome {user?.name} </span>
                                             </div>
                                     }
@@ -159,7 +159,7 @@ function Main() {
                         </div>
                         <div className="modal-body" >
                             <div style={{ overflow: 'auto' }}>
-                                <img src={profileView} width={isMobile ? 350 : 760} />
+                                <img alt='profile' src={profileView} width={isMobile ? 350 : 760} />
                             </div>
                         </div>
                     </div>
