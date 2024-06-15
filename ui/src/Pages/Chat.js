@@ -379,7 +379,6 @@ function Chat({props}) {
           )}
           {loading ? <div className=" text-secondary text-center">Loading...</div> : (chat?.message?.length <= 1) && <div className="text-light text-center">Say Hi to <span className='text-capitalize'>{to?.name}</span></div>}
           {chat?.typing && <img src={typing_gif} width={40} alt='typing' />}
-          {(chat?.message?.some(msg_data=> msg_data.is_read === false) && !chat?.typing) && <div className='small p-1 rounded-circle text-success bg-dark font-weight-bold' style={new_position}>new</div>}
           {pin.id &&
             <div className='row'>
               <div className='col-11 pr-2'>
