@@ -83,51 +83,49 @@ function Login() {
 
   return (
     <div>
-      {/* Header */}
-      <div className='fixed-top'>
-        <div className='p-2 text-center header'>
-          <div className='h4' style={{ fontWeight: 'bolder' }}>Connect <img src={logo} width={25} alt='Logo' /></div>
-        </div>
-      </div>
-
       {loadingFunc(loading, step === 0)}
 
-      <div className={`${error ? 'mt-2':''} login-form`}>
+      <div className="login-form">
         <div className={`form p-2 px-4 ${error ? 'form-error':'form-normal'}`}>
-          {step === 0 ? <form className='' onSubmit={handleSubmit(submit)}>
-            {error && <div className="text-danger text-center font-weight-bold">Invalid credentials</div>}
-            <h4 className='login-title'>Login</h4>
-            <div className='row'>
+          <div className="brand-container">
+            <img src={logo} width={50} className="brand-logo" alt="Logo" />
+            <div className="brand-text">Connect</div>
+          </div>
 
-              <div className='col-12 mb-4'>
+          {step === 0 ? <form className="" onSubmit={handleSubmit(submit)}>
+            {error && <div className="text-danger text-center font-weight-bold mb-3">Invalid credentials</div>}
+            <h4 className="login-title">Sign In</h4>
+            <div className="row">
+
+              <div className="col-12 mb-4">
                 <input type="text"
-                  id='username'
+                  id="username"
                   className="form-control borderless"
-                  placeholder='Mobile No.'
-                  autoComplete='off'
-                  {...register('username', { required: true })}
+                  placeholder="Mobile No."
+                  autoComplete="off"
+                  {...register("username", { required: true })}
                   onFocus={() => { setError(false) }}
                 />
                 {errors?.username && <div className="text-danger">Mobile number is required</div>}
               </div>
 
-              <div className='col-12 mb-5'>
-                <div className='input-group'>
+              <div className="col-12 mb-4">
+                <div className="input-group">
                   <input
                     type={view ? "text" : "password"}
-                    autoComplete='off'
+                    autoComplete="off"
                     className="form-control borderless"
-                    placeholder='Password'
-                    {...register('password', { required: true })} onFocus={() => { setError(false) }} />
-                  <div className='input-group-text eye-icon borderless' style={{ cursor: 'pointer' }} onClick={() => { setView(!view) }}>{view ? <i className='fa fa-eye'></i> : <i className='fa fa-eye-slash'></i>}</div>
+                    placeholder="Password"
+                    {...register("password", { required: true })} onFocus={() => { setError(false) }} />
+                  <div className="input-group-text eye-icon borderless" style={{ cursor: "pointer" }} onClick={() => { setView(!view) }}>{view ? <i className="fa fa-eye"></i> : <i className="fa fa-eye-slash"></i>}</div>
                 </div>
                 {errors?.password && <div className="text-danger">Password is required</div>}
               </div>
 
-              <div className='col-12 mt-2 mb-3'>
+              <div className="col-12 mt-2 mb-4">
                 <div className="col d-flex justify-content-between p-0">
                   <div className="form-check">
-                    <input className="form-check-input" type="checkbox" id="remember" {...register('remember')} />
+                    <input className="form-check-input" type="checkbox" id="remember" {...register("remember")} />
                     <label className="form-check-label" htmlFor="remember"> Remember me </label>
                   </div>
                   <div>
@@ -136,10 +134,10 @@ function Login() {
                 </div>
               </div>
 
-              <div className='col-12'>
+              <div className="col-12">
                 <button type="submit" className="btn btn-light float-center btn-block login-button">Login</button>
-                <h6 className='text-light text-center mt-3'>Don't have an account?
-                  <Link className='navigation' onClick={handlePage}> <u>Sign up!</u></Link>
+                <h6 className="text-light text-center mt-4" style={{ fontSize: "0.9rem", opacity: 0.85 }}>Don't have an account?{" "}
+                  <Link className="navigation" onClick={handlePage}> <u>Sign up!</u></Link>
                 </h6>
               </div>
 

@@ -141,51 +141,53 @@ function Home({ props }) {
       <form onSubmit={handleSubmit(newChat)}>
         <div className="input-group">
           <input type="number" className="form-control searchInput"
-            autoComplete='off'
+            autoComplete="off"
             placeholder="Enter mobile no."
             onKeyDown={e => e.key === 'e' && e.preventDefault()}
             {...register('search', { required: true, minLength: 10 })}
             aria-invalid={errors?.password ? "true" : "false"}
           />
           <div className="input-group-append">
-            <button className="input-group-text search_icon py-0 border-left-0" type='submit' title='search' ><img src={findperson} width={30} alt='search' /></button>
+            <button className="input-group-text search_icon py-0 border-left-0" type="submit" title="search" ><img src={findperson} width={28} alt="search" /></button>
           </div>
         </div>
-        {errors?.search?.type === 'minLength' && <div className='text-danger'>Enter valid number</div>}
+        {errors?.search?.type === 'minLength' && <div className="text-danger mt-1">Enter valid number</div>}
       </form>
-      <div className='mt-2' style={{ cursor: 'pointer', maxHeight: '67vh', overflowX: 'hidden', overflowY: 'auto' }} >
+      <div className="chat-list-container mt-3" style={{ cursor: "pointer", maxHeight: "67vh", overflowX: "hidden", overflowY: "auto" }} >
         {
           list?.map((item, index) => (
             <div
               key={index}
-              className="hoverRow border-bottom border-danger rounded text-light font-weight-bold text-capitalize p-1 d-flex align-items-center"
+              className={`hoverRow d-flex align-items-center ${to?.user_id === item?.user_id ? 'activeRow' : ''}`}
             >
-              <div className={item?.alive ? 'bg-success p-1 rounded' : 'p-1'} style={{ marginBottom: '35px' }}></div>
-              <div >
+              <div className="avatar-wrapper" onClick={() => item?.profile && viewProfile(item?.profile)}>
                 <img
                   id={`imgpr_${index}`}
-                  alt='profile'
-                  className='profile mx-2'
+                  alt="profile"
+                  className="profile-avatar"
                   src={item?.profile ? item?.profile : profile}
                   onError={() => document.getElementById(`imgpr_${index}`).src = profile}
-                  onClick={() => item?.profile && viewProfile(item?.profile) }
                 />
+                {item?.alive && <span className="online-badge"></span>}
               </div>
-              <div className='col-8' onClick={() => { setTo({ user_id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
-                <div className='row'>{item?.name}
-                  <span className='ml-2'>
-                    {item?.newmsg !== 0 && <span className='bg-info text-light px-2 py-1 newmsgcount'>{item?.newmsg}</span>}
-                  </span>
+              <div className="chat-info" onClick={() => { setTo({ user_id: item.user_id, name: item?.name, profile: item?.profile ? item?.profile : null }) }}>
+                <div className="chat-name-row d-flex align-items-center justify-content-between">
+                  <span className="chat-name">{item?.name}</span>
+                  {item?.newmsg !== 0 && <span className="newmsgcount">{item?.newmsg}</span>}
                 </div>
-                <div className='row'> {!item?.alive && <span className='small'>{item?.last_seen} </span>}</div>
+                <div className="chat-status-row">
+                  {item?.alive ? <span className="online-text">Online</span> : <span className="last-seen-text">{item?.last_seen}</span>}
+                </div>
               </div>
-              <div className='col text-right'>
-                <button className='btn btn-link messagedel' title='delete all text you sent' onClick={() => { deleteChat(item?.user_id) }}><i className='fa fa-trash'></i></button>
+              <div className="chat-actions">
+                <button className="messagedel-btn" title="Delete conversation" onClick={() => { deleteChat(item?.user_id) }}>
+                  <i className="fa fa-trash"></i>
+                </button>
               </div>
             </div>
           ))
         }
-        {(list?.length === 0 && !loading) && <div className='text-center text-secondary h4 mt-4 p-2'>No chats</div>}
+        {(list?.length === 0 && !loading) && <div className="text-center text-secondary h5 mt-4 p-2">No chats</div>}
       </div>
 
       {/* modal */}

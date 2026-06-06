@@ -1,94 +1,300 @@
-.header {
-    background-color: #231556;
-    color: #ffffff;
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Outfit', sans-serif !important;
+    background-color: #09061a !important;
+    overflow-x: hidden;
 }
 
-.login-form{
-    padding: 20px;
-    height: 100vh;
+/* Overlay for the background image to make it deep and moody */
+#root::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(9, 6, 26, 0.25) 0%, rgba(9, 6, 26, 0.85) 100%);
+    z-index: 0;
+    pointer-events: none;
+}
+
+.fixed-top {
+    z-index: 10;
+}
+
+.header {
+    background-color: rgba(9, 6, 26, 0.4) !important;
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.login-form {
+    min-height: 100vh;
+    padding: 40px 20px;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ffffff !important;
+    position: relative;
+    z-index: 2;
 }
 
-.login-form .form{
-    width: 70vh;
-    /* height: 70vh; */
-    padding: 10px;
-    background-color: #2315567e;
-    backdrop-filter: blur(3px);
+.login-form .form {
+    width: 100%;
+    max-width: 440px;
+    padding: 2.5rem !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.01) 100%) !important;
+    backdrop-filter: blur(20px) saturate(190%);
+    -webkit-backdrop-filter: blur(20px) saturate(190%);
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 24px !important;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.form-normal{
-    box-shadow: 0px 0px 5px 2px #f0f0f0c0;
+.form-normal {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 
+                inset 0 1px 1px rgba(255, 255, 255, 0.1),
+                0 0 30px rgba(0, 255, 198, 0.03);
 }
 
-.form-error{
-    box-shadow: 0px 0px 5px 2px #ff000071;
+.form-error {
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 
+                inset 0 1px 1px rgba(255, 59, 48, 0.15),
+                0 0 30px rgba(255, 59, 48, 0.15);
+    border-color: rgba(255, 59, 48, 0.3) !important;
 }
 
-.login-title{
-    color: #ffb300 !important;
+/* Card Branding & Logo */
+.brand-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.brand-logo {
+    filter: drop-shadow(0 0 10px rgba(0, 255, 198, 0.45));
+    animation: float 4s ease-in-out infinite;
+    margin-bottom: 0.75rem;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+}
+
+.brand-text {
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #ffffff 0%, #00ffc6 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.login-title {
+    color: rgba(255, 255, 255, 0.9) !important;
     text-align: center;
-    margin-top: 10px;
-    font-weight: bold;
-    font-size: x-large;
-    font-family: 'Times New Roman', Times, serif;
+    margin-bottom: 1.75rem;
+    font-weight: 600;
+    font-size: 1.35rem;
+    letter-spacing: 0.5px;
 }
-/* Remove bootstrap focus design */
+
+/* Remove default bootstrap focus styles */
 .form-control:focus,
 .form-control:active {
     outline: none !important;
-    box-shadow: none;
-    border-color: #ffffff;
+    box-shadow: none !important;
 }
 
-.login-form input{
-    color: #00ffc6  !important;
-    font-weight: bold !important;
-    border-bottom: 1px solid #ffffff;
-    background-color: #ffffff00 !important;
-    /* font-size: large; */
+/* Modern inputs design */
+.login-form .form-control {
+    color: #ffffff !important;
+    font-weight: 400 !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-radius: 12px !important;
+    padding: 0.8rem 1.1rem !important;
+    height: auto !important;
+    font-size: 0.95rem !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-.login-form input::placeholder{
-    color: #00ffc8a1;
+.login-form .form-control::placeholder {
+    color: rgba(255, 255, 255, 0.35) !important;
     font-weight: 400 !important;
 }
-/* password lock */
+
+.login-form .form-control:focus {
+    background: rgba(255, 255, 255, 0.06) !important;
+    border-color: #00ffc6 !important;
+    box-shadow: 0 0 0 4px rgba(0, 255, 198, 0.12) !important;
+}
+
+/* Password eye icon alignment */
+.input-group {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+}
+
+.login-form .input-group .form-control {
+    border-top-right-radius: 0px !important;
+    border-bottom-right-radius: 0px !important;
+    border-right: none !important;
+}
+
 .eye-icon {
-    background-color: #ffffff00 !important;
-    border-bottom: 1px solid #ffffff;
-    color: #00ffc6;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border-left: none !important;
+    border-top-right-radius: 12px !important;
+    border-bottom-right-radius: 12px !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px !important;
+    cursor: pointer;
+    transition: all 0.3s ease !important;
 }
 
-/* remember */
-.form-check-label{
-    color: #00ffc6;
+.input-group:focus-within .form-control {
+    border-color: #00ffc6 !important;
 }
 
-.login-button{
-    border-radius: 20px;
-    font-weight: bolder;
+.input-group:focus-within .eye-icon {
+    border-color: #00ffc6 !important;
+    color: #00ffc6 !important;
+    background: rgba(255, 255, 255, 0.06) !important;
+    box-shadow: 4px 0 0 4px rgba(0, 255, 198, 0.12) !important; /* custom right shadow matching focus */
 }
 
-.navigation{
-    font-weight: bold;
-    color: #00ffc6;
+/* Checkbox remember me */
+.form-check {
+    display: flex;
+    align-items: center;
+    padding-left: 0 !important;
 }
 
-.navigation:hover{
-    color: #fff;
+.form-check-input {
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    margin-left: 0 !important;
+    margin-right: 8px !important;
+    position: relative !important;
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 4px !important;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-.text-danger{
-    color: #f50017 !important;
+.form-check-input:checked {
+    background-color: #00ffc6 !important;
+    border-color: #00ffc6 !important;
 }
 
-.borderless{
-    border-top: 0px;
-    border-left:0px;
-    border-right:0px;
-    border-radius: 0px;
+.form-check-input:checked::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    font-size: 10px;
+    color: #09061a;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.form-check-label {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.form-check-input:checked + .form-check-label {
+    color: #00ffc6 !important;
+}
+
+/* Buttons */
+.login-button {
+    background: linear-gradient(135deg, #00ffc6 0%, #00b8ff 100%) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    color: #09061a !important;
+    font-weight: 700 !important;
+    padding: 0.85rem 1.5rem !important;
+    font-size: 0.95rem !important;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 255, 198, 0.2);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer;
+}
+
+.login-button:hover, 
+.login-button:focus {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 198, 0.35);
+    color: #09061a !important;
+    opacity: 0.95;
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+/* Navigation links */
+.navigation {
+    font-weight: 600;
+    color: #00ffc6 !important;
+    text-decoration: none !important;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.navigation u {
+    text-decoration: none;
+    border-bottom: 1.5px solid transparent;
+    padding-bottom: 1px;
+    transition: border-color 0.2s ease;
+}
+
+.navigation:hover u {
+    border-color: #00ffc6;
+}
+
+.text-danger {
+    color: #ff3b30 !important;
+    font-size: 0.85rem;
+    margin-top: 0.35rem;
+}
+
+/* Position validation errors absolutely to prevent layout shift and scrollbars */
+.login-form .col-12 {
+    position: relative !important;
+}
+
+.login-form .col-12 .text-danger {
+    position: absolute !important;
+    bottom: -20px !important;
+    left: 15px !important;
+    margin: 0 !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+}
+
+.borderless {
+    /* Kept for class compatibility but styles managed above */
 }

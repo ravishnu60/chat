@@ -13,15 +13,26 @@ function Header({user}) {
     navigate('/');
   }
   return (
-    <div className=''>
-      <div className='text-center p-1 d-flex justify-content-between align-items-center header'>
-        <div></div>
-        <div className='h5 fw-bold offset-1'><span className='align-bottom'>Connect</span> <img src={logo} width={25} /> </div>
-        <div className='d-flex align-items-center'>
-          <button className='btn btn-danger btn-sm' title='sign out' hidden={location.pathname === '/login' ? true : false} onClick={signout}><i className='fas fa-sign-out-alt'></i></button>
-        </div>
+    <div className="header-navbar">
+      <div className="header-logo-group">
+        <span className="header-title">Connect</span>
+        <img src={logo} width={28} className="header-logo" alt="logo" />
       </div>
-      {isMobile && <div className='text-center bg-white h5 p-1'>Welcome <span className='text-success'>{user?.name} </span></div>}
+      <div className="header-actions">
+        {user?.name && (
+          <span className="header-welcome-text d-none d-md-inline">
+            Welcome, <span className="header-username">{user?.name}</span>
+          </span>
+        )}
+        <button
+          className="header-signout-btn"
+          title="Sign Out"
+          hidden={location.pathname === '/login'}
+          onClick={signout}
+        >
+          <i className="fas fa-sign-out-alt"></i> Sign Out
+        </button>
+      </div>
     </div>
   )
 }

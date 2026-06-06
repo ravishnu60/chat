@@ -80,65 +80,48 @@ function Main() {
     }
 
     return (
-        <div className='home_bgd'>
+        <div className="home_bgd">
             {loadingFunc(loading)}
             <Header user={user} />
-            <div className='p-3'>
+            <div className="container py-2">
                 {isMobile ?
-                    <div className='row' style={{ height: '80vh' }}>
+                    <div className="mobile-dashboard-container">
                         {
                             !to ?
-                                <div className='col border-right'>
-                                    <Home props={{ user, loading, setLoading, setTo, viewProfile }} />
-                                </div>
+                                <Home props={{ user, loading, setLoading, setTo, viewProfile }} />
                                 :
-                                <div className='col'>
-                                    {
-                                        to ? <Chat props={{ user, to, loading, setLoading, setTo, viewProfile }} /> :
-                                            <div className='text-center h4 mt-5'>
-                                                <img src={gif1} width='80vh' className='mb-4' /><br />
-                                                <span className='font-weight-bold text-light'>Welcome {user?.name} </span>
-                                            </div>
-                                    }
-                                </div>
+                                <Chat props={{ user, to, loading, setLoading, setTo, viewProfile }} />
                         }
                     </div>
                     :
-                    <div className='row' style={{ height: '80vh' }}>
-                        <div className='col-4 border-right'>
-                            <Home props={{ user, loading,to, setLoading, setTo, getUser, viewProfile }} />
+                    <div className="row dashboard-container">
+                        <div className="col-4 chat-list-sidebar">
+                            <Home props={{ user, loading, to, setLoading, setTo, getUser, viewProfile }} />
                         </div>
-                        <div className='col'>
+                        <div className="col chat-content-area">
                             {
                                 to ? <Chat props={{ user, to, loading, setLoading, setTo, viewProfile }} /> :
-                                    <div className='text-center h4 mt-5'>
-                                        <div className=''>
-                                            {user && <img id='profile'
-                                                className={(user?.profile ? 'profileHome' : '')}
-                                                style={{ cursor: 'pointer' }}
+                                    <div className="default-profile-container">
+                                        <div className="profile-avatar-wrapper">
+                                            {user && <img id="profile"
+                                                className="profileHome"
+                                                style={{ cursor: "pointer", width: "120px", height: "120px", borderRadius: "50%" }}
                                                 src={user?.profile ? user?.profile : gif1}
-                                                width='120vh'
-                                                alt='profile'
-                                                title='change profile'
-                                                onClick={() => document.getElementById('profileUpload').click()}
-                                                onError={() => { document.getElementById(`profile`).src = gif1; console.log("yes"); }} />}
-
-                                            {/* <div>
-                                                <img className='mx-5' src={editing} width={25} />
-                                            </div> */}
+                                                alt="profile"
+                                                title="change profile"
+                                                onClick={() => document.getElementById("profileUpload").click()}
+                                                onError={() => { document.getElementById("profile").src = gif1; }} />}
                                         </div>
-                                        <br />
-                                        <input name='file' type='file' id='profileUpload' style={{ display: 'none' }} onChange={profileChange} />
+                                        <input name="file" type="file" id="profileUpload" style={{ display: "none" }} onChange={profileChange} />
                                         {
                                             profile?.file &&
-                                            <div className='mb-3'>
-                                                <button className='btn btn-success mx-3 btn-sm' onClick={uploadProfile}>Upload</button>
-                                                <button className='btn btn-danger btn-sm' onClick={() => { document.getElementById('profile').src = gif1; setProfile() }}>Cancel</button>
-
+                                            <div className="mb-3">
+                                                <button className="profile-upload-btn mx-2 btn-sm" onClick={uploadProfile}>Upload</button>
+                                                <button className="profile-cancel-btn btn-sm" onClick={() => { document.getElementById("profile").src = gif1; setProfile() }}>Cancel</button>
                                             </div>
                                         }
-                                        {user?.name && <span className='font-weight-bold text-light'>Welcome {user?.name} </span>}
-
+                                        {user?.name && <h2 className="welcome-title">Welcome back, {user?.name}</h2>}
+                                        <p className="welcome-subtitle">Select a conversation from the list or enter a mobile number to start a new chat.</p>
                                     </div>
                             }
                         </div>
