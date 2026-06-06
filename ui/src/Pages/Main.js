@@ -2,13 +2,14 @@ import React, { useEffect, useState } from 'react'
 import Header from '../Menus/Header'
 import Home from './Home'
 import Chat from './Chat'
-import { loadingFunc, userstatus, isMobile, base_url, alert } from '../Utils/Utility';
+import { loadingFunc, userstatus, useIsMobile, base_url, alert } from '../Utils/Utility';
 import gif1 from '../Assets/user.png';
 import editing from '../Assets/image-editing.png';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 function Main() {
+    const isMobile = useIsMobile();
     const [user, setUser] = useState();
     const [to, setTo] = useState();
     const header = { "Authorization": "bearer " + sessionStorage.getItem('token') };

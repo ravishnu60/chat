@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl, alert, isMobile } from '../Utils/Utility';
+import { base_url, permission, requestPermission, userstatus, showNotification, loadingFunc, webSocketUrl, alert, useIsMobile } from '../Utils/Utility';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import typing_gif from '../Assets/typing.gif';
@@ -11,6 +11,7 @@ import { emojis, url } from '../Utils/emojis';
 import uEmojiParser from 'universal-emoji-parser'
 
 function Chat({ props }) {
+  const isMobile = useIsMobile();
   const { user, to, loading, setLoading, setTo, viewProfile } = props;
 
   const [chat, setChat] = useState({ typing: false, message: [] });

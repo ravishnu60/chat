@@ -3,7 +3,6 @@ import { useLocation, useNavigate } from 'react-router'
 import logo from '../Assets/logo.png'
 import { Link } from 'react-router-dom';
 import '../Style/style.css'
-import { isMobile } from '../Utils/Utility';
 
 function Header({user}) {
   const location = useLocation();
